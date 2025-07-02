@@ -66,16 +66,6 @@ class GamepadDemo {
             this.stop();
             this.gamepadIndex = null;
         });
-        
-        // Manual start/stop buttons
-        document.getElementById('start-demo')?.addEventListener('click', () => {
-            this.checkForGamepads();
-            this.start();
-        });
-        
-        document.getElementById('stop-demo')?.addEventListener('click', () => {
-            this.stop();
-        });
     }
     
     checkForGamepads() {
