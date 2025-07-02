@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Gamepad Demo - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="gamepad-section">
+        <h2>🎮 Gamepad API Demo</h2>
+        <p>Connect a gamepad and press buttons to see them detected in real-time.</p>
+        
+        <div class="video-stream-container">
+            <h3>📹 Live Video Stream</h3>
+            <img src="/video_stream" alt="Live Video Stream" class="video-stream" id="video-stream">
+        </div>
+        
+        <div id="gamepad-error" class="error-message" style="display: none;"></div>
+        
+        <div class="gamepad-status">
+            <div class="status-item">
+                <label>Gamepad:</label>
+                <span id="connection-status" class="status-disconnected">Checking...</span>
+            </div>
+            <div class="status-item">
+                <label>WebSocket:</label>
+                <span id="websocket-status" class="status-disconnected">Connecting...</span>
+            </div>
+            <div class="status-item">
+                <label>Controller:</label>
+                <span id="gamepad-info">No gamepad detected</span>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="start-demo" class="btn btn-primary">Start Demo</button>
+            <button id="stop-demo" class="btn btn-secondary">Stop Demo</button>
+        </div>
+    </div>
+    
+    <div class="demo-grid">
+        <div class="demo-card">
+            <h3>Last Button Pressed</h3>
+            <div class="button-display">
+                <span id="last-button" class="button-name">None</span>
+            </div>
+        </div>
+        
+        <div class="demo-card">
+            <h3>Left Analog Stick</h3>
+            <div class="stick-container" id="left-stick">
+                <div class="stick-indicator"></div>
+                <div class="stick-center"></div>
+            </div>
+            <div id="left-stick-values" class="stick-values">X: 0.000, Y: 0.000</div>
+        </div>
+        
+        <div class="demo-card">
+            <h3>Right Analog Stick</h3>
+            <div class="stick-container" id="right-stick">
+                <div class="stick-indicator"></div>
+                <div class="stick-center"></div>
+            </div>
+            <div id="right-stick-values" class="stick-values">X: 0.000, Y: 0.000</div>
+        </div>
+    </div>
+    
+    <div class="history-section">
+        <h3>Button Press History</h3>
+        <div id="button-history" class="button-history">
+            <div class="history-placeholder">Press gamepad buttons to see history...</div>
+        </div>
+    </div>
+    
+    <div class="info-section">
+        <div class="navigation-links">
+            <a href="/" class="nav-link">← Back to Counter Demo</a>
+        </div>
+        
+        <h3>Instructions</h3>
+        <ol>
+            <li>Connect a gamepad to your computer via USB or Bluetooth</li>
+            <li>Press any button on the gamepad to activate it</li>
+            <li>Click "Start Demo" if detection doesn't start automatically</li>
+            <li>Press buttons and move analog sticks to see real-time feedback</li>
+            <li><strong>WebSocket:</strong> Gamepad data is sent to the server in real-time</li>
+            <li><strong>Server Logs:</strong> Check the server console to see gamepad data logging</li>
+        </ol>
+        
+        <div class="button-mapping">
+            <h4>Standard Button Mapping</h4>
+            <div class="mapping-grid">
+                <div class="mapping-item">A/Cross - Button 0</div>
+                <div class="mapping-item">B/Circle - Button 1</div>
+                <div class="mapping-item">X/Square - Button 2</div>
+                <div class="mapping-item">Y/Triangle - Button 3</div>
+                <div class="mapping-item">Left Bumper - Button 4</div>
+                <div class="mapping-item">Right Bumper - Button 5</div>
+                <div class="mapping-item">Start - Button 9</div>
+                <div class="mapping-item">D-Pad directions - Buttons 12-15</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', path='/js/gamepad.js') }}"></script>
+{% endblock %}

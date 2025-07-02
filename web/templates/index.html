@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="demo-section">
+        <h2>HTMX Counter Demo</h2>
+        <p>This demonstrates HTMX functionality with a simple counter.</p>
+        
+        <div id="counter-container">
+            {% include "counter.html" %}
+        </div>
+        
+        <div class="button-group">
+            <button 
+                hx-post="/increment" 
+                hx-target="#counter-container"
+                class="btn btn-primary">
+                + Increment
+            </button>
+            
+            <button 
+                hx-post="/decrement" 
+                hx-target="#counter-container"
+                class="btn btn-secondary">
+                - Decrement
+            </button>
+            
+            <button 
+                hx-post="/reset" 
+                hx-target="#counter-container"
+                class="btn btn-danger">
+                🔄 Reset
+            </button>
+        </div>
+    </div>
+    
+    <div class="info-section">
+        <h3>About This Demo</h3>
+        <ul>
+            <li>FastAPI backend with Jinja2 templates</li>
+            <li>HTMX for dynamic interactions</li>
+            <li>No complex JavaScript required</li>
+            <li>Vanilla CSS styling</li>
+        </ul>
+        
+        <div class="navigation-links">
+            <h4>More Demos</h4>
+            <a href="/gamepad" class="nav-link">🎮 Gamepad API Demo</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

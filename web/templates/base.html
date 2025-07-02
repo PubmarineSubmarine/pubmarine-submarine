@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Pubmarine Submarine{% endblock %}</title>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/gamepad.css') }}">
+</head>
+<body>
+    <header>
+        <h1>🚢 Pubmarine Submarine</h1>
+        <p>FastAPI + HTMX Demo</p>
+    </header>
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer>
+        <p>Powered by FastAPI & HTMX</p>
+    </footer>
+</body>
+</html>
