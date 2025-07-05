@@ -1,15 +1,8 @@
 {% extends "base.html" %}
-
-{% block title %}Gamepad Demo - {{ super() }}{% endblock %}
-
 {% block content %}
 <div class="container">
-    <div class="gamepad-section">
-        <h2>🎮 Gamepad API Demo</h2>
-        <p>Connect a gamepad and press buttons to see them detected in real-time.</p>
-        
+    <div class="gamepad-section">        
         <div class="video-stream-container">
-            <h3>📹 Live Video Stream with Gamepad Overlay</h3>
             <div class="video-overlay-wrapper">
                 <img src="/video_stream" alt="Live Video Stream" class="video-stream" id="video-stream">
                 
@@ -25,7 +18,6 @@
                     
                     <!-- Left Analog Stick - Bottom Left -->
                     <div class="overlay-stick-left">
-                        <div class="overlay-label">Left Stick</div>
                         <div class="stick-container-overlay" id="left-stick">
                             <div class="stick-indicator"></div>
                             <div class="stick-center"></div>
@@ -35,8 +27,7 @@
                     
                     <!-- Right Analog Stick - Bottom Right -->
                     <div class="overlay-stick-right">
-                        <div class="overlay-label">Right Stick</div>
-                        <div class="stick-container-overlay" id="right-stick">
+`                           <div class="stick-container-overlay" id="right-stick">
                             <div class="stick-indicator"></div>
                             <div class="stick-center"></div>
                         </div>
@@ -72,12 +63,6 @@
         <h3>Button Press History</h3>
         <div id="button-history" class="button-history">
             <div class="history-placeholder">Press gamepad buttons to see history...</div>
-        </div>
-    </div>
-    
-    <div class="info-section">
-        <div class="navigation-links">
-            <a href="/" class="nav-link">← Back to Counter Demo</a>
         </div>
     </div>
 </div>

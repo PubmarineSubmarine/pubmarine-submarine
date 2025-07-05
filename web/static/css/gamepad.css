@@ -1,7 +1,6 @@
 /* Gamepad Demo Specific Styles */
 
 .gamepad-section {
-    padding: 3rem;
     text-align: center;
     border-bottom: 1px solid #eee;
 }
@@ -49,6 +48,8 @@
     background: #000;
     display: block;
     object-fit: contain;
+    max-height: 90vh;
+
 }
 
 .gamepad-overlay {
@@ -88,7 +89,7 @@
     border-radius: 8px;
     padding: 12px 20px;
     border: 2px solid rgba(0, 123, 255, 0.8);
-    min-width: 120px;
+    min-width: 140px;
     backdrop-filter: blur(8px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
@@ -105,6 +106,7 @@
     bottom: 15px;
     left: 15px;
     text-align: center;
+    width: 140px;
 }
 
 /* Right Stick Overlay - Bottom Right */
@@ -113,6 +115,7 @@
     bottom: 15px;
     right: 15px;
     text-align: center;
+    width: 140px;
 }
 
 /* Stick Container Overlay */
@@ -148,8 +151,7 @@
     transition: all 0.1s ease;
     border: 2px solid rgba(255, 255, 255, 0.9);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-    top: 40px;
-    left: 40px;
+    /* Initial position will be set by JavaScript - center at 40px, 40px */
 }
 
 /* Stick Values Overlay */
@@ -163,6 +165,9 @@
     margin-top: 5px;
     backdrop-filter: blur(4px);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    width: 140px;
+    text-align: center;
+    white-space: nowrap;
 }
 
 .error-message {

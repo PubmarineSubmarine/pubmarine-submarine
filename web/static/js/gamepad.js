@@ -1,9 +1,4 @@
-/**
- * Gamepad API Demo - Vanilla JavaScript
- * Displays gamepad button presses and analog stick positions
- */
-
-class GamepadDemo {
+class GamepadController {
     constructor() {
         this.gamepadIndex = null;
         this.previousButtons = [];
@@ -14,10 +9,10 @@ class GamepadDemo {
         
         // Button mapping for standard gamepad
         this.buttonNames = {
-            0: 'A / Cross',
-            1: 'B / Circle', 
-            2: 'X / Square',
-            3: 'Y / Triangle',
+            0: 'A',
+            1: 'B', 
+            2: 'X',
+            3: 'Y',
             4: 'Left Bumper',
             5: 'Right Bumper',
             6: 'Left Trigger',
@@ -210,10 +205,11 @@ class GamepadDemo {
             const adjustedX = Math.abs(x) < deadzone ? 0 : x;
             const adjustedY = Math.abs(y) < deadzone ? 0 : y;
             
-            // Update visual indicator (assuming a 100px container)
-            const centerX = 50;
-            const centerY = 50;
-            const maxRadius = 40;
+            // Update visual indicator (80px container)
+            const containerSize = 80;
+            const centerX = containerSize / 2;
+            const centerY = containerSize / 2;
+            const maxRadius = (containerSize / 2) - 10; // Leave some margin from edge
             
             const visualX = centerX + (adjustedX * maxRadius);
             const visualY = centerY + (adjustedY * maxRadius);
@@ -342,14 +338,11 @@ document.addEventListener('DOMContentLoaded', () => {
             errorEl.style.display = 'block';
             errorEl.innerHTML = `
                 <strong>Secure Context Required</strong><br>
-                The Gamepad API requires HTTPS. Please access this page via:<br>
-                <code>https://localhost:8000/gamepad</code><br>
-                <small>Or use the HTTPS server command below.</small>
+                The Gamepad API requires HTTPS.<br>
             `;
         }
         return;
     }
     
-    // Initialize gamepad demo
-    window.gamepadDemo = new GamepadDemo();
+    window.gamepadController = new GamepadController();
 });

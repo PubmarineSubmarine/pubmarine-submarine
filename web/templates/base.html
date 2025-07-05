@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Pubmarine Submarine{% endblock %}</title>
-    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <title>{% block title %}Mission Control{% endblock %}</title>
+    <script src="{{ url_for('static', path='/js/htmx.org@1.9.12') }}"></script>
+   <link rel="icon" type="image/x-icon" href="{{ url_for('static', path='/sub.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/gamepad.css') }}">
 </head>
 <body>
     <header>
-        <h1>🚢 Pubmarine Submarine</h1>
-        <p>FastAPI + HTMX Demo</p>
+        <h1>Pubmarine Submarine Mission Control</h1>
     </header>
     
     <main>
@@ -19,7 +19,7 @@
     </main>
     
     <footer>
-        <p>Powered by FastAPI & HTMX</p>
+        <p>Please use caution while piloting the submarine.</p>
     </footer>
 </body>
 </html>
