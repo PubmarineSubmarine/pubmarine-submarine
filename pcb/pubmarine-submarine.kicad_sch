@@ -5041,6 +5041,223 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "pubmarine-submarine:MPU-6050_Module"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at -6.604 7.62 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "MPU-6050"
+				(at 5.588 7.62 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "pubmarine-submarine:MPU-6050_Module"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "mems"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "MPU-6050_Module_0_1"
+				(rectangle
+					(start -7.62 6.35)
+					(end 7.62 -6.35)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "MPU-6050_Module_1_1"
+				(pin bidirectional line
+					(at -11.43 3.81 0)
+					(length 3.81)
+					(name "SCL"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -11.43 1.27 0)
+					(length 3.81)
+					(name "SDA"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -11.43 -1.27 0)
+					(length 3.81)
+					(name "XDA"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -11.43 -3.81 0)
+					(length 3.81)
+					(name "XCL"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 0 10.16 270)
+					(length 3.81)
+					(name "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 0 -10.16 90)
+					(length 3.81)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 11.43 1.27 180)
+					(length 3.81)
+					(name "AD0"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at 11.43 -1.27 180)
+					(length 3.81)
+					(name "INT"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 	)
 	(rectangle
 		(start 140.97 19.05)
@@ -5092,7 +5309,7 @@
 	)
 	(rectangle
 		(start 134.62 182.88)
-		(end 233.68 226.06)
+		(end 269.24 226.06)
 		(stroke
 			(width 0)
 			(type default)
@@ -5186,6 +5403,18 @@
 		)
 		(uuid f22a4285-8759-45a7-956e-29ba692ec172)
 	)
+	(rectangle
+		(start 234.95 189.23)
+		(end 267.97 223.52)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(uuid f98e5232-c4b0-415c-994b-34729a5dce8e)
+	)
 	(text "Pressure Sensor"
 		(exclude_from_sim no)
 		(at 147.32 192.278 0)
@@ -5226,6 +5455,16 @@
 		)
 		(uuid "2e1189ff-f911-492d-9926-85c814d2bfd3")
 	)
+	(text "IMU Module"
+		(exclude_from_sim no)
+		(at 242.062 191.008 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "3c54d010-f3b6-47f6-8ee2-513738d393ed")
+	)
 	(text "Main Motors"
 		(exclude_from_sim no)
 		(at 45.72 236.982 0)
@@ -5236,7 +5475,7 @@
 		)
 		(uuid "4245db40-3f15-4598-8fa8-1d69a3f49c68")
 	)
-	(text "IMU Breakout"
+	(text "I2C Breakout"
 		(exclude_from_sim no)
 		(at 196.85 191.77 0)
 		(effects
@@ -5295,6 +5534,16 @@
 			)
 		)
 		(uuid "b68b7b42-a535-4690-b4f2-5e77fee6c9af")
+	)
+	(text "12.6V->3.15V\n11.1V->2.775V\n9.9V->2.475V"
+		(exclude_from_sim no)
+		(at 212.852 217.424 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "b7ab5235-ae4a-4626-9968-9dc04d5f1b15")
 	)
 	(text "Mounting Holes"
 		(exclude_from_sim no)
@@ -5711,8 +5960,16 @@
 		(uuid "0f9afea3-3e46-4b67-b898-0cae5aee9c0f")
 	)
 	(no_connect
+		(at 242.57 207.01)
+		(uuid "2be65da1-d792-4968-9e5f-1b08d2bd5cf9")
+	)
+	(no_connect
 		(at 62.23 260.35)
 		(uuid "394cf44d-d788-489d-b8a6-02b831a94581")
+	)
+	(no_connect
+		(at 242.57 209.55)
+		(uuid "5b3fa93a-a445-437b-bc56-0efaa94f1509")
 	)
 	(no_connect
 		(at 364.49 124.46)
@@ -5721,6 +5978,14 @@
 	(no_connect
 		(at 243.84 260.35)
 		(uuid "8d1c1c32-29f4-4003-af86-7b5a985f400b")
+	)
+	(no_connect
+		(at 265.43 204.47)
+		(uuid "a2e46705-0e64-403f-a6d9-89fd0aa247d2")
+	)
+	(no_connect
+		(at 265.43 207.01)
+		(uuid "bdcde301-bdd4-4602-a677-dc22f831a842")
 	)
 	(no_connect
 		(at 359.41 148.59)
@@ -7522,6 +7787,26 @@
 			)
 		)
 	)
+	(global_label "SCL"
+		(shape bidirectional)
+		(at 242.57 201.93 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "084cd56a-8100-476a-b705-573302e8061c")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 242.57 201.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "FL"
 		(shape bidirectional)
 		(at 50.8 58.42 180)
@@ -8738,6 +9023,26 @@
 		(uuid "d121af87-1cac-481a-bb50-66c2c003bb33")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 86.36 60.96 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "SDA"
+		(shape bidirectional)
+		(at 242.57 204.47 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "d302248b-a157-466b-8774-f791ccf7cbb1")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 242.57 204.47 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10167,7 +10472,6 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "14929422-c759-4ac3-8971-75be137ea099")
 		(property "Reference" "Q2"
 			(at 201.93 48.2599 0)
@@ -10179,7 +10483,7 @@
 			)
 		)
 		(property "Value" "AO3400A"
-			(at 201.93 49.5299 0)
+			(at 201.93 50.546 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10227,6 +10531,94 @@
 			(project "pubmarine-submarine"
 				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
 					(reference "Q2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "pubmarine-submarine:MPU-6050_Module")
+		(at 254 205.74 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "15c323fe-f6d9-44d6-9c40-c1aef7ce16c4")
+		(property "Reference" "U7"
+			(at 256.1433 194.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MPU-6050"
+			(at 256.1433 196.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "pubmarine-submarine:MPU-6050_Module"
+			(at 254 205.74 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 254 205.74 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 254 205.74 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "8"
+			(uuid "b04c8653-1de5-40ec-aa98-87ef918594f5")
+		)
+		(pin "7"
+			(uuid "d9c58efd-cdd2-4f81-93ab-6f2f26e14102")
+		)
+		(pin "2"
+			(uuid "812a4461-e4e9-4a2f-ac09-4b7ef276da58")
+		)
+		(pin "1"
+			(uuid "51f6b85e-d02f-441b-b7a1-31f479d572fa")
+		)
+		(pin "6"
+			(uuid "7511d344-175b-424d-ba17-3648c8eee10b")
+		)
+		(pin "5"
+			(uuid "6cd46fae-9b71-417b-bece-3fdb29a5a5f8")
+		)
+		(pin "4"
+			(uuid "c9bc80da-c35e-4dc8-a48e-82099f2bf634")
+		)
+		(pin "3"
+			(uuid "9e9af24d-c722-4bba-ab03-95b4de7f8914")
+		)
+		(instances
+			(project ""
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "U7")
 					(unit 1)
 				)
 			)
@@ -11804,7 +12196,6 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "2d46da3b-ae3e-4064-9161-5ce3b1026c8b")
 		(property "Reference" "Q3"
 			(at 234.95 48.2599 0)
@@ -11816,7 +12207,7 @@
 			)
 		)
 		(property "Value" "AO3400A"
-			(at 234.95 49.5299 0)
+			(at 234.95 50.546 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15271,7 +15662,6 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "60e92ba1-f8ed-4696-a909-19e2bd498af8")
 		(property "Reference" "Q6"
 			(at 201.93 82.5499 0)
@@ -15283,7 +15673,7 @@
 			)
 		)
 		(property "Value" "AO3400A"
-			(at 201.93 83.8199 0)
+			(at 201.93 84.836 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16285,6 +16675,72 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+5VL")
+		(at 254 195.58 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "7bfccbbf-ed53-4ceb-bbab-dc799f97ccfd")
+		(property "Reference" "#PWR092"
+			(at 254 199.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+5VL"
+			(at 254 190.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 254 195.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 254 195.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+5VL\""
+			(at 254 195.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "3731d106-4d40-45ce-950b-d83ee5fb3cbc")
+		)
+		(instances
+			(project ""
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "#PWR092")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GND")
 		(at 172.72 270.51 0)
 		(unit 1)
@@ -16429,7 +16885,6 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "80462ecc-bca1-42d3-a474-fb385cd85eb2")
 		(property "Reference" "Q1"
 			(at 168.91 48.2599 0)
@@ -16441,7 +16896,7 @@
 			)
 		)
 		(property "Value" "AO3400A"
-			(at 168.91 49.5299 0)
+			(at 168.91 50.546 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -17043,7 +17498,6 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "8a7a7fd5-ea95-4ba7-9b02-b708d3a0c72c")
 		(property "Reference" "Q4"
 			(at 269.24 48.2599 0)
@@ -17055,7 +17509,7 @@
 			)
 		)
 		(property "Value" "AO3400A"
-			(at 269.24 49.5299 0)
+			(at 269.24 50.546 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -17745,7 +18199,6 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "95122448-734b-425b-a269-20d1559888f0")
 		(property "Reference" "Q5"
 			(at 168.91 82.5499 0)
@@ -17757,7 +18210,7 @@
 			)
 		)
 		(property "Value" "AO3400A"
-			(at 168.91 83.8199 0)
+			(at 168.91 84.836 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18226,7 +18679,6 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "9b6b7490-9952-4ab3-8870-5985bf48f788")
 		(property "Reference" "Q8"
 			(at 269.24 82.5499 0)
@@ -18238,7 +18690,7 @@
 			)
 		)
 		(property "Value" "AO3400A"
-			(at 269.24 83.8199 0)
+			(at 269.24 84.836 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18286,6 +18738,72 @@
 			(project "pubmarine-submarine"
 				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
 					(reference "Q8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 254 215.9 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "9d207d9c-2ab5-4944-aa49-97ec3fe29e8f")
+		(property "Reference" "#PWR099"
+			(at 254 222.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 254 220.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 254 215.9 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 254 215.9 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 254 215.9 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c4b668ad-5d7f-4aa1-8cd6-eaf261a5f9b5")
+		)
+		(instances
+			(project ""
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "#PWR099")
 					(unit 1)
 				)
 			)
@@ -19113,7 +19631,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "R"
+		(property "Value" "13k"
 			(at 226.06 213.3599 0)
 			(effects
 				(font
@@ -19183,7 +19701,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "R"
+		(property "Value" "39k"
 			(at 226.06 205.7399 0)
 			(effects
 				(font
@@ -23240,7 +23758,6 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "f3d40e61-7482-4d1f-b5d1-010a6f14d937")
 		(property "Reference" "Q7"
 			(at 234.95 82.5499 0)
@@ -23252,7 +23769,7 @@
 			)
 		)
 		(property "Value" "AO3400A"
-			(at 234.95 83.8199 0)
+			(at 234.95 84.836 0)
 			(effects
 				(font
 					(size 1.27 1.27)
