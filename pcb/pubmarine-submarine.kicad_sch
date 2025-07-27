@@ -5368,7 +5368,7 @@
 		(uuid e90e6a40-cd01-4550-a2b6-1a7534f9a32d)
 	)
 	(rectangle
-		(start 20.32 189.23)
+		(start 19.05 189.23)
 		(end 104.14 215.9)
 		(stroke
 			(width 0)
@@ -10214,7 +10214,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "0.22uF"
+		(property "Value" "220n"
 			(at 142.748 267.97 0)
 			(effects
 				(font
@@ -10713,7 +10713,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100uF"
+		(property "Value" "100u"
 			(at 30.988 267.97 0)
 			(effects
 				(font
@@ -10972,7 +10972,7 @@
 				)
 			)
 		)
-		(property "Value" "470"
+		(property "Value" "470R"
 			(at 254 78.74 90)
 			(effects
 				(font
@@ -11446,7 +11446,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "0.1uF"
+		(property "Value" "100n"
 			(at 25.4 140.9699 0)
 			(effects
 				(font
@@ -11581,7 +11581,7 @@
 				)
 			)
 		)
-		(property "Value" "470"
+		(property "Value" "470R"
 			(at 153.67 78.74 90)
 			(effects
 				(font
@@ -11723,7 +11723,7 @@
 				)
 			)
 		)
-		(property "Value" "470"
+		(property "Value" "470R"
 			(at 219.71 44.45 90)
 			(effects
 				(font
@@ -11791,7 +11791,7 @@
 				)
 			)
 		)
-		(property "Value" "470"
+		(property "Value" "470R"
 			(at 186.69 78.74 90)
 			(effects
 				(font
@@ -12469,7 +12469,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "4.7K"
+		(property "Value" "4k7"
 			(at 176.53 204.4699 0)
 			(effects
 				(font
@@ -12974,7 +12974,7 @@
 				)
 			)
 		)
-		(property "Value" "470"
+		(property "Value" "470R"
 			(at 254 44.45 90)
 			(effects
 				(font
@@ -13173,21 +13173,19 @@
 		(fields_autoplaced yes)
 		(uuid "3ac1b9e2-9292-4e62-a84c-521f11abfaa9")
 		(property "Reference" "R21"
-			(at 368.2999 45.72 0)
+			(at 369.57 36.83 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 370.8399 45.72 0)
+		(property "Value" "1k"
+			(at 369.57 39.37 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
@@ -14713,7 +14711,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100uF"
+		(property "Value" "100u"
 			(at 216.408 116.84 0)
 			(effects
 				(font
@@ -14782,7 +14780,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100uF"
+		(property "Value" "100u"
 			(at 212.598 267.97 0)
 			(effects
 				(font
@@ -16624,7 +16622,7 @@
 				)
 			)
 		)
-		(property "Value" "470"
+		(property "Value" "470R"
 			(at 219.71 78.74 90)
 			(effects
 				(font
@@ -17781,21 +17779,19 @@
 		(fields_autoplaced yes)
 		(uuid "8e2fd46d-31ee-4ea6-8e05-40538e1d64d1")
 		(property "Reference" "R23"
-			(at 365.7599 106.68 0)
+			(at 367.03 97.79 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
-		(property "Value" "330"
-			(at 368.2999 106.68 0)
+		(property "Value" "330R"
+			(at 367.03 100.33 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
@@ -18140,7 +18136,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "10K"
+		(property "Value" "10k"
 			(at 148.59 207.0099 0)
 			(effects
 				(font
@@ -20778,7 +20774,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100uF"
+		(property "Value" "100u"
 			(at 205.232 116.84 0)
 			(effects
 				(font
@@ -20847,7 +20843,7 @@
 				)
 			)
 		)
-		(property "Value" "470"
+		(property "Value" "470R"
 			(at 186.69 44.45 90)
 			(effects
 				(font
@@ -21053,7 +21049,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "0.22uF"
+		(property "Value" "220n"
 			(at 22.098 267.97 0)
 			(effects
 				(font
@@ -21320,7 +21316,7 @@
 				)
 			)
 		)
-		(property "Value" "470"
+		(property "Value" "470R"
 			(at 153.67 44.45 90)
 			(effects
 				(font
@@ -21522,7 +21518,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100uF"
+		(property "Value" "100u"
 			(at 91.948 267.97 0)
 			(effects
 				(font
@@ -22522,7 +22518,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "20K"
+		(property "Value" "20k"
 			(at 148.59 214.6299 0)
 			(effects
 				(font
@@ -22582,24 +22578,23 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "e67fa144-6e7d-4313-9029-a9043033013a")
 		(property "Reference" "R26"
-			(at 394.97 118.1099 0)
+			(at 390.906 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 			)
 		)
-		(property "Value" "330"
-			(at 394.97 120.6499 0)
+		(property "Value" "330R"
+			(at 390.906 120.65 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
@@ -22997,7 +22992,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100uF"
+		(property "Value" "100u"
 			(at 151.638 267.97 0)
 			(effects
 				(font
@@ -23207,7 +23202,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "0.22uF"
+		(property "Value" "220n"
 			(at 203.708 267.97 0)
 			(effects
 				(font
@@ -23546,21 +23541,19 @@
 		(fields_autoplaced yes)
 		(uuid "ef86ed15-158c-47f4-8ac9-8fbec86852c8")
 		(property "Reference" "R22"
-			(at 367.0299 74.93 0)
+			(at 368.3 66.04 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
-		(property "Value" "330"
-			(at 369.5699 74.93 0)
+		(property "Value" "330R"
+			(at 368.3 68.58 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
@@ -23623,7 +23616,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "0.22uF"
+		(property "Value" "220n"
 			(at 83.058 267.97 0)
 			(effects
 				(font
@@ -24045,7 +24038,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "4.7K"
+		(property "Value" "4k7"
 			(at 166.37 204.4699 0)
 			(effects
 				(font
