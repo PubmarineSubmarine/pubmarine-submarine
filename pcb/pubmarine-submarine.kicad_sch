@@ -5578,12 +5578,6 @@
 		(uuid "074d637d-5d33-4363-93e1-340722e70be0")
 	)
 	(junction
-		(at 109.22 48.26)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "0ca9a4e3-795e-4cbf-907d-b10b5654a53f")
-	)
-	(junction
 		(at 151.13 250.19)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -11113,74 +11107,6 @@
 			(project "pubmarine-submarine"
 				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
 					(reference "R12")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:PWR_FLAG")
-		(at 109.22 48.26 0)
-		(mirror y)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "1bda0306-0783-4459-bc7a-2e6509a88af5")
-		(property "Reference" "#FLG6"
-			(at 109.22 46.355 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "PWR_FLAG"
-			(at 109.22 43.18 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" ""
-			(at 109.22 48.26 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 109.22 48.26 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Special symbol for telling ERC where power comes from"
-			(at 109.22 48.26 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "05aa5120-20c0-4381-9254-864c95f5aa2b")
-		)
-		(instances
-			(project "pubmarine-submarine"
-				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
-					(reference "#FLG6")
 					(unit 1)
 				)
 			)
