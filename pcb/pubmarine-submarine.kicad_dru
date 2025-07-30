@@ -25,11 +25,11 @@
 #	(constraint track_width (min 0.127mm))
 #)
 
-(rule "Track spacing, outer layer (1oz copper)"
-	(layer outer)
-	(condition "A.Type == 'track' && B.Type == A.Type")
-	(constraint clearance (min 0.127mm))
-)
+#(rule "Track spacing, outer layer (1oz copper)"
+#	(layer outer)
+#	(condition "A.Type == 'track' && B.Type == A.Type")
+#	(constraint clearance (min 0.127mm))
+#)
 
 (rule "Track width, inner layer"
 	(layer inner)
