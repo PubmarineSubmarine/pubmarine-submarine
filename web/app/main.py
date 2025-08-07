@@ -93,25 +93,22 @@ def log_gamepad_data(data: dict):
 
 @app.get("/cam")
 async def proxy_cam(request: Request):
-
     target_url = "http://localhost:8889/cam"
     
     headers = dict(request.headers)
     if "host" in headers:
         del headers["host"]
     
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.get(
-            url=target_url,
-            headers=headers,
-            params=request.query_params
-        )
-        
-        return StreamingResponse(
-            response.aiter_bytes(),
-            media_type=response.headers.get("content-type"),
-            headers=dict(response.headers)
-        )
+    async def stream_proxy():
+        async with httpx.AsyncClient(timeout=None) as client:
+            async with client.stream("GET", target_url, headers=headers, params=request.query_params) as response:
+                async for chunk in response.aiter_bytes():
+                    yield chunk
+    
+    return StreamingResponse(
+        stream_proxy(),
+        media_type="application/octet-stream"
+    )
 
 if __name__ == "__main__":
     import uvicorn
