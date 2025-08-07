@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, Request, Response, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -91,24 +91,125 @@ def log_gamepad_data(data: dict):
         logger.info(f"🎮 GAMEPAD DATA: {data}")
 
 
-@app.get("/cam")
+WEBRTC_SERVER_URL = "http://localhost:8889"
+
+@app.api_route("/cam", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
 async def proxy_cam(request: Request):
-    target_url = "http://localhost:8889/cam"
-    
-    headers = dict(request.headers)
-    if "host" in headers:
-        del headers["host"]
-    
-    async def stream_proxy():
-        async with httpx.AsyncClient(timeout=None) as client:
-            async with client.stream("GET", target_url, headers=headers, params=request.query_params) as response:
-                async for chunk in response.aiter_bytes():
-                    yield chunk
-    
-    return StreamingResponse(
-        stream_proxy(),
-        media_type="application/octet-stream"
-    )
+    """
+    Proxy all requests to the WebRTC server at /cam endpoint
+    """
+    try:
+        # Construct the target URL
+        target_url = f"{WEBRTC_SERVER_URL}/cam"
+        
+        # Get request body if it exists
+        body = await request.body()
+        
+        # Prepare headers (exclude host header to avoid conflicts)
+        headers = dict(request.headers)
+        if "host" in headers:
+            del headers["host"]
+        
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            # Forward the request to the WebRTC server
+            response = await client.request(
+                method=request.method,
+                url=target_url,
+                headers=headers,
+                content=body,
+                params=request.query_params
+            )
+            
+            # For streaming responses (like video streams)
+            if "stream" in response.headers.get("content-type", "").lower():
+                return StreamingResponse(
+                    response.aiter_bytes(),
+                    media_type=response.headers.get("content-type"),
+                    headers=dict(response.headers)
+                )
+            
+            # For regular responses
+            return Response(
+                content=response.content,
+                status_code=response.status_code,
+                headers=dict(response.headers),
+                media_type=response.headers.get("content-type")
+            )
+            
+    except httpx.ConnectError:
+        raise HTTPException(
+            status_code=502, 
+            detail="WebRTC server is not available at localhost:8889"
+        )
+    except httpx.TimeoutException:
+        raise HTTPException(
+            status_code=504, 
+            detail="Request to WebRTC server timed out"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Proxy error: {str(e)}"
+        )
+
+@app.api_route("/cam/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
+async def proxy_cam_subpaths(path: str, request: Request):
+    """
+    Proxy requests to WebRTC server subpaths (e.g., /cam/stream, /cam/config)
+    """
+    try:
+        # Construct the target URL with the subpath
+        target_url = f"{WEBRTC_SERVER_URL}/cam/{path}"
+        
+        # Get request body if it exists
+        body = await request.body()
+        
+        # Prepare headers (exclude host header to avoid conflicts)
+        headers = dict(request.headers)
+        if "host" in headers:
+            del headers["host"]
+        
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            # Forward the request to the WebRTC server
+            response = await client.request(
+                method=request.method,
+                url=target_url,
+                headers=headers,
+                content=body,
+                params=request.query_params
+            )
+            
+            # For streaming responses
+            if "stream" in response.headers.get("content-type", "").lower():
+                return StreamingResponse(
+                    response.aiter_bytes(),
+                    media_type=response.headers.get("content-type"),
+                    headers=dict(response.headers)
+                )
+            
+            # For regular responses
+            return Response(
+                content=response.content,
+                status_code=response.status_code,
+                headers=dict(response.headers),
+                media_type=response.headers.get("content-type")
+            )
+            
+    except httpx.ConnectError:
+        raise HTTPException(
+            status_code=502, 
+            detail="WebRTC server is not available at localhost:8889"
+        )
+    except httpx.TimeoutException:
+        raise HTTPException(
+            status_code=504, 
+            detail="Request to WebRTC server timed out"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Proxy error: {str(e)}"
+        )
 
 if __name__ == "__main__":
     import uvicorn
