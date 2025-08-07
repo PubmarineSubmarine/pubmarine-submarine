@@ -1,13 +1,11 @@
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import json
 import logging
-import cv2
-import threading
-import time
-import numpy as np
+
+import httpx
 
 app = FastAPI(title="Pubmarine Submarine", version="0.1.0")
 
@@ -24,12 +22,6 @@ logger = logging.getLogger(__name__)
 # Store active WebSocket connections
 active_connections: list[WebSocket] = []
 
-# Video capture setup
-video_capture = None
-latest_frame = None
-frame_lock = threading.Lock()
-video_thread = None
-video_running = False
 
 @app.get("/", response_class=HTMLResponse)
 async def gamepad_demo(request: Request):
@@ -38,8 +30,8 @@ async def gamepad_demo(request: Request):
         "gamepad.html", 
         {"request": request}
     )
-@app.get("/gamepad")
 
+@app.get("/gamepad")
 async def gamepad_page(request: Request):
     # redirect response to /
     """returns a RedirectResponse to hte index at /"""
@@ -99,106 +91,32 @@ def log_gamepad_data(data: dict):
         logger.info(f"🎮 GAMEPAD DATA: {data}")
 
 
-def init_video_capture():
-    """Initialize video capture from /dev/video0."""
-    global video_capture, video_thread, video_running
-    try:
-        video_capture = cv2.VideoCapture(0)  # /dev/video0
-        if not video_capture.isOpened():
-            logger.warning("Could not open /dev/video0")
-            video_capture = None
-            return False
-        
-        # Set video properties for better performance
-        video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        video_capture.set(cv2.CAP_PROP_FPS, 30)
-        
-        # Start video capture thread
-        video_running = True
-        video_thread = threading.Thread(target=video_capture_loop, daemon=True)
-        video_thread.start()
-        
-        logger.info("📹 Video capture initialized successfully")
-        return True
-    except Exception as e:
-        logger.error(f"Failed to initialize video capture: {e}")
-        video_capture = None
-        return False
+@app.get("/cam")
+async def proxy_cam(request: Request):
 
-
-def generate_error_frame(message: str):
-    """Generate a black frame with an error message."""
-    frame = np.zeros((480, 640, 3), dtype=np.uint8)
-    # Calculate text size to center the message
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 1
-    thickness = 2
-    text_size, _ = cv2.getTextSize(message, font, font_scale, thickness)
-    text_width, text_height = text_size
-    x = (frame.shape[1] - text_width) // 2
-    y = (frame.shape[0] + text_height) // 2
-    cv2.putText(frame, message, (x, y), font, font_scale, (255, 255, 255), thickness)
-    _, buffer = cv2.imencode('.jpg', frame)
-    return buffer.tobytes()
-
-def video_capture_loop():
-    """Continuously capture frames in a separate thread."""
-    global video_capture, latest_frame, video_running
+    target_url = "http://localhost:8889/cam"
     
-    while video_running:
-        if video_capture is None or not video_capture.isOpened():
-            # Create black frame with error message
-            with frame_lock:
-                latest_frame = generate_error_frame("No Video")
-            time.sleep(0.1)
-            continue
-        
-        ret, frame = video_capture.read()
-        if ret:
-            # Encode frame as JPEG and store
-            _, buffer = cv2.imencode('.jpg', frame)
-            with frame_lock:
-                latest_frame = buffer.tobytes()
-        else:
-            logger.warning("Failed to read video frame")
-        
-        time.sleep(1/30)
-
-
-def generate_video_stream():
-    """Generate video frames for streaming from shared frame buffer."""
-    global latest_frame
+    headers = dict(request.headers)
+    if "host" in headers:
+        del headers["host"]
     
-    while True:
-        with frame_lock:
-            if latest_frame is not None:
-                frame_bytes = latest_frame
-            else:
-                # Fallback frame if no data yet
-                frame_bytes = generate_error_frame("No Video")
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.get(
+            url=target_url,
+            headers=headers,
+            params=request.query_params
+        )
         
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
-        
-        time.sleep(1 / 30)
-
-
-@app.get("/video_stream")
-async def video_stream():
-    """Serve video stream from /dev/video0."""
-    return StreamingResponse(
-        generate_video_stream(),
-        media_type="multipart/x-mixed-replace; boundary=frame"
-    )
-
+        return StreamingResponse(
+            response.aiter_bytes(),
+            media_type=response.headers.get("content-type"),
+            headers=dict(response.headers)
+        )
 
 if __name__ == "__main__":
     import uvicorn
     from pathlib import Path
-    
-    init_video_capture()
-    
+        
     cert_file = Path("certs/cert.pem")
     key_file = Path("certs/key.pem")
     
