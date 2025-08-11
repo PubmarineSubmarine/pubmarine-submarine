@@ -118,6 +118,8 @@ class GamepadController {
             
             if (!wasPressed && isPressed) {
                 this.onButtonPress(index, button.value);
+            } else if (wasPressed && !isPressed) {
+                this.onButtonRelease(index, button.value)
             }
         });
         
@@ -126,6 +128,17 @@ class GamepadController {
         
         // Store current button state for next frame (store just the pressed boolean)
         this.previousButtons = gamepad.buttons.map(button => button.pressed);
+    }
+
+    onButtonRelease(buttonIndex, value) {
+        const buttonName = this.buttonNames[buttonIndex] || `Button ${buttonIndex}`;
+        this.sendWebSocketData({
+            type: 'button_release',
+            button_index: buttonIndex,
+            button_name: buttonName,
+            value: value,
+            timestamp: Date.now()
+        }); 
     }
     
     onButtonPress(buttonIndex, value) {

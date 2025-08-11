@@ -21,14 +21,14 @@ class Command(BaseModel):
         text = text.strip()
         chunks = text.split(" ")
 
-        command_dict = {"modifiers": []}
+        command_dict = {"flags": []}
         for chunk in chunks:
             if "name" not in command_dict:
                 command_dict["name"] = chunk
                 continue
             arg_name, delim, arg_val = chunk.partition("=")
             if delim != "=":
-                command_dict["modifiers"].append(chunk)
+                command_dict["flags"].append(chunk)
             command_dict[arg_name] = arg_val
         
         model = CommandModel(command=command_dict)
