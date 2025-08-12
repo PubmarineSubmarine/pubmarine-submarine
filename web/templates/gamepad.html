@@ -15,6 +15,9 @@
                             <span id="last-button" class="button-name">None</span>
                         </div>
                     </div>
+                    <div class="overlay-status-left">
+                        <div id="left-status-values" class="stick-values-overlay status-values">Waiting for telemetry</div>
+                    </div>
                     
                     <!-- Left Analog Stick - Bottom Left -->
                     <div class="overlay-stick-left">
@@ -41,21 +44,17 @@
         
         <div class="gamepad-status">
             <div class="status-item">
-                <label>Gamepad:</label>
+                <label>Controller:</label>
                 <span id="connection-status" class="status-disconnected">Checking...</span>
             </div>
             <div class="status-item">
-                <label>WebSocket:</label>
+                <label>Drone:</label>
                 <span id="websocket-status" class="status-disconnected">Connecting...</span>
-            </div>
-            <div class="status-item">
-                <label>Controller:</label>
-                <span id="gamepad-info">No gamepad detected</span>
             </div>
         </div>
         
-
     </div>
+    <button id="testing-btn">testing</button>
     
     <!-- Controls are now overlayed on the video above -->
     

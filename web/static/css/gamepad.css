@@ -78,8 +78,7 @@
 .overlay-button-display {
     position: absolute;
     top: 15px;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 15px;
     text-align: center;
 }
 
@@ -97,6 +96,14 @@
     font-size: 1.1rem;
     font-weight: 600;
     color: #2c3e50;
+}
+
+.overlay-status-left {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    text-align: left;
+    width: 140px;
 }
 
 /* Left Stick Overlay - Bottom Left */
@@ -167,6 +174,9 @@
     width: 140px;
     text-align: center;
     white-space: nowrap;
+}
+.status-values {
+    text-align: left;
 }
 
 .error-message {
