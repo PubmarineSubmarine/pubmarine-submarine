@@ -5389,6 +5389,17 @@
 		)
 		(uuid f98e5232-c4b0-415c-994b-34729a5dce8e)
 	)
+	(text "TODO revision 2:\nLEDs might be too bright?"
+		(exclude_from_sim no)
+		(at 361.696 50.8 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(color 255 0 0 1)
+			)
+		)
+		(uuid "03ebd1b6-56fb-4eec-b0f4-fea33b5858bd")
+	)
 	(text "Pressure Sensor"
 		(exclude_from_sim no)
 		(at 147.32 192.278 0)
@@ -5418,6 +5429,17 @@
 			)
 		)
 		(uuid "0d2f919e-9f00-415d-997d-8e54ad7a1e0c")
+	)
+	(text "revision 2: LSS pin is the return path for motor current, must go to ground even when not using RS."
+		(exclude_from_sim no)
+		(at 120.65 237.744 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(color 255 0 0 1)
+			)
+		)
+		(uuid "1b85c7a5-3e5b-466c-876f-68093d074cda")
 	)
 	(text "Power output to RPi"
 		(exclude_from_sim no)
@@ -5479,6 +5501,17 @@
 		)
 		(uuid "59860648-9ec2-45fd-b3fb-2a79181fdc9e")
 	)
+	(text "TODO revision 2:\nadd I2C OLED screen footprint?"
+		(exclude_from_sim no)
+		(at 202.438 178.562 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(color 255 0 0 1)
+			)
+		)
+		(uuid "675bd72a-7c28-4c0d-ba2d-c2922e1af3d5")
+	)
 	(text "Power In/Out"
 		(exclude_from_sim no)
 		(at 374.65 20.066 0)
@@ -5488,6 +5521,17 @@
 			)
 		)
 		(uuid "7579ee3e-5a73-427f-b686-f7730fc40762")
+	)
+	(text "TODO revision 2:\nChange pin mappings so GPIO channels do not conflict"
+		(exclude_from_sim no)
+		(at 104.902 99.06 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(color 255 0 0 1)
+			)
+		)
+		(uuid "849ed0a3-28d7-4583-83e4-612aeb996aeb")
 	)
 	(text "I2C Pullups"
 		(exclude_from_sim no)
@@ -5518,6 +5562,17 @@
 			)
 		)
 		(uuid "b7ab5235-ae4a-4626-9968-9dc04d5f1b15")
+	)
+	(text "TODO revision 2:\nchange to USB-A female?"
+		(exclude_from_sim no)
+		(at 370.84 128.778 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(color 255 0 0 1)
+			)
+		)
+		(uuid "bc169b0a-d82c-437a-bfa5-3e3460621061")
 	)
 	(text "Mounting Holes"
 		(exclude_from_sim no)
@@ -5914,28 +5969,12 @@
 		(uuid "ffb4f3c8-359f-4153-83a8-e789d8ef540f")
 	)
 	(no_connect
-		(at 123.19 260.35)
-		(uuid "0682070f-ba79-44ed-8b65-1539a2df066b")
-	)
-	(no_connect
-		(at 182.88 260.35)
-		(uuid "0f9afea3-3e46-4b67-b898-0cae5aee9c0f")
-	)
-	(no_connect
 		(at 242.57 207.01)
 		(uuid "2be65da1-d792-4968-9e5f-1b08d2bd5cf9")
 	)
 	(no_connect
-		(at 62.23 260.35)
-		(uuid "394cf44d-d788-489d-b8a6-02b831a94581")
-	)
-	(no_connect
 		(at 242.57 209.55)
 		(uuid "5b3fa93a-a445-437b-bc56-0efaa94f1509")
-	)
-	(no_connect
-		(at 243.84 260.35)
-		(uuid "8d1c1c32-29f4-4003-af86-7b5a985f400b")
 	)
 	(no_connect
 		(at 265.43 204.47)
@@ -10280,6 +10319,72 @@
 			(project ""
 				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
 					(reference "#PWR53")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 243.84 260.35 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "07102060-aa5f-4cda-bc92-478416cd9af2")
+		(property "Reference" "#PWR084"
+			(at 243.84 266.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 243.84 265.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 243.84 260.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 243.84 260.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 243.84 260.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "21261474-51f4-41e4-8786-b589b599edcf")
+		)
+		(instances
+			(project "pubmarine-submarine"
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "#PWR084")
 					(unit 1)
 				)
 			)
@@ -15059,6 +15164,72 @@
 	)
 	(symbol
 		(lib_id "power:GND")
+		(at 182.88 260.35 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "590673b7-3ded-44ed-8ce7-31b55059524c")
+		(property "Reference" "#PWR087"
+			(at 182.88 266.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 182.88 265.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 182.88 260.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 182.88 260.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 182.88 260.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "533bedb2-a85e-405b-8909-909e4ca21073")
+		)
+		(instances
+			(project "pubmarine-submarine"
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "#PWR087")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
 		(at 377.19 34.29 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -19360,6 +19531,72 @@
 	)
 	(symbol
 		(lib_id "power:GND")
+		(at 62.23 260.35 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "ad6328fb-165e-4519-b70a-a123ee1e3ae0")
+		(property "Reference" "#PWR0100"
+			(at 62.23 266.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 62.23 265.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 62.23 260.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 62.23 260.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 62.23 260.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "d690f6c8-9988-4445-918b-855ac18ab2ce")
+		)
+		(instances
+			(project "pubmarine-submarine"
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "#PWR0100")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
 		(at 50.8 205.74 270)
 		(mirror x)
 		(unit 1)
@@ -22098,6 +22335,72 @@
 			(project "pubmarine-submarine"
 				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
 					(reference "U4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 123.19 260.35 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "dfc0e00b-513a-4291-ad88-59bde56fa6a0")
+		(property "Reference" "#PWR098"
+			(at 123.19 266.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 123.19 265.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 123.19 260.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 123.19 260.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 123.19 260.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "425a50ec-3d13-450e-b497-5507885ba224")
+		)
+		(instances
+			(project "pubmarine-submarine"
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "#PWR098")
 					(unit 1)
 				)
 			)
