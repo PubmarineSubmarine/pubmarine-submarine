@@ -8,26 +8,27 @@ import busio
 import neopixel
 import adafruit_mpu6050
 
-from adafruit_motor import motor
+from adafruit_motor import motor, servo
 
 
 # Main motors
+# Motor W is unusable on board revision 1 due to a PWM channel conflict
 _x1 = pwmio.PWMOut(pins.X1, frequency=440)
 _x2 = pwmio.PWMOut(pins.X2, frequency=440)
 _y1 = pwmio.PWMOut(pins.Y1, frequency=440)
 _y2 = pwmio.PWMOut(pins.Y2, frequency=440)
 _z1 = pwmio.PWMOut(pins.Z1, frequency=440)
 _z2 = pwmio.PWMOut(pins.Z2, frequency=440)
-#_w1 = pwmio.PWMOut(pins.W1, frequency=440)
-#_w2 = pwmio.PWMOut(pins.W2, frequency=440)
+# _w1 = pwmio.PWMOut(pins.W1, frequency=440)
+# _w2 = pwmio.PWMOut(pins.W2, frequency=440)
 motor_x = motor.DCMotor(_x1, _x2)
 motor_y = motor.DCMotor(_y1, _y2)
 motor_z = motor.DCMotor(_z1, _z2)
-#motor_w = motor.DCMotor(_w1, _w2)
+# motor_w = motor.DCMotor(_w1, _w2)
 motor_x.decay_mode = motor.FAST_DECAY
 motor_y.decay_mode = motor.FAST_DECAY
 motor_z.decay_mode = motor.FAST_DECAY
-#motor_w.decay_mode = motor.FAST_DECAY
+# motor_w.decay_mode = motor.FAST_DECAY
 
 # Jets
 jet_fu = digitalio.DigitalInOut(pins.FU)
@@ -49,6 +50,14 @@ jet_rr.switch_to_output()
 
 # Servos
 # TODO
+_sv1 = pwmio.PWMOut(pins.SV1, frequency=50, duty_cycle=0)
+sv1 = servo.Servo(_sv1, min_pulse=500, max_pulse=2500, actuation_range=180)
+_sv2 = pwmio.PWMOut(pins.SV2, frequency=50, duty_cycle=0)
+sv2 = servo.Servo(_sv2, min_pulse=500, max_pulse=2500, actuation_range=180)
+_sv3 = pwmio.PWMOut(pins.SV3, frequency=50, duty_cycle=0)
+sv3 = servo.Servo(_sv3, min_pulse=500, max_pulse=2500, actuation_range=180)
+_sv4 = pwmio.PWMOut(pins.SV4, frequency=50, duty_cycle=0)
+sv4 = servo.Servo(_sv4, min_pulse=500, max_pulse=2500, actuation_range=180)
 
 # WS2812B
 pixels = neopixel.NeoPixel(pins.LED_DATA, 3)

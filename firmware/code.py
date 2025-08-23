@@ -18,7 +18,7 @@ def cmd_mot(params):
     commands = params.split(" ")
     for command in commands:
         channel, _, value = command.partition("=")
-        if channel in ["X", "Y", "Z", "W"]:
+        if channel in ["X", "Y", "Z"]:
             try:
                 value = float(value)
             except Exception:
@@ -37,14 +37,23 @@ def cmd_mot(params):
                 do_error("Range")
                 continue
         # TODO servo range
+        if channel in ["SV1", "SV2", "SV3", "SV4"]:
+            try:
+                value = int(value)
+            except Exception:
+                do_error("Number format")
+                continue
+            if value < 0 or value > 180:
+                do_error("Range")
+                continue
         if channel == "X":
             controls.motor_x.throttle = value
         elif channel == "Y":
             controls.motor_y.throttle = value
         elif channel == "Z":
             controls.motor_z.throttle = value
-        elif channel == "W":
-            controls.motor_w.throttle = value
+        # elif channel == "W":
+        #     controls.motor_w.throttle = value
         elif channel == "FU":
             controls.jet_fu.value = bool(value)
         elif channel == "FD":
@@ -61,6 +70,14 @@ def cmd_mot(params):
             controls.jet_rl.value = bool(value)
         elif channel == "RR":
             controls.jet_rr.value = bool(value)
+        elif channel == "SV1":
+            controls.sv1.angle = value
+        elif channel == "SV2":
+            controls.sv2.angle = value
+        elif channel == "SV3":
+            controls.sv3.angle = value
+        elif channel == "SV4":
+            controls.sv4.angle = value
 
 def cmd_reset(params):
     if params == "SOFT":
@@ -121,9 +138,7 @@ while True:
         else:
             do_error("Unknown command")
 
-    #if usb_cdc.console.in_waiting:
-    #    print(usb_cdc.console.read(usb_cdc.console.in_waiting))
-    print(controls.mpu.acceleration, controls.mpu.gyro)
+    print(controls.mpu.acceleration, controls.mpu.gyro, f"BAT={controls.sensor_battery.value / 65535.0 * 3.3 * 4}")
     controls.led.value = not controls.led.value
     controls.pixels[0] = (random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS))
     controls.pixels[1] = (random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS))
