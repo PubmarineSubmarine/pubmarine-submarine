@@ -37,8 +37,8 @@ class Plumbing:
 
     async def stick_moved(self, stick: str, x: float, y: float):
         if stick == "left":
-            sv1 = int(180 * (y + 1) / 2)
-            sv2 = 180 - sv1
+            sv1 = int(90 + 45*y)
+            sv2 = int(90 - 45*y)
             await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
         elif stick == "right":
             pass
