@@ -128,6 +128,8 @@ class GamepadController {
         // Update analog sticks
         this.updateAnalogSticks(gamepad.axes);
 
+	this.updateAnalogTriggers(gamepad.buttons);
+
         // Store current button state for next frame (store just the pressed boolean)
         this.previousButtons = gamepad.buttons.map(button => button.pressed);
     }
@@ -192,7 +194,17 @@ class GamepadController {
                         y: axes[1],
                         timestamp: Date.now()
                     });
-                }
+		    this.lastLeftStickSent = true;
+                } else if (this.lastLeftStickSent) {
+                    this.sendWebSocketData({
+                        type: 'analog_stick',
+                        stick: 'left',
+                        x: 0.0,
+                        y: 0.0,
+                        timestamp: Date.now()
+                    });
+		    this.lastLeftStickSent = false;
+		}
 
                 // Right stick - only send if outside deadzone
                 if (Math.abs(axes[2]) >= deadzone || Math.abs(axes[3]) >= deadzone) {
@@ -203,9 +215,74 @@ class GamepadController {
                         y: axes[3],
                         timestamp: Date.now()
                     });
-                }
+		    this.lastRightStickSent = true;
+                } else if (this.lastRightStickSent) {
+                    this.sendWebSocketData({
+                        type: 'analog_stick',
+                        stick: 'right',
+                        x: 0.0,
+                        y: 0.0,
+                        timestamp: Date.now()
+                    });
+		    this.lastRightStickSent = false;
+		}
 
                 this.lastStickSent = Date.now();
+            }
+        }
+    }
+
+    updateAnalogTriggers(buttons) {
+        if (buttons.length >= 8) {
+            // Left trigger (button 6)
+            this.updateTriggerDisplay('left-trigger', buttons[6].value);
+
+            // Right trigger (button 7)
+            this.updateTriggerDisplay('right-trigger', buttons[7].value);
+
+            // Send analog trigger data via WebSocket (throttled and with deadzone)
+            if (!this.lastTriggerSent || Date.now() - this.lastTriggerSent > 100) {
+                const deadzone = 0.1;
+
+                // Left trigger - only send if outside deadzone
+                if (Math.abs(buttons[6].value) >= deadzone) {
+                    this.sendWebSocketData({
+                        type: 'analog_trigger',
+                        trigger: 'left',
+                        value: buttons[6].value,
+                        timestamp: Date.now()
+                    });
+		    this.lastLeftTriggerSent = true;
+                } else if (this.lastLeftTriggerSent) {
+                    this.sendWebSocketData({
+                        type: 'analog_trigger',
+                        trigger: 'left',
+                        value: 0,
+                        timestamp: Date.now()
+                    });
+		    this.lastLeftTriggerSent = false;
+		}
+
+                // Right trigger - only send if outside deadzone
+                if (Math.abs(buttons[7].value) >= deadzone) {
+                    this.sendWebSocketData({
+                        type: 'analog_trigger',
+                        trigger: 'right',
+                        value: buttons[7].value,
+                        timestamp: Date.now()
+                    });
+		    this.lastRightTriggerSent = true;
+                } else if (this.lastRightTriggerSent) {
+                    this.sendWebSocketData({
+                        type: 'analog_trigger',
+                        trigger: 'right',
+                        value: 0,
+                        timestamp: Date.now()
+                    });
+		    this.lastRightTriggerSent = false;
+		}
+
+                this.lastTriggerSent = Date.now();
             }
         }
     }
@@ -214,7 +291,7 @@ class GamepadController {
         console.log(`update ${state}`)
         const valuesEl = document.getElementById('left-status-values');
         if (valuesEl) {
-            valuesEl.innerHTML = `Battery: ${state.bat}<br/>Depth: ${state.depth}<br/>Gyro: ${state.gyro}`;
+            valuesEl.innerHTML = `Battery: ${state.bat}<br/>Depth: ${state.depth}<br/>Accel: ${state.acc}<br/>Gyro: ${state.gyro}`;
         }
     }
 
@@ -246,6 +323,38 @@ class GamepadController {
 
         if (valuesEl) {
             valuesEl.textContent = `X: ${x.toFixed(3)}, Y: ${y.toFixed(3)}`;
+        }
+    }
+
+    updateTriggerDisplay(triggerId, value) {
+        const triggerEl = document.getElementById(triggerId);
+        const valuesEl = document.getElementById(`${triggerId}-values`);
+
+        /* if (stickEl) {
+            // Apply deadzone
+            const deadzone = 0.1;
+            const adjustedX = Math.abs(x) < deadzone ? 0 : x;
+            const adjustedY = Math.abs(y) < deadzone ? 0 : y;
+
+            // Update visual indicator (80px container)
+            const containerSize = 80;
+            const centerX = containerSize / 2;
+            const centerY = containerSize / 2;
+            const maxRadius = (containerSize / 2) - 10; // Leave some margin from edge
+
+            const visualX = centerX + (adjustedX * maxRadius);
+            const visualY = centerY + (adjustedY * maxRadius);
+
+            const indicator = stickEl.querySelector('.stick-indicator');
+            if (indicator) {
+                indicator.style.left = `${visualX}px`;
+                indicator.style.top = `${visualY}px`;
+            }
+        } */
+
+        if (valuesEl) {
+	    let label = triggerId == 'left' ? 'LT' : 'RT';
+            valuesEl.textContent = `${label}: ${value.toFixed(3)}`;
         }
     }
 

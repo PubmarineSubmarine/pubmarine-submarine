@@ -14,6 +14,8 @@ class Command(BaseModel):
             if key in Command.model_fields.keys() or key == "name":
                 continue
             val = getattr(self, key)
+            if val is None:
+                continue
             if type(val) is tuple:
                 val = ','.join(str(x) for x in val)
             cmd += f" {key.upper()}={val}"
@@ -53,24 +55,31 @@ class StopCmd(Command):
 
 class MotionCmd(Command):
     name: Literal["MOT"] = "MOT"
-    x: float
-    z: float
-    sv1: int
-    fu: int
-    rd: int
+    x: float | None = None
+    z: float | None = None
+    sv1: int | None = None
+    sv2: int | None = None
+    fu: int | None = None
+    fd: int | None = None
+    fl: int | None = None
+    fr: int | None = None
+    ru: int | None = None
+    rd: int | None = None
+    rl: int | None = None
+    rr: int | None = None
 
 
 class StateCmd(Command):
     name: Literal["STAT"] = "STAT"
-    x: float
-    z: float
-    sv1: int
-    fu: int
-    rd: int
-    acc: tuple[float, float, float]
-    gyro: tuple[float, float, float]
-    depth: float
-    bat: float
+    x: float | None = None
+    z: float | None = None
+    sv1: int | None = None
+    fu: int | None = None
+    rd: int | None = None
+    acc: tuple[float, float, float] | None = None
+    gyro: tuple[float, float, float] | None = None
+    depth: float | None = None
+    bat: float | None = None
 
     @classmethod
     def default(cls) -> Self:

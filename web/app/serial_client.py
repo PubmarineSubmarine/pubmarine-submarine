@@ -3,6 +3,8 @@ import serial
 from serial_asyncio import open_serial_connection
 import logging
 
+from pydantic import ValidationError
+
 from protocol import Command, StateCmd
 
 logger = logging.getLogger(__name__)
@@ -54,9 +56,9 @@ class SerialClient:
 
     async def write_text(self, text: str):
         try:
-            await self.writer.write(text.encode("utf-8"))
-            await self.writer.drain()
             logger.debug(f"TX: {text}")
+            self.writer.write(text.encode("utf-8"))
+            await self.writer.drain()
         except serial.SerialException:
             logger.exception("Error writing data")
 
@@ -65,17 +67,34 @@ class SerialClient:
             data = await self.reader.readline()
             text = data.decode("utf-8").strip()
             return text if text else None
-        except Exception:
+        except Exception as e:
             logger.exception("Error reading data")
+            if isinstance(e, serial.serialutil.SerialException):
+                raise
             return None
 
     async def continuous_read(self):
         while True:
-            data = await self.read_data()
+            try:
+                data = await self.read_data()
+            except serial.serialutil.SerialException:
+                reader, writer = await open_serial_connection(
+                    url=self.port, baudrate=self.baudrate
+                )
+                self.reader = reader
+                self.writer = writer
+                continue
+
             if data:
                 if callback := self.callback:
-                    cmd = Command.deserialize(data.strip())
-                    await callback(cmd)
+                    # logger.debug(f"RX: {data}")
+                    try:
+                        cmd = Command.deserialize(data.strip())
+                        if not isinstance(cmd, StateCmd):
+                            logger.info(cmd)
+                        await callback(cmd)
+                    except ValidationError:
+                        logger.debug(f"RX: {data}")
                 else:
                     logger.debug(f"RX: {data}")
 

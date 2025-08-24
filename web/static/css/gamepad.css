@@ -124,6 +124,22 @@
     width: 140px;
 }
 
+/* Left Trigger Overlay - Mid Left */
+.overlay-trigger-left {
+    position: absolute;
+    bottom: 50%;
+    left: 15px;
+    text-align: center;
+}
+
+/* Left Trigger Overlay - Mid Left */
+.overlay-trigger-right {
+    position: absolute;
+    bottom: 50%;
+    right: 15px;
+    text-align: center;
+}
+
 /* Stick Container Overlay */
 .stick-container-overlay {
     position: relative;
@@ -177,6 +193,20 @@
 }
 .status-values {
     text-align: left;
+}
+.trigger-values-overlay {
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    color: white;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 4px 6px;
+    border-radius: 4px;
+    margin-top: 5px;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    width: 140px;
+    text-align: center;
+    white-space: nowrap;
 }
 
 .error-message {

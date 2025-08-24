@@ -36,7 +36,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # Set up logging for gamepad data
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 @app.get("/", response_class=HTMLResponse)
@@ -82,16 +82,27 @@ async def log_gamepad_data(data: dict):
         value = data["value"]
         button_index = data["button_index"]
         await plumbing.button_pressed(button_index, value)
-        # logger.info(f"🎮 BUTTON: {button_name} pressed (value: {value:.3f})")
+        logger.info(f"🎮 BUTTON: {button_name} pressed (value: {value:.3f})")
 
     elif event_type == "button_release":
-        pass
+        button_name = data.get("button_name", "Unknown")
+        value = data["value"]
+        button_index = data["button_index"]
+        await plumbing.button_released(button_index, value)
+        logger.info(f"🎮 BUTTON: {button_name} released (value: {value:.3f})")
 
     elif event_type == "analog_stick":
         stick = data.get("stick", "unknown")
         x = data.get("x", 0)
         y = data.get("y", 0)
+        await plumbing.stick_moved(stick, x, y)
         logger.info(f"🕹️  STICK: {stick} moved to X:{x:.3f}, Y:{y:.3f}")
+
+    elif event_type == "analog_trigger":
+        trigger = data.get("trigger", "unknown")
+        value = data.get("value", 0)
+        await plumbing.trigger_moved(trigger, value)
+        logger.info(f"🕹️  TRIGGER: {trigger} moved to:{value:.3f}")
 
     elif event_type == "gamepad_connected":
         gamepad_id = data.get("gamepad_id", "Unknown")
