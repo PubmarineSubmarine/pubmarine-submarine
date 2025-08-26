@@ -21,7 +21,7 @@ plumbing = Plumbing()
 
 
 @asynccontextmanager
-async def plumbing_lifespan(app: FastAPI):
+async def plumbing_lifespan(_app: FastAPI):
     await plumbing.init()
     yield
     await plumbing.shutdown()
@@ -54,7 +54,6 @@ async def gamepad_page(request: Request):
 
 @app.websocket("/ws/gamepad")
 async def websocket_endpoint(websocket: WebSocket):
-    """WebSocket endpoint for real-time gamepad data."""
     await websocket.accept()
     plumbing.ws_connect(websocket)
 

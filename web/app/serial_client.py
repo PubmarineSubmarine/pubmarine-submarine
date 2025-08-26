@@ -31,7 +31,7 @@ class DebugSerialClient:
                 logger.exception("Error handling cmd")
 
 class SerialClient:
-    def __init__(self, port="/dev/ttyUSB0", baudrate=9600):
+    def __init__(self, port="/dev/ttyUSB0", baudrate=115200):
         self.port = port
         self.baudrate = baudrate
         self.callback = None
@@ -62,7 +62,7 @@ class SerialClient:
         except serial.SerialException:
             logger.exception("Error writing data")
 
-    async def read_data(self) -> str | None:
+    async def read_line(self) -> str | None:
         try:
             data = await self.reader.readline()
             text = data.decode("utf-8").strip()
@@ -97,5 +97,3 @@ class SerialClient:
                         logger.debug(f"RX: {data}")
                 else:
                     logger.debug(f"RX: {data}")
-
-            await sleep(0.01)

@@ -7,7 +7,6 @@ logger = logging.getLogger(__name__)
 
 class Plumbing:
     def __init__(self):
-        self.headlights = False
         self.connections: list[WebSocket] = []
         # self.serial = DebugSerialClient()
         self.serial = SerialClient("/dev/ttyACM0")
@@ -18,7 +17,8 @@ class Plumbing:
         await self.serial.connect()
 
     async def shutdown(self):
-        pass
+        await self.serial.write_cmd(StopCmd())
+        await self.serial.disconnect()
 
     def ws_connect(self, ws: WebSocket):
         self.connections.append(ws)
