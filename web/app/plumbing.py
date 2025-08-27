@@ -1,15 +1,16 @@
 import logging
 from fastapi import WebSocket
-from protocol import Command, ResetCmd, StateCmd, StopCmd, MotionCmd
-from serial_client import DebugSerialClient, SerialClient
+from protocol import Command, ResetCmd, StopCmd, MotionCmd
+from serial_client import SerialClient
 
 logger = logging.getLogger(__name__)
 
 class Plumbing:
     def __init__(self):
         self.connections: list[WebSocket] = []
-        # self.serial = DebugSerialClient()
+        #self.serial = DebugSerialClient()
         self.serial = SerialClient("/dev/ttyACM0")
+        #self.serial = SerialClient("/dev/pts/13", baudrate=9600)
         self.serial.callback = self.handle_circuitpy_msg
 
     async def init(self):
@@ -31,7 +32,6 @@ class Plumbing:
 
     async def handle_circuitpy_msg(self, msg: Command):
         j = msg.model_dump_json()
-        # logger.debug("forwarding")
         for ws in self.connections:
             await ws.send_text(j)
 

@@ -6,6 +6,7 @@ class GamepadController {
         this.isRunning = false;
         this.websocket = null;
         this.wsConnected = false;
+        this.objectGamepadState = "";
 
         // Button mapping for standard gamepad
         this.buttonNames = {
@@ -104,6 +105,26 @@ class GamepadController {
         this.animationFrame = requestAnimationFrame(() => this.loop());
     }
 
+    gamepadToObject(obj) {
+        if (obj === null || typeof obj !== 'object') {
+            return obj;
+        }
+
+        if (Array.isArray(obj)) {
+            return obj.map(item => this.gamepadToObject(item));
+        }
+
+        const result = {};
+        for (let prop in obj) {
+            const value = obj[prop];
+            if (typeof value !== 'function') {
+                result[prop] = this.gamepadToObject(value);
+            }
+        }
+
+        return result;
+    }
+
     updateGamepadState() {
         const gamepads = navigator.getGamepads();
         const gamepad = gamepads[this.gamepadIndex];
@@ -111,6 +132,13 @@ class GamepadController {
         if (!gamepad) {
             this.stop();
             return;
+        }
+
+        const gamepadObj = this.gamepadToObject(gamepad)
+        if (!_.isEqual(gamepadObj, this.objectGamepadState)) {
+            console.log(gamepadObj)
+            this.objectGamepadState = gamepadObj
+            this.sendWebSocketData(gamepadObj)
         }
 
         // Check buttons
@@ -128,7 +156,7 @@ class GamepadController {
         // Update analog sticks
         this.updateAnalogSticks(gamepad.axes);
 
-	this.updateAnalogTriggers(gamepad.buttons);
+        this.updateAnalogTriggers(gamepad.buttons);
 
         // Store current button state for next frame (store just the pressed boolean)
         this.previousButtons = gamepad.buttons.map(button => button.pressed);
@@ -194,7 +222,7 @@ class GamepadController {
                         y: axes[1],
                         timestamp: Date.now()
                     });
-		    this.lastLeftStickSent = true;
+                    this.lastLeftStickSent = true;
                 } else if (this.lastLeftStickSent) {
                     this.sendWebSocketData({
                         type: 'analog_stick',
@@ -203,8 +231,8 @@ class GamepadController {
                         y: 0.0,
                         timestamp: Date.now()
                     });
-		    this.lastLeftStickSent = false;
-		}
+                    this.lastLeftStickSent = false;
+                }
 
                 // Right stick - only send if outside deadzone
                 if (Math.abs(axes[2]) >= deadzone || Math.abs(axes[3]) >= deadzone) {
@@ -215,7 +243,7 @@ class GamepadController {
                         y: axes[3],
                         timestamp: Date.now()
                     });
-		    this.lastRightStickSent = true;
+                    this.lastRightStickSent = true;
                 } else if (this.lastRightStickSent) {
                     this.sendWebSocketData({
                         type: 'analog_stick',
@@ -224,8 +252,8 @@ class GamepadController {
                         y: 0.0,
                         timestamp: Date.now()
                     });
-		    this.lastRightStickSent = false;
-		}
+                    this.lastRightStickSent = false;
+                }
 
                 this.lastStickSent = Date.now();
             }
@@ -252,7 +280,7 @@ class GamepadController {
                         value: buttons[6].value,
                         timestamp: Date.now()
                     });
-		    this.lastLeftTriggerSent = true;
+                    this.lastLeftTriggerSent = true;
                 } else if (this.lastLeftTriggerSent) {
                     this.sendWebSocketData({
                         type: 'analog_trigger',
@@ -260,8 +288,8 @@ class GamepadController {
                         value: 0,
                         timestamp: Date.now()
                     });
-		    this.lastLeftTriggerSent = false;
-		}
+                    this.lastLeftTriggerSent = false;
+                }
 
                 // Right trigger - only send if outside deadzone
                 if (Math.abs(buttons[7].value) >= deadzone) {
@@ -271,7 +299,7 @@ class GamepadController {
                         value: buttons[7].value,
                         timestamp: Date.now()
                     });
-		    this.lastRightTriggerSent = true;
+                    this.lastRightTriggerSent = true;
                 } else if (this.lastRightTriggerSent) {
                     this.sendWebSocketData({
                         type: 'analog_trigger',
@@ -279,8 +307,8 @@ class GamepadController {
                         value: 0,
                         timestamp: Date.now()
                     });
-		    this.lastRightTriggerSent = false;
-		}
+                    this.lastRightTriggerSent = false;
+                }
 
                 this.lastTriggerSent = Date.now();
             }
@@ -353,7 +381,7 @@ class GamepadController {
         } */
 
         if (valuesEl) {
-	    let label = triggerId == 'left' ? 'LT' : 'RT';
+            let label = triggerId == 'left' ? 'LT' : 'RT';
             valuesEl.textContent = `${label}: ${value.toFixed(3)}`;
         }
     }

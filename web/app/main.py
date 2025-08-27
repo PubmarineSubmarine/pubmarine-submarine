@@ -111,7 +111,8 @@ async def log_gamepad_data(data: dict):
         logger.info("🔌 GAMEPAD DISCONNECTED")
 
     else:
-        logger.info(f"🎮 GAMEPAD DATA: {data}")
+        pass
+        #logger.info(f"🎮 GAMEPAD DATA: {data}")
 
 
 WEBRTC_SERVER_URL = "http://localhost:8889"

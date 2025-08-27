@@ -35,14 +35,37 @@ class SerialClient:
         self.port = port
         self.baudrate = baudrate
         self.callback = None
+        self.connect_loop_task = None
+        self.read_task = None
+        self.writer = None
+        self.reader = None
+
+    async def _connect_loop(self):
+        error_count = 0
+        while True:
+            try:
+                reader, writer = await open_serial_connection(
+                    url=self.port, baudrate=self.baudrate
+                )
+                logger.info(f"Successfully connected: {self.port}")
+                self.reader = reader
+                self.writer = writer
+
+                if self.read_task:
+                    self.read_task.cancel()
+                self.read_task = create_task(self.continuous_read())
+                return
+            except serial.SerialException as e:
+                await sleep(0.2)
+                if error_count == 0:
+                    logger.warning(f"Retrying - {e}")
+                    error_count += 1
 
     async def connect(self):
-        reader, writer = await open_serial_connection(
-            url=self.port, baudrate=self.baudrate
-        )
-        self.reader = reader
-        self.writer = writer
-        self.read_task = create_task(self.continuous_read())
+        if self.connect_loop_task:
+            self.connect_loop_task.cancel()
+        self.connect_loop_task = create_task(self._connect_loop())
+
 
     def disconnect(self):
         if self.writer:
@@ -55,35 +78,30 @@ class SerialClient:
         await self.write_text(cmd.serialize() + "\n")
 
     async def write_text(self, text: str):
+        if not self.writer:
+            return
         try:
             logger.debug(f"TX: {text}")
             self.writer.write(text.encode("utf-8"))
             await self.writer.drain()
         except serial.SerialException:
-            logger.exception("Error writing data")
+            #logger.exception("Error writing data")
+            logger.warning(f"Failed to send serial command: {text}")
 
     async def read_line(self) -> str | None:
-        try:
-            data = await self.reader.readline()
-            text = data.decode("utf-8").strip()
-            return text if text else None
-        except Exception as e:
-            logger.exception("Error reading data")
-            if isinstance(e, serial.serialutil.SerialException):
-                raise
-            return None
+        data = await self.reader.readline()
+        text = data.decode("utf-8").strip()
+        return text if text else None
+
 
     async def continuous_read(self):
         while True:
             try:
-                data = await self.read_data()
-            except serial.serialutil.SerialException:
-                reader, writer = await open_serial_connection(
-                    url=self.port, baudrate=self.baudrate
-                )
-                self.reader = reader
-                self.writer = writer
-                continue
+                data = await self.read_line()
+            except serial.SerialException:
+                logger.warning(f"Disconnected {self.port}")
+                await self.connect()
+                return
 
             if data:
                 if callback := self.callback:
