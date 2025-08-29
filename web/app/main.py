@@ -16,6 +16,7 @@ import logging
 import httpx
 
 from plumbing import Plumbing
+from gpio import cleanup_gpio, initialize_gpio
 
 plumbing = Plumbing()
 
@@ -23,8 +24,10 @@ plumbing = Plumbing()
 @asynccontextmanager
 async def plumbing_lifespan(_app: FastAPI):
     await plumbing.init()
+    initialize_gpio()
     yield
     await plumbing.shutdown()
+    cleanup_gpio()
 
 
 app = FastAPI(lifespan=plumbing_lifespan, title="Pubmarine Submarine", version="0.1.0")

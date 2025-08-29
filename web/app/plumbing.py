@@ -2,6 +2,7 @@ import logging
 from fastapi import WebSocket
 from protocol import Command, ResetCmd, StopCmd, MotionCmd
 from serial_client import SerialClient
+from gpio import reset_pico
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +60,8 @@ class Plumbing:
                 await self.serial.write_cmd(StopCmd())
             case 3:  # Y
                 await self.serial.write_cmd(MotionCmd(sv1=90, sv2=90))
+            case 8: # back / select
+                await reset_pico()
 
     async def button_released(self, index, value):
         pass

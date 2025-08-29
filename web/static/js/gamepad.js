@@ -37,7 +37,7 @@ class GamepadController {
         this.initWebSocket();
         this.updateDisplay();
         document.getElementById("testing-btn").addEventListener("click", () => {
-            this.onButtonPress(1, 1.0);
+            this.onButtonPress(8, 1.0);
         });
     }
 
