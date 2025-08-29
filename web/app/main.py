@@ -1,3 +1,4 @@
+from asyncio import TaskGroup
 from contextlib import asynccontextmanager
 from fastapi import (
     FastAPI,
@@ -61,12 +62,13 @@ async def websocket_endpoint(websocket: WebSocket):
     plumbing.ws_connect(websocket)
 
     try:
-        while True:
-            # Receive gamepad data from client
-            data = await websocket.receive_text()
-            gamepad_data = json.loads(data)
+        async with TaskGroup() as tg:
+            while True:
+                # Receive gamepad data from client
+                data = await websocket.receive_text()
+                gamepad_data = json.loads(data)
 
-            await log_gamepad_data(gamepad_data)
+                tg.create_task(handle_gamepad_data(gamepad_data))
 
     except WebSocketDisconnect:
         plumbing.ws_disconnect(websocket)
@@ -74,6 +76,12 @@ async def websocket_endpoint(websocket: WebSocket):
         logger.error(f"WebSocket error: {e}")
         plumbing.ws_disconnect(websocket)
 
+
+async def handle_gamepad_data(data: dict):
+    try:
+        await log_gamepad_data(data)
+    except Exception:
+        logger.exception("Error handling websocket message")
 
 async def log_gamepad_data(data: dict):
     """Log gamepad data in a readable format."""
@@ -115,6 +123,7 @@ async def log_gamepad_data(data: dict):
 
     else:
         pass
+        # full gamepad state comes in here 
         #logger.info(f"🎮 GAMEPAD DATA: {data}")
 
 
