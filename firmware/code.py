@@ -147,6 +147,9 @@ def cmd_stop(params):
     controls.motor_y.throttle = 0
     controls.motor_z.throttle = 0
     # controls.motor_w.throttle = 0
+    requests.x = 0
+    requests.y = 0
+    requests.z = 0
     controls.jet_fu.value = False
     controls.jet_fd.value = False
     controls.jet_fl.value = False
@@ -155,62 +158,82 @@ def cmd_stop(params):
     controls.jet_rd.value = False
     controls.jet_rl.value = False
     controls.jet_rr.value = False
-    # TODO servos
     controls.sv1.angle = clamp(0, 180, 90 + SV1_ADJUST)
     controls.sv2.angle = clamp(0, 180, 90 + SV2_ADJUST)
+
+def cmd_error(params):
+    raise ValueError(params)
 
 def do_error(params):
     print(f"ERR {params}")
 
 cmd_stop("")
 
-# Main loop
-while True:
-    while select.select([sys.stdin], [], [], 0) == ([sys.stdin], [], []):
-        buffer += sys.stdin.read(1)
-        if buffer[-1] == '\x08':
-            buffer = buffer[0:-2]
-    # print(repr(buffer))
-    lines = []
-    while "\n" in buffer:
-        line, _, buffer = buffer.partition("\n")
-        lines.append(line)
+supervisor.runtime.autoreload = False
+supervisor.set_next_code_file(None, reload_on_error=True, sticky_on_error=True)
 
-    # Main dispatch
-    for line in lines:
-        cmd, _, tail = line.partition(" ")
-        tail = tail.strip()
-        if cmd == "MOT":
-            cmd_mot(tail)
-        elif cmd == "RESET":
-            cmd_reset(tail)
-        elif cmd == "BOOT":
-            cmd_boot(tail)
-        elif cmd == "STOP":
-            cmd_stop(tail)
-        else:
-            do_error("Unknown command")
+try:
+    # Main loop
+    while True:
+        if not supervisor.runtime.serial_connected:
+            cmd_stop("")
+        while select.select([sys.stdin], [], [], 0) == ([sys.stdin], [], []):
+            buffer += sys.stdin.read(1)
+            if buffer[-1] == '\x08':
+                buffer = buffer[0:-2]
+        # print(repr(buffer))
+        lines = []
+        while "\n" in buffer:
+            line, _, buffer = buffer.partition("\n")
+            lines.append(line)
 
-    print(f"# req x = {requests.x}, current x = {controls.motor_x.throttle}")
-    print(f"# req y = {requests.y}, current y = {controls.motor_y.throttle}")
-    print(f"# req z = {requests.z}, current z = {controls.motor_z.throttle}")
-    soft_motor_control(controls.motor_x, requests.x)
-    soft_motor_control(controls.motor_y, requests.y)
-    soft_motor_control(controls.motor_z, requests.z)
+        # Main dispatch
+        for line in lines:
+            cmd, _, tail = line.partition(" ")
+            tail = tail.strip()
+            if cmd == "MOT":
+                cmd_mot(tail)
+            elif cmd == "RESET":
+                cmd_reset(tail)
+            elif cmd == "BOOT":
+                cmd_boot(tail)
+            elif cmd == "STOP":
+                cmd_stop(tail)
+            elif cmd == "ERROR":
+                cmd_error(tail)
+            else:
+                do_error("Unknown command")
 
-    controls.led.value = not controls.led.value
-    controls.pixels[0] = (random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS))
-    controls.pixels[1] = (random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS))
-    controls.pixels[2] = (random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS))
-    time_delta = time.monotonic() - last_tick_time
-    # print("#", last_tick_time, time.monotonic(), time_delta)
-    print(f"STAT X={controls.motor_x.throttle or 0.0} Y={controls.motor_y.throttle or 0.0} Z={controls.motor_z.throttle or 0.0} SV1={controls.sv1.angle or -1} " +
-          f"SV2={controls.sv2.angle or -1} SV3={controls.sv3.angle or -1} SV4={controls.sv4.angle or -1} FU={int(controls.jet_fu.value)} " +
-          f"FD={int(controls.jet_fd.value)} FL={int(controls.jet_fl.value)} FR={int(controls.jet_fr.value)} RU={int(controls.jet_ru.value)} " +
-          f"RD={int(controls.jet_rd.value)} RL={int(controls.jet_rl.value)} RR={int(controls.jet_rr.value)} BAT={controls.sensor_battery.value / 65535.0 * 3.3 * 4} " +
-          f"DEPTH={controls.sensor_depth.value / 65535.0} ACC={controls.mpu.acceleration[0]},{controls.mpu.acceleration[1]},{controls.mpu.acceleration[2]} " +
-          f"GYRO={controls.mpu.gyro[0]},{controls.mpu.gyro[1]},{controls.mpu.gyro[2]}")
-    time_to_sleep = TICK_MS/1000.0 - time_delta
-    if time_to_sleep > 0:
-        time.sleep(time_to_sleep)
-    last_tick_time = time.monotonic()
+        print(f"# req x = {requests.x}, current x = {controls.motor_x.throttle}")
+        print(f"# req y = {requests.y}, current y = {controls.motor_y.throttle}")
+        print(f"# req z = {requests.z}, current z = {controls.motor_z.throttle}")
+        soft_motor_control(controls.motor_x, requests.x)
+        soft_motor_control(controls.motor_y, requests.y)
+        soft_motor_control(controls.motor_z, requests.z)
+
+        controls.led.value = not controls.led.value
+        controls.pixels[0] = (random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS))
+        controls.pixels[1] = (random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS))
+        controls.pixels[2] = (random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS))
+        time_delta = time.monotonic() - last_tick_time
+        # print("#", last_tick_time, time.monotonic(), time_delta)
+        try:
+            acc = controls.mpu.acceleration
+            gyro = controls.mpu.gyro
+        except Exception:
+            import traceback
+            traceback.print_exc()
+            acc = (-1.0, -1.0, -1.0)
+            gyro = (-1.0, -1.0, -1.0)
+        print(f"STAT X={controls.motor_x.throttle or 0.0} Y={controls.motor_y.throttle or 0.0} Z={controls.motor_z.throttle or 0.0} SV1={controls.sv1.angle or -1} " +
+              f"SV2={controls.sv2.angle or -1} SV3={controls.sv3.angle or -1} SV4={controls.sv4.angle or -1} FU={int(controls.jet_fu.value)} " +
+              f"FD={int(controls.jet_fd.value)} FL={int(controls.jet_fl.value)} FR={int(controls.jet_fr.value)} RU={int(controls.jet_ru.value)} " +
+              f"RD={int(controls.jet_rd.value)} RL={int(controls.jet_rl.value)} RR={int(controls.jet_rr.value)} BAT={controls.sensor_battery.value / 65535.0 * 3.3 * 4} " +
+              f"DEPTH={controls.sensor_depth.value / 65535.0} ACC={acc[0]},{acc[1]},{acc[2]} " +
+              f"GYRO={gyro[0]},{gyro[1]},{gyro[2]}")
+        time_to_sleep = TICK_MS/1000.0 - time_delta
+        if time_to_sleep > 0:
+            time.sleep(time_to_sleep)
+        last_tick_time = time.monotonic()
+except KeyboardInterrupt:
+    pass
