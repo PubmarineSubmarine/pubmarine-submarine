@@ -61,15 +61,16 @@ class DebugSerialClient:
                         if self.last_motion_cmd.fr: right_thrust += 1
                         if self.last_motion_cmd.rr: right_thrust += 1
 
-                        yaw_delta += (right_thrust - left_thrust) * 1.5
+                        yaw_delta = (right_thrust - left_thrust) * 15.0
 
-                        self.gyro[0] += (roll_delta - self.gyro[0]) * 0.1  # roll
+                        self.gyro[0] += (roll_delta - self.gyro[0]) * 0.5  # roll
                         self.gyro[1] += (pitch_delta - self.gyro[1]) * 0.1  # pitch
-                        self.gyro[2] += (yaw_delta - self.gyro[2]) * 0.1  # yaw
+                        self.gyro[2] += yaw_delta * 0.3  # yaw accumulates
 
                         self.gyro[0] *= 0.95
                         self.gyro[1] *= 0.95
-                        self.gyro[2] *= 0.95
+                        # Don't decay yaw as much so rotation is visible
+                        self.gyro[2] *= 0.98
 
                     state.gyro = tuple(round(v, 3) for v in self.gyro)
                     await self.callback(state)

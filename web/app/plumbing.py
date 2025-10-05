@@ -42,7 +42,15 @@ class Plumbing:
             sv2 = int(90 - 45*y)
             await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
         elif stick == "right":
+            # Used for the debug impl. No idea what this does to the real sub uncomment at your own risk
             pass
+            #if abs(x) > 0.1:
+            #    if x < 0:
+            #        await self.serial.write_cmd(MotionCmd(fl=1, rl=1))
+            #    else:
+            #        await self.serial.write_cmd(MotionCmd(fr=1, rr=1))
+            #else:
+            #    await self.serial.write_cmd(MotionCmd(fl=0, rl=0, fr=0, rr=0))
 
     async def trigger_moved(self, trigger: str, value: float):
         if trigger == "left":

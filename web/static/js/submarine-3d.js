@@ -11,6 +11,7 @@ class Submarine3D {
         this.camera = null;
         this.renderer = null;
         this.submarine = null;
+        this.grid = null;
         this.animationFrameId = null;
 
         // Gyro data (roll, pitch, yaw in degrees)
@@ -34,23 +35,27 @@ class Submarine3D {
 
         // Scene setup
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x0a1929);
+        this.scene.background = null;
 
         // Camera setup
         const width = container.clientWidth;
         const height = container.clientHeight;
         this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-        this.camera.position.set(0, 2, 6);
-        this.camera.lookAt(0, -1, 0);
+        this.camera.position.set(0, 2.5, 6);
+        this.camera.lookAt(0, -0.5, 0);
 
         // Renderer setup
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         this.renderer.setSize(width, height);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(this.renderer.domElement);
+        this.renderer.sortObjects = true;
 
         // Lighting
         this.setupLighting();
+
+        // Add reference grid
+        this.addGrid();
 
         // Load submarine model
         this.loadModel();
@@ -81,6 +86,22 @@ class Submarine3D {
         const rimLight = new THREE.DirectionalLight(0x4488ff, 0.3);
         rimLight.position.set(-5, 2, -5);
         this.scene.add(rimLight);
+    }
+
+    addGrid() {
+        // Create a grid on the XZ plane (horizontal plane)
+        const gridSize = 60;
+        const gridDivisions = 60;
+        const gridColor = 0x00ffff;
+        const gridOpacity = 0.2;
+
+        const gridHelper = new THREE.GridHelper(gridSize, gridDivisions, gridColor, gridColor);
+
+        gridHelper.material.transparent = true;
+        gridHelper.material.opacity = gridOpacity;
+
+        this.grid = gridHelper;
+        this.scene.add(gridHelper);
     }
 
     loadModel() {
@@ -131,16 +152,17 @@ class Submarine3D {
                 objLoader.load(
                     this.modelPath,
                     (object) => {
-                        // Center the model
+                        // Scale the model to fit the view
                         const box = new THREE.Box3().setFromObject(object);
-                        const center = box.getCenter(new THREE.Vector3());
-                        object.position.sub(center);
-
-                        // Scale the model to fit the view (2x larger)
                         const size = box.getSize(new THREE.Vector3());
                         const maxDim = Math.max(size.x, size.y, size.z);
                         const scale = 4 / maxDim;
                         object.scale.set(scale, scale, scale);
+
+                        // Center the model after scaling
+                        const scaledBox = new THREE.Box3().setFromObject(object);
+                        const center = scaledBox.getCenter(new THREE.Vector3());
+                        object.position.sub(center);
 
                         this.submarine = object;
                         this.scene.add(object);
@@ -172,16 +194,17 @@ class Submarine3D {
         loader.load(
             this.modelPath,
             (object) => {
-                // Center the model
+                // Scale the model to fit the view
                 const box = new THREE.Box3().setFromObject(object);
-                const center = box.getCenter(new THREE.Vector3());
-                object.position.sub(center);
-
-                // Scale the model to fit the view (2x larger)
                 const size = box.getSize(new THREE.Vector3());
                 const maxDim = Math.max(size.x, size.y, size.z);
                 const scale = 4 / maxDim;
                 object.scale.set(scale, scale, scale);
+
+                // Center the model after scaling
+                const scaledBox = new THREE.Box3().setFromObject(object);
+                const center = scaledBox.getCenter(new THREE.Vector3());
+                object.position.sub(center);
 
                 // Apply default material
                 object.traverse((child) => {
@@ -230,8 +253,13 @@ class Submarine3D {
         // Smoothly interpolate rotation
         if (this.submarine) {
             this.submarine.rotation.x += (this.targetRotation.x - this.submarine.rotation.x) * this.smoothing;
-            this.submarine.rotation.y += (this.targetRotation.y - this.submarine.rotation.y) * this.smoothing;
+            // Don't rotate submarine on Y axis - only rotate the grid
             this.submarine.rotation.z += (this.targetRotation.z - this.submarine.rotation.z) * this.smoothing;
+        }
+
+        // Rotate grid to match yaw so camera always looks at back of sub
+        if (this.grid) {
+            this.grid.rotation.y += (this.targetRotation.y - this.grid.rotation.y) * this.smoothing;
         }
 
         if (this.renderer && this.scene && this.camera) {
