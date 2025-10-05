@@ -18,6 +18,11 @@
                     <div class="overlay-status-left">
                         <div id="left-status-values" class="stick-values-overlay status-values">Waiting for telemetry</div>
                     </div>
+
+                    <!-- 3D Submarine Visualization - Top Left -->
+                    <div class="overlay-submarine-3d">
+                        <div id="submarine-3d-container" class="submarine-3d-container"></div>
+                    </div>
                     
                     <!-- Left Analog Stick - Bottom Left -->
                     <div class="overlay-stick-left">
@@ -74,5 +79,30 @@
     </div>
 </div>
 
+<!-- Import map to resolve 'three' bare specifier -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+    // Import Three.js and loaders as ES6 modules
+    import * as THREE from 'three';
+    import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+    import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+
+    // Make THREE and loaders available globally
+    window.THREE = THREE;
+    window.OBJLoader = OBJLoader;
+    window.MTLLoader = MTLLoader;
+
+    // Signal that libraries are ready
+    window.dispatchEvent(new Event('objloader-ready'));
+</script>
+<script src="{{ url_for('static', path='/js/submarine-3d.js') }}"></script>
 <script src="{{ url_for('static', path='/js/gamepad.js') }}"></script>
 {% endblock %}

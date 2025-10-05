@@ -7,6 +7,7 @@ class GamepadController {
         this.websocket = null;
         this.wsConnected = false;
         this.objectGamepadState = "";
+        this.submarine3D = null;
 
         // Button mapping for standard gamepad
         this.buttonNames = {
@@ -36,9 +37,31 @@ class GamepadController {
         this.bindEvents();
         this.initWebSocket();
         this.updateDisplay();
+        this.init3DSubmarine();
         document.getElementById("testing-btn").addEventListener("click", () => {
             this.onButtonPress(8, 1.0);
         });
+    }
+
+    init3DSubmarine() {
+        // Wait for THREE and OBJLoader to be ready before initializing
+        const initSub = () => {
+            if (typeof THREE !== 'undefined' && typeof OBJLoader !== 'undefined' && typeof Submarine3D !== 'undefined') {
+                const modelPath = '/static/subsanwich.obj';
+                this.submarine3D = new Submarine3D('submarine-3d-container', modelPath);
+                console.log('3D submarine visualization initialized');
+            } else {
+                console.warn('THREE, Submarine3D class or OBJLoader not found');
+            }
+        };
+
+        // If THREE and OBJLoader are already loaded, init immediately
+        if (typeof THREE !== 'undefined' && typeof OBJLoader !== 'undefined') {
+            initSub();
+        } else {
+            // Otherwise wait for the event
+            window.addEventListener('objloader-ready', initSub, { once: true });
+        }
     }
 
     bindEvents() {
@@ -320,6 +343,34 @@ class GamepadController {
         const valuesEl = document.getElementById('left-status-values');
         if (valuesEl) {
             valuesEl.innerHTML = `Battery: ${state.bat}<br/>Depth: ${state.depth}<br/>Accel: ${state.acc}<br/>Gyro: ${state.gyro}`;
+        }
+
+        // Update 3D submarine orientation if gyro data is available
+        if (this.submarine3D && state.gyro) {
+            // Parse gyro data (comes as tuple string like "(1.2,3.4,5.6)")
+            let gyroData;
+            if (typeof state.gyro === 'string') {
+                const matches = state.gyro.match(/\(([-\d.]+),([-\d.]+),([-\d.]+)\)/);
+                if (matches) {
+                    gyroData = {
+                        x: parseFloat(matches[1]),
+                        y: parseFloat(matches[2]),
+                        z: parseFloat(matches[3])
+                    };
+                }
+            } else if (Array.isArray(state.gyro)) {
+                gyroData = {
+                    x: state.gyro[0],
+                    y: state.gyro[1],
+                    z: state.gyro[2]
+                };
+            } else if (typeof state.gyro === 'object') {
+                gyroData = state.gyro;
+            }
+
+            if (gyroData) {
+                this.submarine3D.updateOrientation(gyroData);
+            }
         }
     }
 

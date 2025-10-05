@@ -1,7 +1,7 @@
 import logging
 from fastapi import WebSocket
 from protocol import Command, ResetCmd, StopCmd, MotionCmd
-from serial_client import SerialClient
+from serial_client import DebugSerialClient, SerialClient
 from gpio import reset_pico
 
 logger = logging.getLogger(__name__)
