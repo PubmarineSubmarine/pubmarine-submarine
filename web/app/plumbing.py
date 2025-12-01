@@ -3,6 +3,7 @@ from fastapi import WebSocket
 from protocol import Command, ResetCmd, StopCmd, MotionCmd
 from serial_client import DebugSerialClient, SerialClient
 from gpio import reset_pico
+from os import environ
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +11,10 @@ class Plumbing:
     def __init__(self):
         self.connections: list[WebSocket] = []
         #self.serial = DebugSerialClient()
-        self.serial = SerialClient("/dev/ttyACM0")
+        if environ.get("PUBMARINE_DEBUG_SERIAL"):
+            self.serial = DebugSerialClient()
+        else:
+            self.serial = SerialClient("/dev/ttyACM0")
         #self.serial = SerialClient("/dev/pts/13", baudrate=9600)
         self.serial.callback = self.handle_circuitpy_msg
 

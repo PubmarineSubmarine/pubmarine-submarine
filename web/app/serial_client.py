@@ -29,6 +29,46 @@ class DebugSerialClient:
         if isinstance(cmd, MotionCmd):
             self.last_motion_cmd = cmd
 
+            # Immediately send state update for responsive feedback
+            if self.callback:
+                state = StateCmd.default()
+
+                # Calculate gyro based on the new command
+                roll_delta = 0.0
+                pitch_delta = 0.0
+                yaw_delta = 0.0
+
+                if cmd.sv1 is not None:
+                    roll_delta = (cmd.sv1 - 90) * 0.5
+                if cmd.sv2 is not None:
+                    pitch_delta = (cmd.sv2 - 90) * 0.5
+
+                if cmd.x is not None:
+                    roll_delta += cmd.x * 10.0
+                if cmd.z is not None:
+                    roll_delta += cmd.z * 10.0
+
+                left_thrust = 0
+                right_thrust = 0
+
+                if cmd.fl: left_thrust += 1
+                if cmd.rl: left_thrust += 1
+                if cmd.fr: right_thrust += 1
+                if cmd.rr: right_thrust += 1
+
+                yaw_delta = (right_thrust - left_thrust) * 15.0
+
+                self.gyro[0] += (roll_delta - self.gyro[0]) * 0.5
+                self.gyro[1] += (pitch_delta - self.gyro[1]) * 0.1
+                self.gyro[2] += yaw_delta * 0.3
+
+                self.gyro[0] *= 0.95
+                self.gyro[1] *= 0.95
+                self.gyro[2] *= 0.98
+
+                state.gyro = tuple(round(v, 3) for v in self.gyro)
+                await self.callback(state)
+
     async def fake_state(self):
         while True:
             try:

@@ -4,7 +4,7 @@
     <div class="gamepad-section">        
         <div class="video-stream-container">
             <div class="video-overlay-wrapper">
-                <iframe src="/cam" title="description" class="video-stream" id="video-stream" height="600"></iframe>
+                <iframe src="/cam" title="description" class="video-stream" id="video-stream"></iframe>
                 
                 <!-- Gamepad Overlay Elements -->
                 <div class="gamepad-overlay">
@@ -23,7 +23,12 @@
                     <div class="overlay-submarine-3d">
                         <div id="submarine-3d-container" class="submarine-3d-container"></div>
                     </div>
-                    
+
+                    <!-- Artificial Horizon - Top Left, below 3D visualization -->
+                    <div class="overlay-artificial-horizon">
+                        <canvas id="artificial-horizon" width="200" height="200"></canvas>
+                    </div>
+
                     <!-- Left Analog Stick - Bottom Left -->
                     <div class="overlay-stick-left">
                         <div class="stick-container-overlay" id="left-stick">
@@ -72,9 +77,9 @@
     <!-- Controls are now overlayed on the video above -->
     
     <div class="history-section">
-        <h3>Button Press History</h3>
+        <h3>Console Log</h3>
         <div id="button-history" class="button-history">
-            <div class="history-placeholder">Press gamepad buttons to see history...</div>
+            <div class="history-placeholder">No messages...</div>
         </div>
     </div>
 </div>
@@ -104,5 +109,6 @@
     window.dispatchEvent(new Event('objloader-ready'));
 </script>
 <script src="{{ url_for('static', path='/js/submarine-3d.js') }}"></script>
+<script src="{{ url_for('static', path='/js/artificial-horizon.js') }}"></script>
 <script src="{{ url_for('static', path='/js/gamepad.js') }}"></script>
 {% endblock %}

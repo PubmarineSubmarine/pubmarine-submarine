@@ -8,6 +8,7 @@ class GamepadController {
         this.wsConnected = false;
         this.objectGamepadState = "";
         this.submarine3D = null;
+        this.artificialHorizon = null;
 
         // Button mapping for standard gamepad
         this.buttonNames = {
@@ -38,9 +39,19 @@ class GamepadController {
         this.initWebSocket();
         this.updateDisplay();
         this.init3DSubmarine();
+        this.initArtificialHorizon();
         document.getElementById("testing-btn").addEventListener("click", () => {
             this.onButtonPress(8, 1.0);
         });
+    }
+
+    initArtificialHorizon() {
+        if (typeof ArtificialHorizon !== 'undefined') {
+            this.artificialHorizon = new ArtificialHorizon('artificial-horizon');
+            console.log('Artificial horizon initialized');
+        } else {
+            console.warn('ArtificialHorizon class not found');
+        }
     }
 
     init3DSubmarine() {
@@ -233,7 +244,7 @@ class GamepadController {
             this.updateStickDisplay('right-stick', axes[2], axes[3]);
 
             // Send analog stick data via WebSocket (throttled and with deadzone)
-            if (!this.lastStickSent || Date.now() - this.lastStickSent > 100) {
+            if (!this.lastStickSent || Date.now() - this.lastStickSent > 10) {
                 const deadzone = 0.1;
 
                 // Left stick - only send if outside deadzone
@@ -291,49 +302,48 @@ class GamepadController {
             // Right trigger (button 7)
             this.updateTriggerDisplay('right-trigger', buttons[7].value);
 
-            // Send analog trigger data via WebSocket (throttled and with deadzone)
-            if (!this.lastTriggerSent || Date.now() - this.lastTriggerSent > 100) {
-                const deadzone = 0.1;
+            // Send analog trigger data via WebSocket with deadzone
+            const deadzone = 0.1;
+            const now = Date.now();
 
-                // Left trigger - only send if outside deadzone
-                if (Math.abs(buttons[6].value) >= deadzone) {
-                    this.sendWebSocketData({
-                        type: 'analog_trigger',
-                        trigger: 'left',
-                        value: buttons[6].value,
-                        timestamp: Date.now()
-                    });
-                    this.lastLeftTriggerSent = true;
-                } else if (this.lastLeftTriggerSent) {
-                    this.sendWebSocketData({
-                        type: 'analog_trigger',
-                        trigger: 'left',
-                        value: 0,
-                        timestamp: Date.now()
-                    });
-                    this.lastLeftTriggerSent = false;
-                }
+            // Left trigger - send when value changes
+            if (Math.abs(buttons[6].value) >= deadzone) {
+                this.sendWebSocketData({
+                    type: 'analog_trigger',
+                    trigger: 'left',
+                    value: buttons[6].value,
+                    timestamp: now
+                });
+                this.lastLeftTriggerSent = true;
+            }
+            if (Math.abs(buttons[6].value) < deadzone && this.lastLeftTriggerSent) {
+                this.sendWebSocketData({
+                    type: 'analog_trigger',
+                    trigger: 'left',
+                    value: 0,
+                    timestamp: now
+                });
+                this.lastLeftTriggerSent = false;
+            }
 
-                // Right trigger - only send if outside deadzone
-                if (Math.abs(buttons[7].value) >= deadzone) {
-                    this.sendWebSocketData({
-                        type: 'analog_trigger',
-                        trigger: 'right',
-                        value: buttons[7].value,
-                        timestamp: Date.now()
-                    });
-                    this.lastRightTriggerSent = true;
-                } else if (this.lastRightTriggerSent) {
-                    this.sendWebSocketData({
-                        type: 'analog_trigger',
-                        trigger: 'right',
-                        value: 0,
-                        timestamp: Date.now()
-                    });
-                    this.lastRightTriggerSent = false;
-                }
-
-                this.lastTriggerSent = Date.now();
+            // Right trigger - send when value changes
+            if (Math.abs(buttons[7].value) >= deadzone) {
+                this.sendWebSocketData({
+                    type: 'analog_trigger',
+                    trigger: 'right',
+                    value: buttons[7].value,
+                    timestamp: now
+                });
+                this.lastRightTriggerSent = true;
+            }
+            if (Math.abs(buttons[7].value) < deadzone && this.lastRightTriggerSent) {
+                this.sendWebSocketData({
+                    type: 'analog_trigger',
+                    trigger: 'right',
+                    value: 0,
+                    timestamp: now
+                });
+                this.lastRightTriggerSent = false;
             }
         }
     }
@@ -345,7 +355,7 @@ class GamepadController {
             valuesEl.innerHTML = `Battery: ${state.bat}<br/>Depth: ${state.depth}<br/>Accel: ${state.acc}<br/>Gyro: ${state.gyro}`;
         }
 
-        // Update 3D submarine orientation if gyro data is available
+        // Update 3D submarine orientation and artificial horizon if gyro data is available
         if (this.submarine3D && state.gyro) {
             // Parse gyro data (comes as tuple string like "(1.2,3.4,5.6)")
             let gyroData;
@@ -370,6 +380,7 @@ class GamepadController {
 
             if (gyroData) {
                 this.submarine3D.updateOrientation(gyroData);
+                this.artificialHorizon.updateOrientation(gyroData);
             }
         }
     }
