@@ -136,7 +136,9 @@ class GamepadController {
 
         const gamepadObj = this.gamepadToObject(gamepad)
         if (!_.isEqual(gamepadObj, this.objectGamepadState)) {
-            console.log(gamepadObj)
+            // console.log(gamepadObj)
+            // console.log(gamepadObj.axes)
+            // console.log(gamepadObj.buttons.map(x => x.value))
             this.objectGamepadState = gamepadObj
             this.sendWebSocketData(gamepadObj)
         }
@@ -156,6 +158,11 @@ class GamepadController {
         // Update analog sticks
         this.updateAnalogSticks(gamepad.axes);
 
+        // handle weird mapping for Yoga laptop
+        /* if (gamepad.axes.length == 8) {
+            gamepad.buttons[6] = {pressed: gamepad.axes[6].value > 0, touched: gamepad.axes[6].value > 0, value: gamepad.axes[6].value >= 0 ? gamepad.axes[6].value : 0.0}
+            gamepad.buttons[7] = {pressed: gamepad.axes[7].value > 0, touched: gamepad.axes[7].value > 0, value: gamepad.axes[7].value >= 0 ? gamepad.axes[7].value : 0.0}
+        } */
         this.updateAnalogTriggers(gamepad.buttons);
 
         // Store current button state for next frame (store just the pressed boolean)
@@ -203,6 +210,10 @@ class GamepadController {
 
     updateAnalogSticks(axes) {
         if (axes.length >= 4) {
+            /* if (axes.length == 8) {
+                // handle weird mapping for Yoga laptop
+                axes = [axes[0], axes[1], axes[4], axes[5]];
+            } */
             // Left stick (axes 0, 1)
             this.updateStickDisplay('left-stick', axes[0], axes[1]);
 
@@ -449,6 +460,7 @@ class GamepadController {
             };
 
             this.websocket.onmessage = (event) => {
+                console.log(event)
                 const data = JSON.parse(event.data);
                 console.log('Received from server:', data);
                 if (data.name === "STAT") {

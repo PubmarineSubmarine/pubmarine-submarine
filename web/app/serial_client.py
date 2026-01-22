@@ -113,5 +113,7 @@ class SerialClient:
                         await callback(cmd)
                     except ValidationError:
                         logger.debug(f"RX: {data}")
+                        pass
                 else:
-                    logger.debug(f"RX: {data}")
+                    # logger.debug(f"RX: {data}")
+                    pass
