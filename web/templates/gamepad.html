@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="gamepad-section">        
+        <div class="video-stream-container">
+            <div class="video-overlay-wrapper">
+                <iframe src="/cam" title="description" class="video-stream" id="video-stream"></iframe>
+                
+                <!-- Gamepad Overlay Elements -->
+                <div class="gamepad-overlay">
+                    <!-- Last Button Pressed - Top Center -->
+                    <div class="overlay-button-display">
+                        <div class="overlay-label">Last Button</div>
+                        <div class="button-display-overlay">
+                            <span id="last-button" class="button-name">None</span>
+                        </div>
+                    </div>
+                    <div class="overlay-status-left">
+                        <div id="left-status-values" class="stick-values-overlay status-values">Waiting for telemetry</div>
+                    </div>
+
+                    <!-- 3D Submarine Visualization - Top Left -->
+                    <div class="overlay-submarine-3d">
+                        <div id="submarine-3d-container" class="submarine-3d-container"></div>
+                    </div>
+
+                    <!-- Artificial Horizon - Top Left, below 3D visualization -->
+                    <div class="overlay-artificial-horizon">
+                        <canvas id="artificial-horizon" width="200" height="200"></canvas>
+                    </div>
+
+                    <!-- Left Analog Stick - Bottom Left -->
+                    <div class="overlay-stick-left">
+                        <div class="stick-container-overlay" id="left-stick">
+                            <div class="stick-indicator"></div>
+                            <div class="stick-center"></div>
+                        </div>
+                        <div id="left-stick-values" class="stick-values-overlay">X: 0.000, Y: 0.000</div>
+                    </div>
+                    
+                    <!-- Right Analog Stick - Bottom Right -->
+                    <div class="overlay-stick-right">
+`                           <div class="stick-container-overlay" id="right-stick">
+                            <div class="stick-indicator"></div>
+                            <div class="stick-center"></div>
+                        </div>
+                        <div id="right-stick-values" class="stick-values-overlay">X: 0.000, Y: 0.000</div>
+                    </div>
+
+		    <div class="overlay-trigger-left">
+			<div id="left-trigger-values" class="trigger-values-overlay">LT: 0.000</div>
+		    </div>
+
+		    <div class="overlay-trigger-right">
+			<div id="right-trigger-values" class="trigger-values-overlay">RT: 0.000</div>
+		    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="gamepad-error" class="error-message" style="display: none;"></div>
+        
+        <div class="gamepad-status">
+            <div class="status-item">
+                <label>Controller:</label>
+                <span id="connection-status" class="status-disconnected">Checking...</span>
+            </div>
+            <div class="status-item">
+                <label>Drone:</label>
+                <span id="websocket-status" class="status-disconnected">Connecting...</span>
+            </div>
+        </div>
+        
+    </div>
+    <button id="testing-btn">reset</button>
+    
+    <!-- Controls are now overlayed on the video above -->
+    
+    <div class="history-section">
+        <h3>Console Log</h3>
+        <div id="button-history" class="button-history">
+            <div class="history-placeholder">No messages...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Import map to resolve 'three' bare specifier -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+    // Import Three.js and loaders as ES6 modules
+    import * as THREE from 'three';
+    import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+    import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+
+    // Make THREE and loaders available globally
+    window.THREE = THREE;
+    window.OBJLoader = OBJLoader;
+    window.MTLLoader = MTLLoader;
+
+    // Signal that libraries are ready
+    window.dispatchEvent(new Event('objloader-ready'));
+</script>
+<script src="{{ url_for('static', path='/js/submarine-3d.js') }}"></script>
+<script src="{{ url_for('static', path='/js/artificial-horizon.js') }}"></script>
+<script src="{{ url_for('static', path='/js/gamepad.js') }}"></script>
+{% endblock %}
