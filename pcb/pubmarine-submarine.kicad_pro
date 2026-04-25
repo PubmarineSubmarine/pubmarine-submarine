@@ -447,20 +447,7 @@
     "equivalence_files": []
   },
   "erc": {
-    "erc_exclusions": [
-      [
-        "pin_to_pin|3937000|304800|65a42743-15c0-47a1-bf26-6d17f6330657|4fc48ff3-a915-4dbb-b8f2-d0c0f92020d2|/12d1b76a-b790-4941-94cf-e8b80e5b52d9|/12d1b76a-b790-4941-94cf-e8b80e5b52d9|/12d1b76a-b790-4941-94cf-e8b80e5b52d9",
-        ""
-      ],
-      [
-        "power_pin_not_driven|1828800|2603500|41d8263c-f76f-4438-ad34-53824f2fe735|00000000-0000-0000-0000-000000000000|/12d1b76a-b790-4941-94cf-e8b80e5b52d9|/12d1b76a-b790-4941-94cf-e8b80e5b52d9|",
-        ""
-      ],
-      [
-        "power_pin_not_driven|863600|482600|35839751-ec8a-43a1-bdef-54403a1a85a1|00000000-0000-0000-0000-000000000000|/12d1b76a-b790-4941-94cf-e8b80e5b52d9|/12d1b76a-b790-4941-94cf-e8b80e5b52d9|",
-        ""
-      ]
-    ],
+    "erc_exclusions": [],
     "meta": {
       "version": 0
     },
@@ -675,6 +662,7 @@
       "single_global_label": "ignore",
       "unannotated": "error",
       "unconnected_wire_endpoint": "warning",
+      "undefined_netclass": "error",
       "unit_value_mismatch": "error",
       "unresolved_variable": "error",
       "wire_dangling": "error"

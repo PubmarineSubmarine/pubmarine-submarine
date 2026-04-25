@@ -5522,7 +5522,7 @@
 		)
 		(uuid "7579ee3e-5a73-427f-b686-f7730fc40762")
 	)
-	(text "TODO revision 2:\nChange pin mappings so GPIO channels do not conflict"
+	(text "TODO revision 2:\nChange pin mappings so GPIO channels do not conflict\nAdd reset button\nChange VSYS jumper to default open"
 		(exclude_from_sim no)
 		(at 104.902 99.06 0)
 		(effects
