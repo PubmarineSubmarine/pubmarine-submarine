@@ -1,6 +1,6 @@
 import logging
 from fastapi import WebSocket
-from protocol import Command, ResetCmd, StopCmd, MotionCmd
+from protocol import Command, ResetCmd, StopCmd, MotionCmd, ConsoleLog
 from serial_client import DebugSerialClient, SerialClient
 from gpio import reset_pico
 from os import environ
@@ -39,6 +39,10 @@ class Plumbing:
         j = msg.model_dump_json()
         for ws in self.connections:
             await ws.send_text(j)
+
+    async def console_cmd(self, text: str):
+        await self.handle_circuitpy_msg(ConsoleLog(level="ECHO", line=text))
+        await self.serial.write_text(repr(f"{text}\r\n"))
 
     async def stick_moved(self, stick: str, x: float, y: float):
         if stick == "left":

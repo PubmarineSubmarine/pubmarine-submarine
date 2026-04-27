@@ -18,6 +18,11 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now missioncontrol
 ```
 
+### To run for local debugging
+```
+PUBMARINE_DEBUG_SERIAL=1 uv run app/main.py
+```
+
 
 ## Set up mediaMTX for raspberry pi cam server
 https://github.com/bluenviron/mediamtx?tab=readme-ov-file#linux

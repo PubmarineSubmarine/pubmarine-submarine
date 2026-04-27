@@ -10,6 +10,9 @@ class GamepadController {
         this.submarine3D = null;
         this.artificialHorizon = null;
 
+        this.consoleBufferLimit = 50_000;
+        this.consoleHistory = [];
+
         // Button mapping for standard gamepad
         this.buttonNames = {
             0: 'A',
@@ -43,6 +46,22 @@ class GamepadController {
         document.getElementById("testing-btn").addEventListener("click", () => {
             this.onButtonPress(8, 1.0);
         });
+        const dlBtn = document.getElementById("download-console");
+        if (dlBtn) {
+            dlBtn.addEventListener("click", () => this.downloadConsole());
+        }
+        const consoleInput = document.getElementById("console-input");
+        if (consoleInput) {
+            consoleInput.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" && consoleInput.value.trim()) {
+                    this.sendWebSocketData({
+                        type: "console_command",
+                        text: consoleInput.value.trim()
+                    });
+                    consoleInput.value = "";
+                }
+            });
+        }
     }
 
     initArtificialHorizon() {
@@ -172,7 +191,12 @@ class GamepadController {
         if (!_.isEqual(gamepadObj, this.objectGamepadState)) {
             console.log(gamepadObj)
             this.objectGamepadState = gamepadObj
-            this.sendWebSocketData(gamepadObj)
+            this.sendWebSocketData(
+                {
+                    type: 'gamepad_state',
+                    gamepad: gamepadObj,
+                }
+            )
         }
 
         // Check buttons
@@ -231,8 +255,8 @@ class GamepadController {
             }, 500);
         }
 
-        // Add to button history
-        this.addToButtonHistory(buttonName, value);
+        // Log to console
+        this.logConsole("BTN", buttonName);
     }
 
     updateAnalogSticks(axes) {
@@ -349,7 +373,7 @@ class GamepadController {
     }
 
     updateStatusDisplay(state) {
-        console.log(`update ${state}`)
+        //console.log(`update ${state}`)
         const valuesEl = document.getElementById('left-status-values');
         if (valuesEl) {
             valuesEl.innerHTML = `Battery: ${state.bat}<br/>Depth: ${state.depth}<br/>Accel: ${state.acc}<br/>Gyro: ${state.gyro}`;
@@ -448,24 +472,63 @@ class GamepadController {
         }
     }
 
-    addToButtonHistory(buttonName, value) {
-        const historyEl = document.getElementById('button-history');
+    logConsole(label, message) {
+        const timestamp = new Date().toISOString();
+        this.consoleHistory.push({ ts: timestamp, label, message });
+
+        // Trim internal buffer to limit
+        while (this.consoleHistory.length > this.consoleBufferLimit * 2) {
+            this.consoleHistory.shift();
+        }
+
+        const historyEl = document.getElementById('console-history');
         if (!historyEl) return;
 
-        const timestamp = new Date().toLocaleTimeString();
-        const historyItem = document.createElement('div');
-        historyItem.className = 'history-item';
-        historyItem.innerHTML = `
-            <span class="timestamp">${timestamp}</span>
-            <span class="button-name">${buttonName}</span>
-            <span class="button-value">${value.toFixed(3)}</span>
+        // Remove placeholder on first entry
+        const ph = historyEl.querySelector('.history-placeholder');
+        if (ph) ph.remove();
+
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        item.innerHTML = `
+            <span class="timestamp">${new Date(timestamp).toLocaleTimeString()}</span>
+            <span class="button-name">[${label}]</span>
+            <span class="button-value">${message}</span>
         `;
 
-        historyEl.insertBefore(historyItem, historyEl.firstChild);
+        historyEl.appendChild(item);
 
-        // Keep only last 10 items
-        while (historyEl.children.length > 10) {
-            historyEl.removeChild(historyEl.lastChild);
+        // Auto-scroll to bottom
+        historyEl.scrollTop = historyEl.scrollHeight;
+
+        // Keep only last 500 DOM items for performance
+        while (historyEl.querySelectorAll('.history-item').length > this.consoleBufferLimit) {
+            const first = historyEl.querySelector(':scope > .history-item:first-child');
+            if (first) first.remove();
+        }
+    }
+
+    downloadConsole() {
+        if (!this.consoleHistory.length) return;
+
+        const lines = this.consoleHistory.map(e => `${e.ts} [${e.label}] ${e.message}`);
+        const text = `--- Console Log (${new Date().toISOString()}) ---\n\n` + lines.join('\n') + '\n';
+
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `console-${Date.now()}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        // Clear buffer and UI
+        this.consoleHistory.length = 0;
+        const historyEl = document.getElementById('console-history');
+        if (historyEl) {
+            historyEl.innerHTML = '<div class="history-placeholder">No messages...</div>';
         }
     }
 
@@ -512,9 +575,14 @@ class GamepadController {
 
             this.websocket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                console.log('Received from server:', data);
+                //console.log('Received from server:', data);
                 if (data.name === "STAT") {
                     this.updateStatusDisplay(data);
+                } else if (data.name === "CONSOLE") {
+                    console.info(data.line);
+                    this.logConsole(data.level, data.line);
+                } else {
+                    this.logConsole(data.name, JSON.stringify(data));
                 }
             };
 

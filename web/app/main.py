@@ -121,10 +121,12 @@ async def log_gamepad_data(data: dict):
     elif event_type == "gamepad_disconnected":
         logger.info("🔌 GAMEPAD DISCONNECTED")
 
-    else:
-        pass
+    elif event_type == "gamepad_state":
         # full gamepad state comes in here 
-        #logger.info(f"🎮 GAMEPAD DATA: {data}")
+        #logger.info(f"🎮 GAMEPAD DATA: {data['gamepad']}")
+        pass
+    elif event_type == "console_command":
+        await plumbing.console_cmd(data["text"])
 
 
 WEBRTC_SERVER_URL = "http://localhost:8889"

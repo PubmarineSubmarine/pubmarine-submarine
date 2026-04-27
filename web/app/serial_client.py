@@ -2,10 +2,11 @@ from asyncio import create_task, sleep
 import serial
 from serial_asyncio import open_serial_connection
 import logging
+import random
 
 from pydantic import ValidationError
 
-from protocol import Command, StateCmd, MotionCmd
+from protocol import Command, StateCmd, MotionCmd, ConsoleLog
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,9 @@ class DebugSerialClient:
 
     def disconnect(self):
         pass
+
+    async def write_text(self, text: str):
+        logger.info(f"debug serial tx: {text}")
 
     async def write_cmd(self, cmd: Command):
         txt = cmd.serialize()
@@ -74,6 +78,11 @@ class DebugSerialClient:
             try:
                 await sleep(0.1)  # Update more frequently for smooth simulation
                 if self.callback:
+                    if random.randint(0, 100) == 0:
+                        await self.callback(ConsoleLog(line="This is a test message from the debug PICO serial client"))
+                    elif random.randint(0, 1000) == 0:
+                        await self.callback(MotionCmd(x=1.0, y=-2.7, fl=29))
+
                     state = StateCmd.default()
 
                     # Simulate gyro changes based on last MotionCmd
@@ -200,5 +209,6 @@ class SerialClient:
                         await callback(cmd)
                     except ValidationError:
                         logger.debug(f"RX: {data}")
+                        await callback(ConsoleLog(line=data))
                 else:
                     logger.debug(f"RX: {data}")

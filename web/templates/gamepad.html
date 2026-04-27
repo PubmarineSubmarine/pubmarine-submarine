@@ -76,10 +76,19 @@
     
     <!-- Controls are now overlayed on the video above -->
     
-    <div class="history-section">
-        <h3>Console Log</h3>
-        <div id="button-history" class="button-history">
-            <div class="history-placeholder">No messages...</div>
+    <input type="checkbox" id="console-collapsed" class="console-collapse-toggle">
+    <div class="console-controls">
+        <button id="download-console" title="Download &amp; clear">⬇ Download Console</button>
+        <label for="console-collapsed" id="collapse-console" title="Toggle console">☰ Show Console</label>
+    </div>
+    <div class="console-section">
+        <div class="console-body">
+            <div id="console-history" class="console-buffer">
+                <div class="history-placeholder">No messages...</div>
+            </div>
+            <div class="console-input-row">
+                <input type="text" id="console-input" class="console-input" placeholder="Send command..." autocomplete="off" />
+            </div>
         </div>
     </div>
 </div>
@@ -111,4 +120,27 @@
 <script src="{{ url_for('static', path='/js/submarine-3d.js') }}"></script>
 <script src="{{ url_for('static', path='/js/artificial-horizon.js') }}"></script>
 <script src="{{ url_for('static', path='/js/gamepad.js') }}"></script>
+<script>
+    // Remove video controls from the MediaMTX WebRTC player iframe
+    (function () {
+        const iframe = document.getElementById('video-stream');
+        if (!iframe) return;
+
+        function hideControls() {
+            try {
+                const doc = iframe.contentDocument || iframe.contentWindow?.document;
+                if (!doc) return;
+                const video = doc.querySelector('video');
+                if (video) {
+                    video.removeAttribute('controls');
+                    video.style.pointerEvents = 'none';
+                }
+            } catch (_) {}
+        }
+
+        iframe.addEventListener('load', hideControls);
+        setTimeout(hideControls, 500);
+        setTimeout(hideControls, 1500);
+    })();
+</script>
 {% endblock %}

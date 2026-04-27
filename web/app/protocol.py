@@ -95,6 +95,13 @@ class StateCmd(Command):
             bat=3.5,
         )
 
+
+class ConsoleLog(Command):
+    name: Literal["CONSOLE"] = "CONSOLE"
+    level: str = "INFO"
+    line: str
+ 
+
 class CommandModel(BaseModel):
     command: ResetCmd | StopCmd | MotionCmd | StateCmd = Field(discriminator="name")
 
