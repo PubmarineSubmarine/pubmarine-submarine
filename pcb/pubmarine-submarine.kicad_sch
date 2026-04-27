@@ -5739,6 +5739,18 @@
 		)
 		(uuid "2e1189ff-f911-492d-9926-85c814d2bfd3")
 	)
+	(text "TODO:\n- Review analog signal lines\n- Break out extra GPIOs\n- Break out RST pin (wire to Pi)\n- Add stitching vias\n- Review datasheets\n- Schematic cleanup\n- Fix silkscreen graphics\n- Design review\n- Add BOM/CPL\n- Ship it\n"
+		(exclude_from_sim no)
+		(at 277.368 149.098 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(color 255 0 0 1)
+			)
+			(justify left)
+		)
+		(uuid "391fb491-3187-446b-9113-5a7406288bf1")
+	)
 	(text "IMU Module"
 		(exclude_from_sim no)
 		(at 242.062 191.008 0)
@@ -12141,7 +12153,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "4k7"
+		(property "Value" "2k2"
 			(at 176.53 204.4699 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -23223,7 +23235,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "4k7"
+		(property "Value" "2k2"
 			(at 166.37 204.4699 0)
 			(show_name no)
 			(do_not_autoplace no)
