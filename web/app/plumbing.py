@@ -42,7 +42,7 @@ class Plumbing:
 
     async def console_cmd(self, text: str):
         await self.handle_circuitpy_msg(ConsoleLog(level="ECHO", line=text))
-        await self.serial.write_text(repr(f"{text}\r\n"))
+        await self.serial.write_text(f"{text}\r\n")
 
     async def stick_moved(self, stick: str, x: float, y: float):
         if stick == "left":

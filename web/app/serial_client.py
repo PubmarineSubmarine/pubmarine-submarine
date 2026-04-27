@@ -23,7 +23,7 @@ class DebugSerialClient:
         pass
 
     async def write_text(self, text: str):
-        logger.info(f"debug serial tx: {text}")
+        logger.info(f"debug serial tx: {repr(text)}")
 
     async def write_cmd(self, cmd: Command):
         txt = cmd.serialize()
