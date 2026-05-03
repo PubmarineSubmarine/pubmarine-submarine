@@ -283,6 +283,409 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Connector:Conn_01x02_Pin"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "J"
+				(at 0 2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Conn_01x02_Pin"
+				(at 0 -5.08 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Generic connector, single row, 01x02, script generated"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_locked" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "Conn_01x02_Pin_1_1"
+				(rectangle
+					(start 0.8636 0.127)
+					(end 0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(rectangle
+					(start 0.8636 -2.413)
+					(end 0 -2.667)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 0) (xy 0.8636 0)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 -2.54) (xy 0.8636 -2.54)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at 5.08 0 180)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 -2.54 180)
+					(length 3.81)
+					(name "Pin_2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Connector:Conn_01x03_Pin"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "J"
+				(at 0 5.08 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Conn_01x03_Pin"
+				(at 0 -5.08 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Generic connector, single row, 01x03, script generated"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_locked" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "Conn_01x03_Pin_1_1"
+				(rectangle
+					(start 0.8636 2.667)
+					(end 0 2.413)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(rectangle
+					(start 0.8636 0.127)
+					(end 0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(rectangle
+					(start 0.8636 -2.413)
+					(end 0 -2.667)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 2.54) (xy 0.8636 2.54)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 0) (xy 0.8636 0)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 -2.54) (xy 0.8636 -2.54)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at 5.08 2.54 180)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 0 180)
+					(length 3.81)
+					(name "Pin_2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 -2.54 180)
+					(length 3.81)
+					(name "Pin_3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Connector:Screw_Terminal_01x02"
 			(pin_names
 				(offset 1.016)
@@ -479,6 +882,129 @@
 						)
 					)
 					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Connector:TestPoint"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0.762)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "TP"
+				(at 0 6.858 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "TestPoint"
+				(at 0 5.08 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 5.08 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 5.08 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "test point"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "test point tp"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "Pin* Test*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "TestPoint_0_1"
+				(circle
+					(center 0 3.302)
+					(radius 0.762)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "TestPoint_1_1"
+				(pin passive line
+					(at 0 0 90)
+					(length 2.54)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -5678,17 +6204,6 @@
 		)
 		(uuid "f98e5232-c4b0-415c-994b-34729a5dce8e")
 	)
-	(text "TODO revision 2:\nLEDs might be too bright?"
-		(exclude_from_sim no)
-		(at 361.696 50.8 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-				(color 255 0 0 1)
-			)
-		)
-		(uuid "03ebd1b6-56fb-4eec-b0f4-fea33b5858bd")
-	)
 	(text "Pressure Sensor"
 		(exclude_from_sim no)
 		(at 147.32 192.278 0)
@@ -5738,18 +6253,6 @@
 			)
 		)
 		(uuid "2e1189ff-f911-492d-9926-85c814d2bfd3")
-	)
-	(text "TODO:\n- Review analog signal lines\n- Break out extra GPIOs\n- Break out RST pin (wire to Pi)\n- Add stitching vias\n- Review datasheets\n- Schematic cleanup\n- Fix silkscreen graphics\n- Design review\n- Add BOM/CPL\n- Ship it\n"
-		(exclude_from_sim no)
-		(at 277.368 149.098 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-				(color 255 0 0 1)
-			)
-			(justify left)
-		)
-		(uuid "391fb491-3187-446b-9113-5a7406288bf1")
 	)
 	(text "IMU Module"
 		(exclude_from_sim no)
@@ -5860,17 +6363,6 @@
 			)
 		)
 		(uuid "b7ab5235-ae4a-4626-9968-9dc04d5f1b15")
-	)
-	(text "TODO revision 2:\nchange to USB-A female?"
-		(exclude_from_sim no)
-		(at 370.84 128.778 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-				(color 255 0 0 1)
-			)
-		)
-		(uuid "bc169b0a-d82c-437a-bfa5-3e3460621061")
 	)
 	(text "AHT20\nTemp/Humidity\n"
 		(exclude_from_sim no)
@@ -6135,10 +6627,6 @@
 		(uuid "2be65da1-d792-4968-9e5f-1b08d2bd5cf9")
 	)
 	(no_connect
-		(at 86.36 73.66)
-		(uuid "3905ab10-9424-40d6-904b-4f0db7901f2f")
-	)
-	(no_connect
 		(at 154.94 35.56)
 		(uuid "3d2a59b7-f69b-4eee-b193-4be63dbba971")
 	)
@@ -6149,10 +6637,6 @@
 	(no_connect
 		(at 86.36 50.8)
 		(uuid "6b2da771-d532-4945-b6f8-bee0172bd9f9")
-	)
-	(no_connect
-		(at 86.36 71.12)
-		(uuid "760e19b2-5e2a-4dad-8b49-b6e47164d446")
 	)
 	(no_connect
 		(at 86.36 45.72)
@@ -6642,6 +7126,16 @@
 	)
 	(wire
 		(pts
+			(xy 86.36 60.96) (xy 102.87 60.96)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "85545250-09ad-4aa4-b0bd-9f83e484d912")
+	)
+	(wire
+		(pts
 			(xy 260.35 77.47) (xy 262.89 77.47)
 		)
 		(stroke
@@ -6839,6 +7333,16 @@
 			(type default)
 		)
 		(uuid "b12afa7b-7e15-4a0f-8038-975182f6d727")
+	)
+	(wire
+		(pts
+			(xy 86.36 58.42) (xy 102.87 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b8d0e155-cc2a-493e-a5fa-4f9c847af991")
 	)
 	(wire
 		(pts
@@ -7406,7 +7910,7 @@
 	)
 	(global_label "~{SLEEP_M}"
 		(shape input)
-		(at 86.36 58.42 0)
+		(at 86.36 66.04 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -7415,7 +7919,7 @@
 		)
 		(uuid "01d73483-4886-4da9-989e-9c05a72d0cf5")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 86.36 58.42 0)
+			(at 86.36 66.04 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7610,7 +8114,7 @@
 	)
 	(global_label "~{FAULT_J}"
 		(shape input)
-		(at 86.36 60.96 0)
+		(at 86.36 71.12 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -7619,7 +8123,7 @@
 		)
 		(uuid "21182f59-8005-4985-a7c3-ca96c455b613")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 86.36 60.96 0)
+			(at 86.36 71.12 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7992,6 +8496,28 @@
 			)
 		)
 	)
+	(global_label "IPROPI_A"
+		(shape input)
+		(at 71.12 273.05 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "6abe7d91-6cdb-441a-8496-1d186efdf0db")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 71.12 273.05 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
 	(global_label "SV4"
 		(shape input)
 		(at 91.44 210.82 180)
@@ -8310,6 +8836,28 @@
 			)
 		)
 	)
+	(global_label "IPROPI_B"
+		(shape input)
+		(at 86.36 273.05 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "96ad3882-5085-447e-8871-bda06ba0e8de")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 86.36 273.05 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
 	(global_label "RU"
 		(shape bidirectional)
 		(at 50.8 63.5 180)
@@ -8580,7 +9128,7 @@
 	)
 	(global_label "~{SLEEP_J}"
 		(shape input)
-		(at 86.36 66.04 0)
+		(at 86.36 73.66 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -8589,7 +9137,7 @@
 		)
 		(uuid "b0d8a1b4-a73f-4115-b0b5-e4960aa5f4bf")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 86.36 66.04 0)
+			(at 86.36 73.66 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8656,6 +9204,28 @@
 		(uuid "b9d08ed4-5a93-486a-bdda-9e8e0e6033f4")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 88.9 248.92 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "RUN"
+		(shape input)
+		(at 242.57 144.78 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "bada3038-4d34-409f-b027-b482707e536f")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 242.57 144.78 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10722,7 +11292,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "10K"
+		(property "Value" "10k"
 			(at 227.33 157.4799 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10960,6 +11530,85 @@
 			(project "pubmarine-submarine"
 				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
 					(reference "J24")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 86.36 273.05 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "182b516f-9d06-4c89-bba3-b99b1fa339e3")
+		(property "Reference" "TP2"
+			(at 88.9 268.4779 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "TestPoint"
+			(at 88.9 271.0179 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 91.44 273.05 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 91.44 273.05 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "test point"
+			(at 86.36 273.05 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "2dcdfa0d-4f0c-407a-b68a-d096ad03153c")
+		)
+		(instances
+			(project "pubmarine-submarine"
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "TP2")
 					(unit 1)
 				)
 			)
@@ -11859,6 +12508,161 @@
 		)
 	)
 	(symbol
+		(lib_id "power:GND")
+		(at 326.39 204.47 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "2af8a8f7-dc2d-49fa-87fe-f79d04c35fb2")
+		(property "Reference" "#PWR0137"
+			(at 326.39 210.82 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 326.39 209.55 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 326.39 204.47 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 326.39 204.47 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 326.39 204.47 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "318584d3-2987-4099-86d7-b56dba42bdda")
+		)
+		(instances
+			(project "pubmarine-submarine"
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "#PWR0137")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+5VL")
+		(at 111.76 137.16 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "2b1f9102-f440-476e-9c37-71eaf4758b4e")
+		(property "Reference" "#PWR087"
+			(at 111.76 140.97 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+5VL"
+			(at 106.934 134.874 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 111.76 137.16 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 111.76 137.16 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+5VL\""
+			(at 111.76 137.16 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "c885827e-8809-4eac-b320-602dc321a97f")
+		)
+		(instances
+			(project "pubmarine-submarine"
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "#PWR087")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "pubmarine-submarine:Pico")
 		(at 68.58 62.23 0)
 		(unit 1)
@@ -12285,6 +13089,92 @@
 			(project "pubmarine-submarine"
 				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
 					(reference "#PWR40")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:Conn_01x03_Pin")
+		(at 107.95 58.42 0)
+		(mirror y)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "35db7f6c-e598-4f9b-8781-eb39c930a1b7")
+		(property "Reference" "J19"
+			(at 109.22 57.1499 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "Conn_01x03_Pin"
+			(at 109.22 59.6899 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical"
+			(at 107.95 58.42 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 107.95 58.42 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x03, script generated"
+			(at 107.95 58.42 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "48b5138f-0ee5-4ebd-8206-119d0fa6e32b")
+		)
+		(pin "2"
+			(uuid "99624e94-e341-4431-b0a9-22be3aa7b197")
+		)
+		(pin "3"
+			(uuid "d5cc04de-26e6-4024-8a86-e8173d362dc5")
+		)
+		(instances
+			(project "pubmarine-submarine"
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "J19")
 					(unit 1)
 				)
 			)
@@ -12784,7 +13674,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(in_pos_files yes)
+		(in_pos_files no)
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "42a9cd5c-6a4f-4bde-a3f2-c82d9aec5e37")
@@ -13341,6 +14231,85 @@
 		)
 	)
 	(symbol
+		(lib_id "power:GND")
+		(at 102.87 55.88 270)
+		(mirror x)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "4b6d66b9-3905-433c-8b49-6f7e5c53d04f")
+		(property "Reference" "#PWR023"
+			(at 96.52 55.88 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 99.06 55.8799 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 102.87 55.88 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 102.87 55.88 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 102.87 55.88 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "05b18055-8317-428d-8e4c-341483c67125")
+		)
+		(instances
+			(project "pubmarine-submarine"
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "#PWR023")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:R")
 		(at 165.1 139.7 180)
 		(unit 1)
@@ -13747,6 +14716,89 @@
 			(project "pubmarine-submarine"
 				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
 					(reference "C2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:Conn_01x02_Pin")
+		(at 240.03 139.7 90)
+		(mirror x)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "56236715-b3dc-4a20-9e6f-774d517ac89a")
+		(property "Reference" "J20"
+			(at 243.84 139.0649 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "Conn_01x02_Pin"
+			(at 243.84 141.6049 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
+			(at 240.03 139.7 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 240.03 139.7 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x02, script generated"
+			(at 240.03 139.7 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "2"
+			(uuid "dab25e86-50dd-4731-ab63-491c274e54f1")
+		)
+		(pin "1"
+			(uuid "25af5a86-0f34-4c9c-8d45-1e544e0009be")
+		)
+		(instances
+			(project "pubmarine-submarine"
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "J20")
 					(unit 1)
 				)
 			)
@@ -14582,7 +15634,7 @@
 				)
 			)
 		)
-		(property "Value" "Servo2"
+		(property "Value" "Conn_01x03"
 			(at 52.324 201.676 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -15366,6 +16418,83 @@
 		)
 	)
 	(symbol
+		(lib_id "power:GND")
+		(at 111.76 144.78 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "72f99d9a-0713-455e-8584-71a8d42de928")
+		(property "Reference" "#PWR088"
+			(at 111.76 151.13 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 116.078 146.05 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 111.76 144.78 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 111.76 144.78 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 111.76 144.78 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "19d97ed8-2a2e-4431-bced-8b6b6a6b4949")
+		)
+		(instances
+			(project "pubmarine-submarine"
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "#PWR088")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:+12V")
 		(at 210.82 106.68 0)
 		(unit 1)
@@ -15606,8 +16735,8 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5VL")
-		(at 254 195.58 0)
+		(lib_id "power:+3.3V")
+		(at 326.39 196.85 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -15616,9 +16745,9 @@
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "7bfccbbf-ed53-4ceb-bbab-dc799f97ccfd")
-		(property "Reference" "#PWR092"
-			(at 254 199.39 0)
+		(uuid "7cc2d708-68ba-485a-b6b4-a11e036e2de1")
+		(property "Reference" "#PWR0136"
+			(at 326.39 200.66 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -15628,8 +16757,8 @@
 				)
 			)
 		)
-		(property "Value" "+5VL"
-			(at 254 190.5 0)
+		(property "Value" "+3.3V"
+			(at 326.39 191.77 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -15639,7 +16768,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 254 195.58 0)
+			(at 326.39 196.85 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -15650,7 +16779,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 254 195.58 0)
+			(at 326.39 196.85 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -15660,8 +16789,8 @@
 				)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5VL\""
-			(at 254 195.58 0)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(at 326.39 196.85 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -15672,12 +16801,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "3731d106-4d40-45ce-950b-d83ee5fb3cbc")
+			(uuid "5223638f-9846-47af-9234-2bce364dade8")
 		)
 		(instances
 			(project "pubmarine-submarine"
 				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
-					(reference "#PWR092")
+					(reference "#PWR0136")
 					(unit 1)
 				)
 			)
@@ -16564,6 +17693,84 @@
 			(project "pubmarine-submarine"
 				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
 					(reference "#PWR034")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 254 195.58 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "8aaeaedd-b5ec-4f0c-b9a4-5f8814b75d02")
+		(property "Reference" "#PWR0135"
+			(at 254 199.39 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 254 190.5 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 254 195.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 254 195.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(at 254 195.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "779e58e6-6f85-42f4-bd13-68cd60812645")
+		)
+		(instances
+			(project "pubmarine-submarine"
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "#PWR0135")
 					(unit 1)
 				)
 			)
@@ -17782,7 +18989,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x02")
+		(lib_id "Connector:Screw_Terminal_01x02")
 		(at 142.24 259.08 0)
 		(mirror x)
 		(unit 1)
@@ -17804,7 +19011,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "Conn_01x02"
+		(property "Value" "Screw_Terminal_01x02"
 			(at 144.78 256.5401 0)
 			(hide yes)
 			(show_name no)
@@ -17838,7 +19045,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" "Generic screw terminal, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
 			(at 142.24 259.08 0)
 			(hide yes)
 			(show_name no)
@@ -18902,7 +20109,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(in_pos_files yes)
+		(in_pos_files no)
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "b0101ab1-8249-481c-a261-24d3c9196856")
@@ -19143,7 +20350,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(in_pos_files yes)
+		(in_pos_files no)
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "b978ee0b-ba81-4458-829d-e006b74f5ba0")
@@ -19447,6 +20654,88 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:C")
+		(at 326.39 200.66 0)
+		(mirror y)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "bc619ad3-a372-42f2-84c2-8d323dd68191")
+		(property "Reference" "C6"
+			(at 322.58 199.3899 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "100N"
+			(at 322.58 201.9299 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder"
+			(at 325.4248 204.47 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 326.39 200.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Unpolarized capacitor"
+			(at 326.39 200.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "2"
+			(uuid "75465dd0-849b-4c11-beca-2f92a7119a20")
+		)
+		(pin "1"
+			(uuid "9ad43d1b-70ec-4a69-a8f9-74c7a3bdd34b")
+		)
+		(instances
+			(project "pubmarine-submarine"
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "C6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Connector_Generic:Conn_01x03")
 		(at 34.29 208.28 0)
 		(unit 1)
@@ -19467,7 +20756,7 @@
 				)
 			)
 		)
-		(property "Value" "Servo1"
+		(property "Value" "Conn_01x03"
 			(at 29.464 201.168 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -19529,7 +20818,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x02")
+		(lib_id "Connector:Screw_Terminal_01x02")
 		(at 75.438 258.826 0)
 		(mirror x)
 		(unit 1)
@@ -19551,7 +20840,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "Conn_01x02"
+		(property "Value" "Screw_Terminal_01x02"
 			(at 77.978 256.2861 0)
 			(hide yes)
 			(show_name no)
@@ -19585,7 +20874,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+		(property "Description" "Generic screw terminal, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
 			(at 75.438 258.826 0)
 			(hide yes)
 			(show_name no)
@@ -20254,6 +21543,88 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:C")
+		(at 111.76 140.97 0)
+		(mirror y)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "cc7d3331-2a8b-4a69-92f9-de52a9c1f0f8")
+		(property "Reference" "C5"
+			(at 107.95 139.6999 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "100N"
+			(at 107.95 142.2399 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder"
+			(at 110.7948 144.78 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 111.76 140.97 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Unpolarized capacitor"
+			(at 111.76 140.97 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "2"
+			(uuid "7ed4f187-c384-499b-b7c0-6aac8de93407")
+		)
+		(pin "1"
+			(uuid "2ee5ccaf-3ad8-4390-9d06-363b6198ed91")
+		)
+		(instances
+			(project "pubmarine-submarine"
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "C5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:+5VL")
 		(at 58.42 153.67 0)
 		(unit 1)
@@ -20612,6 +21983,85 @@
 			(project "pubmarine-submarine"
 				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
 					(reference "#PWR60")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 71.12 273.05 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "cff78e33-6f1e-48d3-93a4-b825899dd97b")
+		(property "Reference" "TP1"
+			(at 73.66 268.4779 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "TestPoint"
+			(at 73.66 271.0179 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 76.2 273.05 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 76.2 273.05 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "test point"
+			(at 71.12 273.05 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "7957fc21-8cb3-43c8-85b9-9b7fddbe81dd")
+		)
+		(instances
+			(project "pubmarine-submarine"
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "TP1")
 					(unit 1)
 				)
 			)
@@ -22054,6 +23504,84 @@
 		)
 	)
 	(symbol
+		(lib_id "power:GND")
+		(at 240.03 144.78 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "e9c34bdb-953d-49ca-ac7e-086bc72e798f")
+		(property "Reference" "#PWR083"
+			(at 240.03 151.13 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 240.03 149.86 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 240.03 144.78 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 240.03 144.78 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 240.03 144.78 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "0c22cbb4-d510-4197-a966-111f62dcd611")
+		)
+		(instances
+			(project "pubmarine-submarine"
+				(path "/12d1b76a-b790-4941-94cf-e8b80e5b52d9"
+					(reference "#PWR083")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Mechanical:MountingHole")
 		(at 383.54 240.03 0)
 		(unit 1)
@@ -22061,7 +23589,7 @@
 		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
-		(in_pos_files yes)
+		(in_pos_files no)
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "e9d446e2-edcb-459f-b8f6-8477f16c7db6")
@@ -22231,7 +23759,7 @@
 				)
 			)
 		)
-		(property "Value" "Servo3"
+		(property "Value" "Conn_01x03"
 			(at 71.374 201.422 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -22391,7 +23919,7 @@
 				)
 			)
 		)
-		(property "Value" "Servo4"
+		(property "Value" "Conn_01x03"
 			(at 93.472 201.422 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -23560,13 +25088,14 @@
 		(uuid "ac5930b9-cf6a-459e-aa17-db31d23c4384")
 		(members "0425e9aa-0f09-48cd-8dfc-2eb2ed219f67" "1574da46-ddf1-47ed-9ecc-ca93b645a059"
 			"250b6b6b-f6fe-485b-8926-9c777a6fe30d" "43b3a2be-59e6-4851-bb31-f00e693dc863"
-			"52803d51-af21-4a02-9e1a-17fc12a16527" "5d1aa639-a2d0-4080-9bdf-a478db1f725a"
-			"7548fdf0-9991-4728-8ac1-f17b3d6abb9f" "7efdef24-04ed-4603-aa08-5ff612fb8397"
-			"91782b9c-45ce-48b0-9b81-dc6ad43088fa" "92a1406e-03db-42c7-86c3-517dd4189735"
-			"95f709b6-b083-4826-b7c2-8c494c2d9a0f" "a99559eb-f1d2-4336-885f-59fecda0d8e1"
-			"aca4c8ce-87da-49e2-8e36-19c8b51c786a" "d279163a-a73e-480d-a874-684dbb5f68ce"
+			"52803d51-af21-4a02-9e1a-17fc12a16527" "56236715-b3dc-4a20-9e6f-774d517ac89a"
+			"5d1aa639-a2d0-4080-9bdf-a478db1f725a" "7548fdf0-9991-4728-8ac1-f17b3d6abb9f"
+			"7efdef24-04ed-4603-aa08-5ff612fb8397" "91782b9c-45ce-48b0-9b81-dc6ad43088fa"
+			"92a1406e-03db-42c7-86c3-517dd4189735" "95f709b6-b083-4826-b7c2-8c494c2d9a0f"
+			"a99559eb-f1d2-4336-885f-59fecda0d8e1" "aca4c8ce-87da-49e2-8e36-19c8b51c786a"
+			"bada3038-4d34-409f-b027-b482707e536f" "d279163a-a73e-480d-a874-684dbb5f68ce"
 			"da03178b-3025-4ff9-971a-2fb79839ccee" "e7da107e-14ae-4303-8836-946a47c1aaf8"
-			"f38e2017-730a-46d6-aabd-1918da169f76"
+			"e9c34bdb-953d-49ca-ac7e-086bc72e798f" "f38e2017-730a-46d6-aabd-1918da169f76"
 		)
 	)
 	(sheet

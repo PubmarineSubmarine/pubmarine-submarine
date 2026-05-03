@@ -1291,7 +1291,7 @@
 						)
 					)
 				)
-				(pin power_out line
+				(pin output line
 					(at 13.97 -11.43 180)
 					(length 2.54)
 					(name "OUT2"
@@ -1309,7 +1309,7 @@
 						)
 					)
 				)
-				(pin power_out line
+				(pin output line
 					(at 13.97 -8.89 180)
 					(length 2.54)
 					(name "OUT2"
@@ -2705,7 +2705,7 @@
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
-		(in_pos_files yes)
+		(in_pos_files no)
 		(dnp no)
 		(uuid "579384d9-7393-4504-8a90-b495b15a06ee")
 		(property "Reference" "JP2"
@@ -3210,7 +3210,7 @@
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
-		(in_pos_files yes)
+		(in_pos_files no)
 		(dnp no)
 		(uuid "b084b124-666f-4bfb-96eb-5cd78f329971")
 		(property "Reference" "JP3"
