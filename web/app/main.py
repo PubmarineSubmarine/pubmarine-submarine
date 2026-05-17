@@ -71,10 +71,10 @@ async def websocket_endpoint(websocket: WebSocket):
                 tg.create_task(handle_gamepad_data(gamepad_data))
 
     except WebSocketDisconnect:
-        plumbing.ws_disconnect(websocket)
+        await plumbing.ws_disconnect(websocket)
     except Exception as e:
         logger.error(f"WebSocket error: {e}")
-        plumbing.ws_disconnect(websocket)
+        await plumbing.ws_disconnect(websocket)
 
 
 async def handle_gamepad_data(data: dict):
@@ -127,6 +127,12 @@ async def log_gamepad_data(data: dict):
         pass
     elif event_type == "console_command":
         await plumbing.console_cmd(data["text"])
+
+    elif event_type == "heartbeat":
+        await plumbing.heartbeat()
+    
+    elif event_type == "stop":
+        await plumbing.stop()
 
 
 WEBRTC_SERVER_URL = "http://localhost:8889"

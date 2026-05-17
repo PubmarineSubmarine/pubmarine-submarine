@@ -1,6 +1,6 @@
 import logging
 from fastapi import WebSocket
-from protocol import Command, ResetCmd, StopCmd, MotionCmd, ConsoleLog
+from protocol import Command, ResetCmd, StopCmd, MotionCmd, ConsoleLog, PingCmd
 from serial_client import DebugSerialClient, SerialClient
 from gpio import reset_pico
 from os import environ
@@ -30,10 +30,11 @@ class Plumbing:
         self.connections.append(ws)
         logger.info(f"Websocket client connected. Total: {len(self.connections)}")
 
-    def ws_disconnect(self, ws: WebSocket):
+    async def ws_disconnect(self, ws: WebSocket):
         if ws in self.connections:
             self.connections.remove(ws)
         logger.info(f"Gamepad WebSocket disconnected. Total: {len(self.connections)}")
+        await self.serial.write_cmd(StopCmd())
 
     async def handle_circuitpy_msg(self, msg: Command):
         j = msg.model_dump_json()
@@ -62,22 +63,31 @@ class Plumbing:
 
     async def trigger_moved(self, trigger: str, value: float):
         if trigger == "left":
-            await self.serial.write_cmd(MotionCmd(x=-value, z=-value))
+            await self.serial.write_cmd(MotionCmd(a=-value, b=-value))
         elif trigger == "right":
-            await self.serial.write_cmd(MotionCmd(x=value, z=value))
+            await self.serial.write_cmd(MotionCmd(a=value, b=value))
 
     async def button_pressed(self, index, value):
         match index:
             case 0:  # A
-                await self.serial.write_cmd(MotionCmd(sv1=0, sv2=180))
+                pass
+                # await self.serial.write_cmd(MotionCmd(sv1=0, sv2=180))
             case 1:  # B
-                await self.serial.write_cmd(ResetCmd())
+                pass
+                # await self.serial.write_cmd(ResetCmd())
             case 2:  # X
                 await self.serial.write_cmd(StopCmd())
             case 3:  # Y
-                await self.serial.write_cmd(MotionCmd(sv1=90, sv2=90))
+                pass
+                # await self.serial.write_cmd(MotionCmd(sv1=90, sv2=90))
             case 8: # back / select
                 await reset_pico()
 
     async def button_released(self, index, value):
         pass
+
+    async def heartbeat(self):
+        await self.serial.write_cmd(PingCmd())
+
+    async def stop(self):
+        await self.serial.write_cmd(StopCmd())

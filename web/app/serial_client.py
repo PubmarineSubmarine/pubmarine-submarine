@@ -169,6 +169,9 @@ class SerialClient:
         if task := self.read_task:
             task.cancel()
         logger.debug("Disconnected")
+        if self.connect_loop_task:
+            self.connect_loop_task.cancel()
+        self.connect_loop_task = create_task(self._connect_loop())
 
     async def write_cmd(self, cmd: Command):
         await self.write_text(cmd.serialize() + "\n")

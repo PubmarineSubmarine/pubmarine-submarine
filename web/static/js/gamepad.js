@@ -9,6 +9,7 @@ class GamepadController {
         this.objectGamepadState = "";
         this.submarine3D = null;
         this.artificialHorizon = null;
+        this.firmwareConfig = null;
 
         this.consoleBufferLimit = 50_000;
         this.consoleHistory = [];
@@ -43,6 +44,7 @@ class GamepadController {
         this.updateDisplay();
         this.init3DSubmarine();
         this.initArtificialHorizon();
+        this.initHeartbeat();
         document.getElementById("testing-btn").addEventListener("click", () => {
             this.onButtonPress(8, 1.0);
         });
@@ -92,6 +94,16 @@ class GamepadController {
             // Otherwise wait for the event
             window.addEventListener('objloader-ready', initSub, { once: true });
         }
+    }
+
+    initHeartbeat() {
+        window.setInterval(() => {
+            if (this.wsConnected) {
+                this.sendWebSocketData({
+                    type: 'heartbeat'
+                });
+            }
+        }, 1000);
     }
 
     bindEvents() {
@@ -145,6 +157,11 @@ class GamepadController {
     }
 
     stop() {
+        if (this.wsConnected) {
+            this.sendWebSocketData({
+                type: 'stop'
+            });
+        }
         this.isRunning = false;
         if (this.animationFrame) {
             cancelAnimationFrame(this.animationFrame);
@@ -557,6 +574,10 @@ class GamepadController {
                 console.log('WebSocket connected');
                 this.wsConnected = true;
                 this.updateWebSocketStatus(true);
+                this.sendWebSocketData({
+                    type: "console_command",
+                    text: "GET_CONFIG"
+                });
             };
 
             this.websocket.onclose = () => {
@@ -578,9 +599,13 @@ class GamepadController {
                 //console.log('Received from server:', data);
                 if (data.name === "STAT") {
                     this.updateStatusDisplay(data);
+                    this.logConsole("DEBUG", data.raw);
                 } else if (data.name === "CONSOLE") {
                     console.info(data.line);
                     this.logConsole(data.level, data.line);
+                } else if (data.name === "CONFIG") {
+                    console.info(data.config);
+                    this.firmwareConfig = data.config;
                 } else {
                     this.logConsole(data.name, JSON.stringify(data));
                 }

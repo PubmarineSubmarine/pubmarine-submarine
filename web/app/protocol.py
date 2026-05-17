@@ -1,10 +1,13 @@
-from typing import ClassVar, Literal, Self
+import json
+
+from typing import ClassVar, Literal, Self, Any
 from pydantic import BaseModel, Field
 
 
 class Command(BaseModel):
     name: ClassVar[str]
     flags: list[str] = []
+    raw: str = ""
 
     def serialize(self) -> str:
         cmd = self.name
@@ -25,6 +28,11 @@ class Command(BaseModel):
     def deserialize(cls, text: str):
         text = text.strip()
         chunks = text.split(" ")
+        
+        if chunks[0] == "CONFIG":
+            _, _, config = text.strip().partition(" ")
+            return ConfigCmd(config=json.loads(config))
+
 
         command_dict = {"flags": []}
         for chunk in chunks:
@@ -40,6 +48,7 @@ class Command(BaseModel):
                 arg_val = tuple(arg_val.split(","))
 
             command_dict[arg_name.lower()] = arg_val
+        command_dict["raw"] = text
 
         model = CommandModel(command=command_dict)
         return model.command
@@ -55,8 +64,8 @@ class StopCmd(Command):
 
 class MotionCmd(Command):
     name: Literal["MOT"] = "MOT"
-    x: float | None = None
-    z: float | None = None
+    a: float | None = None
+    b: float | None = None
     sv1: int | None = None
     sv2: int | None = None
     fu: int | None = None
@@ -67,25 +76,37 @@ class MotionCmd(Command):
     rd: int | None = None
     rl: int | None = None
     rr: int | None = None
+    lights: int | None = None
 
 
 class StateCmd(Command):
     name: Literal["STAT"] = "STAT"
-    x: float | None = None
-    z: float | None = None
+    a: float | None = None
+    b: float | None = None
     sv1: int | None = None
+    sv2: int | None = None
     fu: int | None = None
+    fd: int | None = None
+    fl: int | None = None
+    fr: int | None = None
+    ru: int | None = None
     rd: int | None = None
+    rl: int | None = None
+    rr: int | None = None
+    lights: int | None = None
     acc: tuple[float, float, float] | None = None
     gyro: tuple[float, float, float] | None = None
     depth: float | None = None
     bat: float | None = None
+    temp: float | None = None
+    hum: float | None = None
+    mcu: float | None = None
 
     @classmethod
     def default(cls) -> Self:
         return StateCmd(
-            x=1.0,
-            z=-1.0,
+            a=1.0,
+            b=-1.0,
             sv1=90,
             fu=1,
             rd=1,
@@ -100,16 +121,37 @@ class ConsoleLog(Command):
     name: Literal["CONSOLE"] = "CONSOLE"
     level: str = "INFO"
     line: str
+
+
+class PingCmd(Command):
+    name: Literal["PING"] = "PING"
+
+
+class ConfigCmd(Command):
+    name: Literal["CONFIG"] = "CONFIG"
+    config: dict[str, Any] = {}
+
+
+class GetConfigCmd(Command):
+    name: Literal["GET_CONFIG"] = "GET_CONFIG"
+
+
+class SetConfigCmd(Command):
+    name: Literal["SET_CONFIG"] = "SET_CONFIG"
+    config: dict[str, Any] = {}
+
+    def serialize(self) -> str:
+        return f"SET_CONFIG {json.dumps(self.config)}"
  
 
 class CommandModel(BaseModel):
-    command: ResetCmd | StopCmd | MotionCmd | StateCmd = Field(discriminator="name")
+    command: ResetCmd | StopCmd | MotionCmd | StateCmd | PingCmd | ConfigCmd | GetConfigCmd | SetConfigCmd = Field(discriminator="name")
 
 
 def test1():
     test = """
-        STAT X=0.5 Z=-0.5 SV1=90 FU=1 RD=1 ACC=0.23,0.12,9.89 GYRO=0.12,0.23,0.34 DEPTH=0.5 BAT=11.6
-        MOT X=1.0 Z=-0.5 SV1=90 FU=1.0 RD=1.0
+        STAT A=0.5 B=-0.5 SV1=90 FU=1 RD=1 ACC=0.23,0.12,9.89 GYRO=0.12,0.23,0.34 DEPTH=0.5 BAT=11.6
+        MOT A=1.0 B=-0.5 SV1=90 FU=1.0 RD=1.0
         RESET
         RESET SAFE
         BOOT
@@ -134,12 +176,12 @@ def test1():
 def test():
     commands = [
         StopCmd(),
-        MotionCmd(x=1.0, z=-1.0, sv1=90, fu=1, rd=1),
+        MotionCmd(a=1.0, b=-1.0, sv1=90, fu=1, rd=1),
         ResetCmd(flags=["SAFE"]),
         ResetCmd(),
         StateCmd(
-            x=1.0,
-            z=-1.0,
+            a=1.0,
+            b=-1.0,
             sv1=90,
             fu=1,
             rd=1,
