@@ -55,8 +55,8 @@ class StopCmd(Command):
 
 class MotionCmd(Command):
     name: Literal["MOT"] = "MOT"
-    x: float | None = None
-    z: float | None = None
+    a: float | None = None
+    b: float | None = None
     sv1: int | None = None
     sv2: int | None = None
     fu: int | None = None
@@ -71,8 +71,8 @@ class MotionCmd(Command):
 
 class StateCmd(Command):
     name: Literal["STAT"] = "STAT"
-    x: float | None = None
-    z: float | None = None
+    a: float | None = None
+    b: float | None = None
     sv1: int | None = None
     fu: int | None = None
     rd: int | None = None
@@ -84,8 +84,8 @@ class StateCmd(Command):
     @classmethod
     def default(cls) -> Self:
         return StateCmd(
-            x=1.0,
-            z=-1.0,
+            a=1.0,
+            b=-1.0,
             sv1=90,
             fu=1,
             rd=1,
@@ -101,8 +101,8 @@ class CommandModel(BaseModel):
 
 def test1():
     test = """
-        STAT X=0.5 Z=-0.5 SV1=90 FU=1 RD=1 ACC=0.23,0.12,9.89 GYRO=0.12,0.23,0.34 DEPTH=0.5 BAT=11.6
-        MOT X=1.0 Z=-0.5 SV1=90 FU=1.0 RD=1.0
+        STAT A=0.5 B=-0.5 SV1=90 FU=1 RD=1 ACC=0.23,0.12,9.89 GYRO=0.12,0.23,0.34 DEPTH=0.5 BAT=11.6
+        MOT A=1.0 B=-0.5 SV1=90 FU=1.0 RD=1.0
         RESET
         RESET SAFE
         BOOT
@@ -127,12 +127,12 @@ def test1():
 def test():
     commands = [
         StopCmd(),
-        MotionCmd(x=1.0, z=-1.0, sv1=90, fu=1, rd=1),
+        MotionCmd(a=1.0, b=-1.0, sv1=90, fu=1, rd=1),
         ResetCmd(flags=["SAFE"]),
         ResetCmd(),
         StateCmd(
-            x=1.0,
-            z=-1.0,
+            a=1.0,
+            b=-1.0,
             sv1=90,
             fu=1,
             rd=1,

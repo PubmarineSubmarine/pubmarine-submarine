@@ -40,35 +40,45 @@ class Plumbing:
 
     async def stick_moved(self, stick: str, x: float, y: float):
         if stick == "right":
-            sv1 = int(90 + 45*y)
-            sv2 = int(90 - 45*y)
-            await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
+            # sv1 = int(90 + 45*y)
+            # sv2 = int(90 - 45*y)
+            # await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
+            self.throttle = -y
+            await self.update_motors()
         elif stick == "left":
             self.steer = x
             await self.update_motors()
 
     async def trigger_moved(self, trigger: str, value: float):
+        # if trigger == "left":
+        #     self.throttle = -value
+        #     await self.update_motors()
+        # elif trigger == "right":
+        #     self.throttle = value
+        #     await self.update_motors()
         if trigger == "left":
-            self.throttle = -value
-            await self.update_motors()
+            sv1 = int(90 + 45*value)
+            sv2 = int(90 - 45*value)
+            await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
         elif trigger == "right":
-            self.throttle = value
-            await self.update_motors()
+            sv1 = int(90 - 45*value)
+            sv2 = int(90 + 45*value)
+            await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
 
     async def update_motors(self):
-        x_steer = self.steer
-        z_steer = -self.steer
+        a_steer = self.steer
+        b_steer = -self.steer
         if abs(self.steer) + abs(self.throttle) > 0:
             rel_steer = abs(self.steer) / (abs(self.steer) + abs(self.throttle))
             rel_throttle = abs(self.throttle) / (abs(self.steer) + abs(self.throttle))
         else:
             rel_steer = 0
             rel_throttle = 1
-        x = x_steer * rel_steer + self.throttle * rel_throttle
-        z = z_steer * rel_steer + self.throttle * rel_throttle
-        print(f"{self.steer=} {self.throttle=} {rel_steer=} {rel_throttle=} {x=} {z=}")
+        a = a_steer * rel_steer + self.throttle * rel_throttle
+        b = b_steer * rel_steer + self.throttle * rel_throttle
+        print(f"{self.steer=} {self.throttle=} {rel_steer=} {rel_throttle=} {a=} {b=}")
         # TODO motors are swapped
-        await self.serial.write_cmd(MotionCmd(x=z, z=x))
+        await self.serial.write_cmd(MotionCmd(a=a, b=b))
 
     async def button_pressed(self, index, value):
         match index:
@@ -100,7 +110,8 @@ class Plumbing:
                 # yaw right
                 await self.serial.write_cmd(MotionCmd(fu=0, fr=1, fd=1, fl=0, ru=1, rr=0, rd=0, rl=1))
             case 8: # back / select
-                await reset_pico()
+                #await reset_pico()
+                await self.serial.write_cmd(ResetCmd(flags=["SOFT"]))
 
     async def button_released(self, index, value):
         match index:
