@@ -264,9 +264,10 @@ try:
             print("# serial disconnected")
             cmd_stop("")
         while select.select([sys.stdin], [], [], 0) == ([sys.stdin], [], []):
-            buffer += sys.stdin.read(1)
-            if buffer[-1] in ('\x08', '\x7f'):
-                buffer = buffer[0:-2]
+            # buffer += sys.stdin.read(1)
+            # if buffer[-1] in ('\x08', '\x7f'):
+            #     buffer = buffer[0:-2]
+            buffer += sys.stdin.read()
         # print(repr(buffer))
         lines = []
         while "\n" in buffer:
@@ -318,7 +319,6 @@ try:
         controls.led.value = not controls.led.value
         for i in range(len(controls.pixels)):
             controls.pixels[i] = (random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS), random.randint(0, MAX_BRIGHTNESS))
-        time_delta = time.monotonic() - last_tick_time
         acc = (-1.0, -1.0, -1.0)
         gyro = (-1.0, -1.0, -1.0)
         # print("#", last_tick_time, time.monotonic(), time_delta)
@@ -334,21 +334,42 @@ try:
             traceback.print_exception(e)
             acc = (-1.0, -1.0, -1.0)
             gyro = (-1.0, -1.0, -1.0)
+        bat = 0
+        depth = 0
+        temp = 0
+        hum = 0
+        mcu = 0
+        ia = 0
+        ib = 0
+        bat = controls.sensor_battery.voltage * 4
+        depth = controls.sensor_depth.value / 65535.0
+        ia = controls.sensor_ipropi_a.voltage / 330.0 * 1100
+        ib = controls.sensor_ipropi_b.voltage / 330.0 * 1100
         if config.get("stat_interval", 1) > 0 and tick_number % config["stat_interval"] == 0:
+            # temp = controls.aht.temperature
+            # hum = controls.aht.relative_humidity
+            # mcu = microcontroller.cpu.temperature
+            # display.label_1.text = f"BAT:{controls.sensor_battery.voltage * 4:.2f} FM:{int(controls.fault_m.value)} FJ:{int(controls.fault_j.value)}"
+            # display.label_2.text = f"IA:{controls.sensor_ipropi_a.voltage / 330.0 * 1100:.2f} IB:{controls.sensor_ipropi_b.voltage / 330.0 * 1100:.2f}"
+            time_delta = time.monotonic() - last_tick_time
             print(f"STAT A={controls.motor_a.throttle or 0.0} B={controls.motor_b.throttle or 0.0} SV1={controls.sv1.angle or -1} " +
                   f"SV2={controls.sv2.angle or -1} SV3={controls.sv3.angle or -1} SV4={controls.sv4.angle or -1} FU={int(controls.jet_fu.value)} " +
                   f"FD={int(controls.jet_fd.value)} FL={int(controls.jet_fl.value)} FR={int(controls.jet_fr.value)} RU={int(controls.jet_ru.value)} " +
                   f"RD={int(controls.jet_rd.value)} RL={int(controls.jet_rl.value)} RR={int(controls.jet_rr.value)} " +
-                  f"LIGHTS={int(controls.lights.value)} BAT={controls.sensor_battery.voltage * 4} " +
-                  f"DEPTH={controls.sensor_depth.value / 65535.0} ACC={acc[0]},{acc[1]},{acc[2]} " +
+                  f"LIGHTS={int(controls.lights.value)} BAT={bat} " +
+                  f"DEPTH={depth} ACC={acc[0]},{acc[1]},{acc[2]} " +
                   f"GYRO={gyro[0]},{gyro[1]},{gyro[2]} " +
-                  f"TEMP={controls.aht.temperature} HUM={controls.aht.relative_humidity} " +
-                  f"MCU={microcontroller.cpu.temperature}")
+                  f"TEMP={temp} HUM={hum} " +
+                  f"MCU={mcu} " +
+                  f"IA={ia} IB={ib} " +
+                  f"FM={int(controls.fault_m.value)} FJ={int(controls.fault_j.value)} TD={time_delta*1000}")
         if config.get("heartbeat"):
             if time.monotonic() - last_heartbeat_time >= 10 and last_heartbeat_lost_time < last_heartbeat_time:
                 print("# heartbeat lost, stopping motors")
                 last_heartbeat_lost_time = time.monotonic()
                 cmd_stop("")
+        time_delta = time.monotonic() - last_tick_time
+        # display.label.text = f"{time_delta*1000}"
         time_to_sleep = TICK_MS/1000.0 - time_delta
         if time_to_sleep > 0:
             time.sleep(time_to_sleep)

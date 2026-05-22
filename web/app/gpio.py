@@ -18,8 +18,9 @@ def initialize_gpio():
         return
     GPIO.setmode(GPIO.BCM)
 
-    GPIO.setup(PICO_RESET_PIN, GPIO.OUT)
-    GPIO.output(PICO_RESET_PIN, GPIO.HIGH)
+    # never output high, pressing reset button on board would short to ground
+    # instead we use high-Z input for run and output low for reset
+    GPIO.setup(PICO_RESET_PIN, GPIO.IN, GPIO.PUD_OFF)
     logger.debug(f"GPIO initialized. Using pin {PICO_RESET_PIN} for reset")
 
 
@@ -34,7 +35,8 @@ async def reset_pico():
         logger.info("Ignoring reset command - GPIO unavailable")
         return
     logger.debug("Reseting pico...")
+    GPIO.setup(PICO_RESET_PIN, GPIO.OUT)
     GPIO.output(PICO_RESET_PIN, GPIO.LOW)
     await sleep(0.5)
-    GPIO.output(PICO_RESET_PIN, GPIO.HIGH)
+    GPIO.setup(PICO_RESET_PIN, GPIO.IN, GPIO.PUD_OFF)
     logger.info("Pico reset via GPIO")

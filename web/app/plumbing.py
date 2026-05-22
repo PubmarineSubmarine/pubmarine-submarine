@@ -1,6 +1,6 @@
 import logging
 from fastapi import WebSocket
-from protocol import Command, ResetCmd, StopCmd, MotionCmd, ConsoleLog, PingCmd
+from protocol import Command, ResetCmd, StopCmd, MotionCmd, ConsoleLog, PingCmd, StateCmd
 from serial_client import DebugSerialClient, SerialClient
 from gpio import reset_pico
 from os import environ
@@ -39,6 +39,12 @@ class Plumbing:
         await self.serial.write_cmd(StopCmd())
 
     async def handle_circuitpy_msg(self, msg: Command):
+        if isinstance(msg, StateCmd):
+            try:
+                with open("/sys/class/thermal/thermal_zone0/temp") as f:
+                    msg.pi = int(f.read().strip()) / 1000.0
+            except:
+                pass
         j = msg.model_dump_json()
         for ws in self.connections:
             await ws.send_text(j)
@@ -120,8 +126,8 @@ class Plumbing:
                 # yaw right
                 await self.serial.write_cmd(MotionCmd(fu=0, fr=1, fd=1, fl=0, ru=1, rr=0, rd=0, rl=1))
             case 8: # back / select
-                #await reset_pico()
-                await self.serial.write_cmd(ResetCmd(flags=["SOFT"]))
+                await reset_pico()
+                #await self.serial.write_cmd(ResetCmd(flags=["SOFT"]))
 
 
     async def button_released(self, index, value):

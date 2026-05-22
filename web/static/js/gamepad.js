@@ -44,7 +44,7 @@ class GamepadController {
         this.updateDisplay();
         this.init3DSubmarine();
         this.initArtificialHorizon();
-        this.initHeartbeat();
+        // this.initHeartbeat();
         document.getElementById("testing-btn").addEventListener("click", () => {
             this.onButtonPress(8, 1.0);
         });
@@ -172,7 +172,8 @@ class GamepadController {
         if (!this.isRunning) return;
 
         this.updateGamepadState();
-        this.animationFrame = requestAnimationFrame(() => this.loop());
+	// this.animationFrame = requestAnimationFrame(() => this.loop());
+	setTimeout(() => this.loop(), 50);
     }
 
     gamepadToObject(obj) {
@@ -393,7 +394,7 @@ class GamepadController {
         //console.log(`update ${state}`)
         const valuesEl = document.getElementById('left-status-values');
         if (valuesEl) {
-            valuesEl.innerHTML = `Battery: ${state.bat}<br/>Depth: ${state.depth}<br/>Accel: ${state.acc}<br/>Gyro: ${state.gyro}`;
+            valuesEl.innerHTML = `Battery: ${state.bat}<br/>Depth: ${state.depth}<br/>Accel: ${state.acc}<br/>Gyro: ${state.gyro}<br/>Temp: ${state.temp}<br/>Humidity: ${state.hum}<br/>MCU Temp: ${state.mcu}<br/>Pi Temp: ${state.pi}<br/>IA: ${state.ia}<br/>IB: ${state.ib}<br/>FM: ${state.fm}<br/>FJ: ${state.fj}<br/>TD: ${state.td}`;
         }
 
         // Update 3D submarine orientation and artificial horizon if gyro data is available
@@ -510,8 +511,11 @@ class GamepadController {
         item.innerHTML = `
             <span class="timestamp">${new Date(timestamp).toLocaleTimeString()}</span>
             <span class="button-name">[${label}]</span>
-            <span class="button-value">${message}</span>
         `;
+        const buttonValue = document.createElement('span');
+        buttonValue.className = 'button-value';
+        buttonValue.innerText = message;
+        item.appendChild(buttonValue);
 
         historyEl.appendChild(item);
 
@@ -596,15 +600,18 @@ class GamepadController {
 
             this.websocket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                //console.log('Received from server:', data);
+                console.log('Received from server:', data);
                 if (data.name === "STAT") {
                     this.updateStatusDisplay(data);
                     this.logConsole("DEBUG", data.raw);
+                } else if (data.name === "PONG") {
+
                 } else if (data.name === "CONSOLE") {
                     console.info(data.line);
                     this.logConsole(data.level, data.line);
                 } else if (data.name === "CONFIG") {
                     console.info(data.config);
+                    this.logConsole(data.name, JSON.stringify(data.config));
                     this.firmwareConfig = data.config;
                 } else {
                     this.logConsole(data.name, JSON.stringify(data));

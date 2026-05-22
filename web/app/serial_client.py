@@ -3,6 +3,7 @@ import serial
 from serial_asyncio import open_serial_connection
 import logging
 import random
+import traceback
 
 from pydantic import ValidationError
 
@@ -47,10 +48,10 @@ class DebugSerialClient:
                 if cmd.sv2 is not None:
                     pitch_delta = (cmd.sv2 - 90) * 0.5
 
-                if cmd.x is not None:
-                    roll_delta += cmd.x * 10.0
-                if cmd.z is not None:
-                    roll_delta += cmd.z * 10.0
+                if cmd.a is not None:
+                    roll_delta += cmd.a * 10.0
+                if cmd.b is not None:
+                    roll_delta += cmd.b * 10.0
 
                 left_thrust = 0
                 right_thrust = 0
@@ -81,7 +82,7 @@ class DebugSerialClient:
                     if random.randint(0, 100) == 0:
                         await self.callback(ConsoleLog(line="This is a test message from the debug PICO serial client"))
                     elif random.randint(0, 1000) == 0:
-                        await self.callback(MotionCmd(x=1.0, y=-2.7, fl=29))
+                        await self.callback(MotionCmd(a=1.0, b=-2.7, fl=29))
 
                     state = StateCmd.default()
 
@@ -97,10 +98,10 @@ class DebugSerialClient:
                             pitch_delta = (self.last_motion_cmd.sv2 - 90) * 0.5  # Map 0-180 to degrees
 
                         # Handle x and z axes - both control roll
-                        if self.last_motion_cmd.x is not None:
-                            roll_delta += self.last_motion_cmd.x * 10.0
-                        if self.last_motion_cmd.z is not None:
-                            roll_delta += self.last_motion_cmd.z * 10.0
+                        if self.last_motion_cmd.a is not None:
+                            roll_delta += self.last_motion_cmd.a * 10.0
+                        if self.last_motion_cmd.b is not None:
+                            roll_delta += self.last_motion_cmd.b * 10.0
 
                         left_thrust = 0
                         right_thrust = 0
@@ -204,13 +205,14 @@ class SerialClient:
 
             if data:
                 if callback := self.callback:
-                    # logger.debug(f"RX: {data}")
+                    logger.debug(f"RX: {data}")
                     try:
                         cmd = Command.deserialize(data.strip())
                         if not isinstance(cmd, StateCmd):
                             logger.info(cmd)
                         await callback(cmd)
                     except ValidationError:
+                        traceback.print_exc()
                         logger.debug(f"RX: {data}")
                         await callback(ConsoleLog(line=data))
                 else:

@@ -83,8 +83,8 @@ class StateCmd(Command):
     name: Literal["STAT"] = "STAT"
     a: float | None = None
     b: float | None = None
-    sv1: int | None = None
-    sv2: int | None = None
+    sv1: float | None = None
+    sv2: float | None = None
     fu: int | None = None
     fd: int | None = None
     fl: int | None = None
@@ -101,6 +101,12 @@ class StateCmd(Command):
     temp: float | None = None
     hum: float | None = None
     mcu: float | None = None
+    ia: float | None = None
+    ib: float | None = None
+    fm: int | None = None
+    fj: int | None = None
+    pi: float | None = None
+    td: float | None = None
 
     @classmethod
     def default(cls) -> Self:
@@ -127,6 +133,10 @@ class PingCmd(Command):
     name: Literal["PING"] = "PING"
 
 
+class PongCmd(Command):
+    name: Literal["PONG"] = "PONG"
+
+
 class ConfigCmd(Command):
     name: Literal["CONFIG"] = "CONFIG"
     config: dict[str, Any] = {}
@@ -145,7 +155,7 @@ class SetConfigCmd(Command):
  
 
 class CommandModel(BaseModel):
-    command: ResetCmd | StopCmd | MotionCmd | StateCmd | PingCmd | ConfigCmd | GetConfigCmd | SetConfigCmd = Field(discriminator="name")
+    command: ResetCmd | StopCmd | MotionCmd | StateCmd | PingCmd | PongCmd | ConfigCmd | GetConfigCmd | SetConfigCmd = Field(discriminator="name")
 
 
 def test1():
