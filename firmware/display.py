@@ -15,3 +15,4 @@ group.append(label_1)
 label_2 = adafruit_display_text.label.Label(terminalio.FONT, text="PubSubHub v2", color=0xFFFFFF)
 label_2.y = 24
 group.append(label_2)
+controls.display.refresh()

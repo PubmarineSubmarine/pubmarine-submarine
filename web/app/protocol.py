@@ -1,7 +1,7 @@
 import json
 
 from typing import ClassVar, Literal, Self, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Command(BaseModel):
@@ -107,6 +107,9 @@ class StateCmd(Command):
     fj: int | None = None
     pi: float | None = None
     td: float | None = None
+    br: int | None = None
+
+    model_config = ConfigDict(extra='allow')
 
     @classmethod
     def default(cls) -> Self:

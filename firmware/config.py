@@ -6,8 +6,12 @@ from io import BytesIO
 
 DEFAULT_CONFIG = {
     "watchdog": False,
+    "watchdog_timeout": 2.5,
     "heartbeat": False,
+    "heartbeat_timeout": 3,
     "stat_interval": 1,
+    "sens_interval": 0,
+    "disp_interval": 40,
     "autoreload": True,
     "reload_on_success": False,
     "reload_on_error": True,

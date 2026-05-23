@@ -10,6 +10,7 @@ import microcontroller
 import supervisor
 import json
 import watchdog
+import io
 
 from config import get_config, set_config, clear_config
 
@@ -247,11 +248,20 @@ supervisor.set_next_code_file(None, reload_on_success=config.get("reload_on_succ
 
 if config.get("watchdog"):
     print("# enabling watchdog")
-    microcontroller.watchdog.timeout = 2.5
+    microcontroller.watchdog.timeout = config.get("watchdog_timeout", 2.5)
     microcontroller.watchdog.mode = watchdog.WatchDogMode.RESET
 else:
     print("# not enabling watchdog")
 
+
+buf = io.StringIO(128)
+bat = 0.0
+depth = 0.0
+temp = 0.0
+hum = 0.0
+mcu = 0.0
+ia = 0.0
+ib = 0.0
 
 try:
     controls.sleep_m.value = True
@@ -263,21 +273,26 @@ try:
         if not supervisor.runtime.serial_connected:
             print("# serial disconnected")
             cmd_stop("")
-        while select.select([sys.stdin], [], [], 0) == ([sys.stdin], [], []):
-            # buffer += sys.stdin.read(1)
-            # if buffer[-1] in ('\x08', '\x7f'):
-            #     buffer = buffer[0:-2]
-            buffer += sys.stdin.read()
-        # print(repr(buffer))
+        bytes_read = 0
+        while avail := supervisor.runtime.serial_bytes_available:
+            buf.write(sys.stdin.read(avail))
+            bytes_read += avail
         lines = []
-        while "\n" in buffer:
-            line, _, buffer = buffer.partition("\n")
+        buf.seek(0)
+        while line := buf.readline():
+            if not line.endswith("\n"):
+                break
             line = line.strip()
             if line:
                 lines.append(line)
+        buf = io.StringIO(line)
+        buf.seek(0, 2)
 
         # Main dispatch
         for line in lines:
+            if last_heartbeat_time <= last_heartbeat_lost_time:
+                display.label.text = "heartbeat returned"
+                controls.display.refresh()
             last_heartbeat_time = time.monotonic()
             cmd, _, tail = line.partition(" ")
             cmd = cmd.upper()
@@ -334,23 +349,20 @@ try:
             traceback.print_exception(e)
             acc = (-1.0, -1.0, -1.0)
             gyro = (-1.0, -1.0, -1.0)
-        bat = 0
-        depth = 0
-        temp = 0
-        hum = 0
-        mcu = 0
-        ia = 0
-        ib = 0
         bat = controls.sensor_battery.voltage * 4
         depth = controls.sensor_depth.value / 65535.0
         ia = controls.sensor_ipropi_a.voltage / 330.0 * 1100
         ib = controls.sensor_ipropi_b.voltage / 330.0 * 1100
-        if config.get("stat_interval", 1) > 0 and tick_number % config["stat_interval"] == 0:
-            # temp = controls.aht.temperature
-            # hum = controls.aht.relative_humidity
-            # mcu = microcontroller.cpu.temperature
-            # display.label_1.text = f"BAT:{controls.sensor_battery.voltage * 4:.2f} FM:{int(controls.fault_m.value)} FJ:{int(controls.fault_j.value)}"
-            # display.label_2.text = f"IA:{controls.sensor_ipropi_a.voltage / 330.0 * 1100:.2f} IB:{controls.sensor_ipropi_b.voltage / 330.0 * 1100:.2f}"
+        mcu = microcontroller.cpu.temperature
+        if config.get("sens_interval", 0) > 0 and tick_number % config.get("sens_interval", 0) == 0:
+            temp = controls.aht.temperature
+            hum = controls.aht.relative_humidity
+        if config.get("disp_interval", 40) > 0 and tick_number % config.get("disp_interval", 40) == 0:
+            # bat += random.uniform(0, 1)
+            display.label_1.text = f"BAT:{bat:.2f} FM:{int(controls.fault_m.value)} FJ:{int(controls.fault_j.value)}"
+            display.label_2.text = f"IA:{ia:.2f} IB:{ia:.2f}"
+            controls.display.refresh()
+        if config.get("stat_interval", 1) > 0 and tick_number % config.get("stat_interval", 1) == 0:
             time_delta = time.monotonic() - last_tick_time
             print(f"STAT A={controls.motor_a.throttle or 0.0} B={controls.motor_b.throttle or 0.0} SV1={controls.sv1.angle or -1} " +
                   f"SV2={controls.sv2.angle or -1} SV3={controls.sv3.angle or -1} SV4={controls.sv4.angle or -1} FU={int(controls.jet_fu.value)} " +
@@ -362,14 +374,16 @@ try:
                   f"TEMP={temp} HUM={hum} " +
                   f"MCU={mcu} " +
                   f"IA={ia} IB={ib} " +
-                  f"FM={int(controls.fault_m.value)} FJ={int(controls.fault_j.value)} TD={time_delta*1000}")
+                  f"FM={int(controls.fault_m.value)} FJ={int(controls.fault_j.value)} TD={time_delta*1000} BR={bytes_read}")
         if config.get("heartbeat"):
-            if time.monotonic() - last_heartbeat_time >= 10 and last_heartbeat_lost_time < last_heartbeat_time:
+            if time.monotonic() - last_heartbeat_time >= config.get("heartbeat_timeout", 3) and last_heartbeat_lost_time < last_heartbeat_time:
                 print("# heartbeat lost, stopping motors")
                 last_heartbeat_lost_time = time.monotonic()
                 cmd_stop("")
+                display.label.text = "heartbeat lost"
+                controls.display.refresh()
         time_delta = time.monotonic() - last_tick_time
-        # display.label.text = f"{time_delta*1000}"
+        # display.label.text = f"tick:{time_delta*1000}ms"
         time_to_sleep = TICK_MS/1000.0 - time_delta
         if time_to_sleep > 0:
             time.sleep(time_to_sleep)

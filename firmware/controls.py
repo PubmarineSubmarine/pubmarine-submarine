@@ -73,12 +73,12 @@ led.switch_to_output()
 
 # I2C/MPU6050
 displayio.release_displays()
-i2c = busio.I2C(pins.SCL, pins.SDA)
+i2c = busio.I2C(pins.SCL, pins.SDA, frequency=400000)
 mpu = adafruit_mpu6050.MPU6050(i2c)
 ads = adafruit_ads1x15.ads1015.ADS1015(i2c, gain=1, data_rate=1600, mode=adafruit_ads1x15.ads1x15.Mode.SINGLE)
 aht = adafruit_ahtx0.AHTx0(i2c)
 display_bus = i2cdisplaybus.I2CDisplayBus(i2c, device_address=0x3c)
-display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=32)
+display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=32, auto_refresh=False)
 
 # Analog sensors
 sensor_depth = adafruit_ads1x15.analog_in.AnalogIn(ads, adafruit_ads1x15.ads1015.P3)

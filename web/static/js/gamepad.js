@@ -44,7 +44,7 @@ class GamepadController {
         this.updateDisplay();
         this.init3DSubmarine();
         this.initArtificialHorizon();
-        // this.initHeartbeat();
+        this.initHeartbeat();
         document.getElementById("testing-btn").addEventListener("click", () => {
             this.onButtonPress(8, 1.0);
         });
@@ -394,7 +394,7 @@ class GamepadController {
         //console.log(`update ${state}`)
         const valuesEl = document.getElementById('left-status-values');
         if (valuesEl) {
-            valuesEl.innerHTML = `Battery: ${state.bat}<br/>Depth: ${state.depth}<br/>Accel: ${state.acc}<br/>Gyro: ${state.gyro}<br/>Temp: ${state.temp}<br/>Humidity: ${state.hum}<br/>MCU Temp: ${state.mcu}<br/>Pi Temp: ${state.pi}<br/>IA: ${state.ia}<br/>IB: ${state.ib}<br/>FM: ${state.fm}<br/>FJ: ${state.fj}<br/>TD: ${state.td}`;
+            valuesEl.innerHTML = `Battery: ${state.bat}<br/>Depth: ${state.depth}<br/>Accel: ${state.acc}<br/>Gyro: ${state.gyro}<br/>Temp: ${state.temp}<br/>Humidity: ${state.hum}<br/>MCU Temp: ${state.mcu}<br/>Pi Temp: ${state.pi}<br/>IA: ${state.ia}<br/>IB: ${state.ib}<br/>FM: ${state.fm}<br/>FJ: ${state.fj}<br/>TD: ${state.td}<br/>BR: ${state.br}`;
         }
 
         // Update 3D submarine orientation and artificial horizon if gyro data is available
