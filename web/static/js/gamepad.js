@@ -44,7 +44,7 @@ class GamepadController {
         this.updateDisplay();
         this.init3DSubmarine();
         this.initArtificialHorizon();
-        this.initHeartbeat();
+        // this.initHeartbeat();
         document.getElementById("testing-btn").addEventListener("click", () => {
             this.onButtonPress(8, 1.0);
         });

@@ -17,23 +17,23 @@ from config import get_config, set_config, clear_config
 
 config = get_config()
 
-MAX_BRIGHTNESS = 10
+MAX_BRIGHTNESS = config.get("max_brightness", 20)
 TICK_MS = 50
 buffer = ""
 last_tick_time = time.monotonic()
 last_heartbeat_time = time.monotonic()
 last_heartbeat_lost_time = time.monotonic()
 tick_number = 0
-MOTOR_MIN = 0.2
-MOTOR_MIN_START = 0.3
-MOTOR_MAX_START = 0.5
-MOTOR_MAX_CHANGE_TICK = 0.2
-SV1_ADJUST = 0
-SV2_ADJUST = 5
-SV3_ADJUST = 0
-SV4_ADJUST = 0
-MOTOR_A_SCALE = 1.0
-MOTOR_B_SCALE = -1.0
+MOTOR_MIN = config.get("motor_min", 0.2)
+MOTOR_MIN_START = config.get("motor_min_start", 0.3)
+MOTOR_MAX_START = config.get("motor_max_start", 0.5)
+MOTOR_MAX_CHANGE_TICK = config.get("motor_max_change_tick", 0.2)
+SV1_ADJUST = config.get("sv1_adjust", 0)
+SV2_ADJUST = config.get("sv2_adjust", 0)
+SV3_ADJUST = config.get("sv3_adjust", 0)
+SV4_ADJUST = config.get("sv4_adjust", 0)
+MOTOR_A_SCALE = config.get("motor_a_scale", 1.0)
+MOTOR_B_SCALE = config.get("motor_b_scale", -1.0)
 
 class Requests:
     a: float = 0.0

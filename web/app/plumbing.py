@@ -19,6 +19,7 @@ class Plumbing:
         self.serial.callback = self.handle_circuitpy_msg
         self.throttle = 0.0
         self.steer = 0.0
+        self.lights = False
 
     async def init(self):
         print("connecting serial")
@@ -43,6 +44,10 @@ class Plumbing:
             try:
                 with open("/sys/class/thermal/thermal_zone0/temp") as f:
                     msg.pi = int(f.read().strip()) / 1000.0
+                if msg.lights == 1:
+                    self.lights = True
+                elif msg.lights == 0:
+                    self.lights = False
             except:
                 pass
         j = msg.model_dump_json()
@@ -97,11 +102,11 @@ class Plumbing:
     async def button_pressed(self, index, value):
         match index:
             case 0:  # A
-                # await self.serial.write_cmd(MotionCmd(sv1=0, sv2=180))
-                pass
+                await self.serial.write_cmd(MotionCmd(rd=1, rl=1, rr=1))
             case 1:  # B
                 # await self.serial.write_cmd(ResetCmd())
-                pass
+                self.lights = not self.lights
+                await self.serial.write_cmd(MotionCmd(lights=int(self.lights)))
             case 2:  # X
                 await self.serial.write_cmd(StopCmd())
             case 3:  # Y
@@ -132,6 +137,8 @@ class Plumbing:
 
     async def button_released(self, index, value):
         match index:
+            case 0:  # A
+                await self.serial.write_cmd(MotionCmd(rd=0, rl=0, rr=0))
             case 4:  # Left Bumper
                 await self.serial.write_cmd(MotionCmd(fu=0, fd=0, fl=0, fr=0, ru=0, rd=0, rl=0, rr=0))
             case 5:  # Right Bumper
