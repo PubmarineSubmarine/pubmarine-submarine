@@ -20,11 +20,11 @@ logger = logging.getLogger(__name__)
 class Plumbing:
     def __init__(self):
         self.connections: list[WebSocket] = []
-        # self.serial = DebugSerialClient()
-        if environ.get("PUBMARINE_DEBUG_SERIAL"):
+        port = environ.get("SERIAL_PORT")
+        if port == "DEBUG":
             self.serial = DebugSerialClient()
         else:
-            self.serial = SerialClient()
+            self.serial = SerialClient(port=port)
         # self.serial = SerialClient("/dev/pts/13", baudrate=9600)
         self.serial.callback = self.handle_circuitpy_msg
         self.throttle = 0.0
