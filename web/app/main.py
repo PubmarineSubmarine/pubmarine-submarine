@@ -1,5 +1,9 @@
+import json
+import logging
 from asyncio import TaskGroup
 from contextlib import asynccontextmanager
+
+import httpx
 from fastapi import (
     FastAPI,
     HTTPException,
@@ -11,13 +15,8 @@ from fastapi import (
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-import json
-import logging
-
-import httpx
-
-from plumbing import Plumbing
 from gpio import cleanup_gpio, initialize_gpio
+from plumbing import Plumbing
 
 plumbing = Plumbing()
 
@@ -42,6 +41,7 @@ templates = Jinja2Templates(directory="templates")
 # Set up logging for gamepad data
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
 
 @app.get("/", response_class=HTMLResponse)
 async def gamepad_demo(request: Request):
@@ -83,6 +83,7 @@ async def handle_gamepad_data(data: dict):
     except Exception:
         logger.exception("Error handling websocket message")
 
+
 async def log_gamepad_data(data: dict):
     """Log gamepad data in a readable format."""
     event_type = data.get("type", "unknown")
@@ -122,15 +123,15 @@ async def log_gamepad_data(data: dict):
         logger.info("🔌 GAMEPAD DISCONNECTED")
 
     elif event_type == "gamepad_state":
-        # full gamepad state comes in here 
-        #logger.info(f"🎮 GAMEPAD DATA: {data['gamepad']}")
+        # full gamepad state comes in here
+        # logger.info(f"🎮 GAMEPAD DATA: {data['gamepad']}")
         pass
     elif event_type == "console_command":
         await plumbing.console_cmd(data["text"])
 
     elif event_type == "heartbeat":
         await plumbing.heartbeat()
-    
+
     elif event_type == "stop":
         await plumbing.stop()
 
@@ -182,20 +183,14 @@ async def proxy_cam(request: Request):
             )
 
     except httpx.ConnectError:
-        raise HTTPException(
-            status_code=502, detail="WebRTC server is not available at localhost:8889"
-        )
+        raise HTTPException(status_code=502, detail="WebRTC server is not available at localhost:8889")
     except httpx.TimeoutException:
-        raise HTTPException(
-            status_code=504, detail="Request to WebRTC server timed out"
-        )
+        raise HTTPException(status_code=504, detail="Request to WebRTC server timed out")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Proxy error: {str(e)}")
 
 
-@app.api_route(
-    "/cam/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
-)
+@app.api_route("/cam/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
 async def proxy_cam_subpaths(path: str, request: Request):
     """
     Proxy requests to WebRTC server subpaths (e.g., /cam/stream, /cam/config)
@@ -239,20 +234,17 @@ async def proxy_cam_subpaths(path: str, request: Request):
             )
 
     except httpx.ConnectError:
-        raise HTTPException(
-            status_code=502, detail="WebRTC server is not available at localhost:8889"
-        )
+        raise HTTPException(status_code=502, detail="WebRTC server is not available at localhost:8889")
     except httpx.TimeoutException:
-        raise HTTPException(
-            status_code=504, detail="Request to WebRTC server timed out"
-        )
+        raise HTTPException(status_code=504, detail="Request to WebRTC server timed out")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Proxy error: {str(e)}")
 
 
 if __name__ == "__main__":
-    import uvicorn
     from pathlib import Path
+
+    import uvicorn
 
     cert_file = Path("certs/cert.pem")
     key_file = Path("certs/key.pem")
