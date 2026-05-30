@@ -11,7 +11,8 @@ class GamepadController {
         this.artificialHorizon = null;
         this.firmwareConfig = null;
 
-        this.consoleBufferLimit = 50_000;
+        this.consoleBufferLimit = 100_000;
+        this.domBufferLimit = 1_500;
         this.consoleHistory = [];
 
         // Button mapping for standard gamepad
@@ -495,7 +496,7 @@ class GamepadController {
         this.consoleHistory.push({ ts: timestamp, label, message });
 
         // Trim internal buffer to limit
-        while (this.consoleHistory.length > this.consoleBufferLimit * 2) {
+        while (this.consoleHistory.length > this.consoleBufferLimit) {
             this.consoleHistory.shift();
         }
 
@@ -522,8 +523,7 @@ class GamepadController {
         // Auto-scroll to bottom
         historyEl.scrollTop = historyEl.scrollHeight;
 
-        // Keep only last 500 DOM items for performance
-        while (historyEl.querySelectorAll('.history-item').length > this.consoleBufferLimit) {
+        while (historyEl.querySelectorAll('.history-item').length > this.domBufferLimit) {
             const first = historyEl.querySelector(':scope > .history-item:first-child');
             if (first) first.remove();
         }
