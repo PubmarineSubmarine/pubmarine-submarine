@@ -20,7 +20,15 @@ sudo systemctl enable --now missioncontrol
 
 ### To run for local debugging
 ```
-PUBMARINE_DEBUG_SERIAL=1 uv run app/main.py
+# backend
+SERIAL_PORT="DEBUG" uv run app/main.py
+# frontend
+npm run watch
+```
+
+### To build frontend
+```
+npm run build
 ```
 
 
