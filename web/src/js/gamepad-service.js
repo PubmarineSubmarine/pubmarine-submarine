@@ -10,6 +10,8 @@ export const telemetry = signal(null);
 export const connected = signal(false);
 export const wsConnected = signal(false);
 
+const DEADZONE = 0.1;
+
 // ── Service singleton ───────────────────────────────────────────────
 class GamepadService {
   constructor() {
@@ -17,7 +19,7 @@ class GamepadService {
     this.previousButtons = [];
     this.isRunning = false;
     this.websocket = null;
-    this.objectGamepadState = "";
+    this.lastGamepadJSON = "";
 
     this.consoleBufferLimit = 100_000;
     this.domBufferLimit = 1_500;
@@ -57,8 +59,8 @@ class GamepadService {
   }
 
   // ── Init & lifecycle ──────────────────────────────────────────────
-  init(consoleHistoryRef) {
-    this._consoleHistoryRef = consoleHistoryRef;
+  init(consoleHistoryEl) {
+    this._consoleHistoryRef = consoleHistoryEl;
     this.bindEvents();
     this.initWebSocket();
     this.checkForGamepads();
@@ -78,8 +80,6 @@ class GamepadService {
       console.log("Gamepad connected:", e.gamepad.id);
       this.gamepadIndex = e.gamepad.index;
       connected.value = true;
-      // Update connection status with gamepad id — handled by signal
-      this._updateConnectionDisplay(e.gamepad.id);
       this.sendWebSocketData({
         type: "gamepad_connected",
         gamepad_id: e.gamepad.id,
@@ -91,7 +91,6 @@ class GamepadService {
     window.addEventListener("gamepaddisconnected", (e) => {
       console.log("Gamepad disconnected:", e.gamepad.id);
       connected.value = false;
-      this._updateConnectionDisplay("");
       this.sendWebSocketData({
         type: "gamepad_disconnected",
         gamepad_id: e.gamepad.id,
@@ -107,21 +106,11 @@ class GamepadService {
       if (gamepads[i]) {
         this.gamepadIndex = i;
         connected.value = true;
-        this._updateConnectionDisplay(gamepads[i].id);
         return true;
       }
     }
     connected.value = false;
-    this._updateConnectionDisplay("");
     return false;
-  }
-
-  _updateConnectionDisplay(gamepadId) {
-    // The App component renders the connection status from signals,
-    // but we also expose the raw gamepad id for display
-    if (this._onConnectionChange) {
-      this._onConnectionChange(gamepadId);
-    }
   }
 
   start() {
@@ -149,39 +138,6 @@ class GamepadService {
   }
 
   // ── Gamepad state polling ─────────────────────────────────────────
-  gamepadToObject(obj) {
-    if (obj === null || typeof obj !== "object") return obj;
-    if (Array.isArray(obj))
-      return obj.map((item) => this.gamepadToObject(item));
-    const result = {};
-    for (let prop in obj) {
-      const value = obj[prop];
-      if (typeof value !== "function") {
-        result[prop] = this.gamepadToObject(value);
-      }
-    }
-    return result;
-  }
-
-  // Native deep equality — replaces lodash _.isEqual
-  _deepEqual(a, b) {
-    if (a === b) return true;
-    if (typeof a !== typeof b) return false;
-    if (a === null || b === null) return false;
-    if (Array.isArray(a)) {
-      if (!Array.isArray(b)) return false;
-      if (a.length !== b.length) return false;
-      return a.every((val, i) => this._deepEqual(val, b[i]));
-    }
-    if (typeof a === "object") {
-      const keysA = Object.keys(a);
-      const keysB = Object.keys(b);
-      if (keysA.length !== keysB.length) return false;
-      return keysA.every((key) => this._deepEqual(a[key], b[key]));
-    }
-    return false;
-  }
-
   updateGamepadState() {
     const gamepads = navigator.getGamepads();
     const gamepad = gamepads[this.gamepadIndex];
@@ -191,12 +147,13 @@ class GamepadService {
       return;
     }
 
-    const gamepadObj = this.gamepadToObject(gamepad);
-    if (!this._deepEqual(gamepadObj, this.objectGamepadState)) {
-      this.objectGamepadState = gamepadObj;
+    // JSON.stringify already strips functions — cheap diff + send in one go
+    const gamepadJSON = JSON.stringify(gamepad);
+    if (gamepadJSON !== this.lastGamepadJSON) {
+      this.lastGamepadJSON = gamepadJSON;
       this.sendWebSocketData({
         type: "gamepad_state",
-        gamepad: gamepadObj,
+        gamepad: JSON.parse(gamepadJSON),
       });
     }
 
@@ -250,57 +207,41 @@ class GamepadService {
   updateAnalogSticks(axes) {
     if (axes.length < 4) return;
 
-    // Left stick
     leftStick.value = { x: axes[0], y: axes[1] };
-    // Right stick
     rightStick.value = { x: axes[2], y: axes[3] };
 
-    // Send via WebSocket (throttled + deadzone)
     if (!this.lastStickSent || Date.now() - this.lastStickSent > 10) {
-      const deadzone = 0.1;
-
-      if (Math.abs(axes[0]) >= deadzone || Math.abs(axes[1]) >= deadzone) {
-        this.sendWebSocketData({
-          type: "analog_stick",
-          stick: "left",
-          x: axes[0],
-          y: axes[1],
-          timestamp: Date.now(),
-        });
-        this.lastLeftStickSent = true;
-      } else if (this.lastLeftStickSent) {
-        this.sendWebSocketData({
-          type: "analog_stick",
-          stick: "left",
-          x: 0.0,
-          y: 0.0,
-          timestamp: Date.now(),
-        });
-        this.lastLeftStickSent = false;
-      }
-
-      if (Math.abs(axes[2]) >= deadzone || Math.abs(axes[3]) >= deadzone) {
-        this.sendWebSocketData({
-          type: "analog_stick",
-          stick: "right",
-          x: axes[2],
-          y: axes[3],
-          timestamp: Date.now(),
-        });
-        this.lastRightStickSent = true;
-      } else if (this.lastRightStickSent) {
-        this.sendWebSocketData({
-          type: "analog_stick",
-          stick: "right",
-          x: 0.0,
-          y: 0.0,
-          timestamp: Date.now(),
-        });
-        this.lastRightStickSent = false;
-      }
-
+      this._sendStick("left", axes[0], axes[1]);
+      this._sendStick("right", axes[2], axes[3]);
       this.lastStickSent = Date.now();
     }
+  }
+
+  _sendStick(name, x, y) {
+    const wasActive =
+      name === "left" ? this.lastLeftStickSent : this.lastRightStickSent;
+    const active = Math.abs(x) >= DEADZONE || Math.abs(y) >= DEADZONE;
+
+    if (active) {
+      this.sendWebSocketData({
+        type: "analog_stick",
+        stick: name,
+        x,
+        y,
+        timestamp: Date.now(),
+      });
+    } else if (wasActive) {
+      this.sendWebSocketData({
+        type: "analog_stick",
+        stick: name,
+        x: 0,
+        y: 0,
+        timestamp: Date.now(),
+      });
+    }
+
+    if (name === "left") this.lastLeftStickSent = active;
+    else this.lastRightStickSent = active;
   }
 
   updateAnalogTriggers(buttons) {
@@ -309,46 +250,34 @@ class GamepadService {
     leftTrigger.value = buttons[6].value;
     rightTrigger.value = buttons[7].value;
 
-    const deadzone = 0.1;
+    this._sendTrigger("left", buttons[6].value);
+    this._sendTrigger("right", buttons[7].value);
+  }
+
+  _sendTrigger(name, value) {
+    const wasActive =
+      name === "left" ? this.lastLeftTriggerSent : this.lastRightTriggerSent;
+    const active = Math.abs(value) >= DEADZONE;
     const now = Date.now();
 
-    if (Math.abs(buttons[6].value) >= deadzone) {
+    if (active) {
       this.sendWebSocketData({
         type: "analog_trigger",
-        trigger: "left",
-        value: buttons[6].value,
+        trigger: name,
+        value,
         timestamp: now,
       });
-      this.lastLeftTriggerSent = true;
-    }
-    if (Math.abs(buttons[6].value) < deadzone && this.lastLeftTriggerSent) {
+    } else if (wasActive) {
       this.sendWebSocketData({
         type: "analog_trigger",
-        trigger: "left",
+        trigger: name,
         value: 0,
         timestamp: now,
       });
-      this.lastLeftTriggerSent = false;
     }
 
-    if (Math.abs(buttons[7].value) >= deadzone) {
-      this.sendWebSocketData({
-        type: "analog_trigger",
-        trigger: "right",
-        value: buttons[7].value,
-        timestamp: now,
-      });
-      this.lastRightTriggerSent = true;
-    }
-    if (Math.abs(buttons[7].value) < deadzone && this.lastRightTriggerSent) {
-      this.sendWebSocketData({
-        type: "analog_trigger",
-        trigger: "right",
-        value: 0,
-        timestamp: now,
-      });
-      this.lastRightTriggerSent = false;
-    }
+    if (name === "left") this.lastLeftTriggerSent = active;
+    else this.lastRightTriggerSent = active;
   }
 
   // ── Telemetry / status display ────────────────────────────────────

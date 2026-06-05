@@ -1,4 +1,4 @@
-import { render } from "preact";
+import { render, Fragment } from "preact";
 import { useState, useEffect, useRef } from "preact/hooks";
 
 import gamepadService, {
@@ -18,14 +18,12 @@ function StickDisplay({ stick }) {
   const y = stick.value.y;
 
   // Apply deadzone for visual display
-  const deadzone = 0.1;
-  const adjustedX = Math.abs(x) < deadzone ? 0 : x;
-  const adjustedY = Math.abs(y) < deadzone ? 0 : y;
+  const adjustedX = Math.abs(x) < 0.1 ? 0 : x;
+  const adjustedY = Math.abs(y) < 0.1 ? 0 : y;
 
   // Calculate indicator position (80px container)
-  const containerSize = 80;
-  const center = containerSize / 2;
-  const maxRadius = containerSize / 2 - 10;
+  const center = 40;
+  const maxRadius = 30;
   const visualX = center + adjustedX * maxRadius;
   const visualY = center + adjustedY * maxRadius;
 
@@ -89,28 +87,24 @@ const TELEMETRY_FIELDS = [
 function TelemetryReadout() {
   const state = telemetry.value;
 
-  if (!state) {
-    return (
-      <div class="overlay-status-left">
-        <div class="stick-values-overlay status-values">
-          Waiting for telemetry
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div class="overlay-status-left">
       <div class="stick-values-overlay status-values">
-        {TELEMETRY_FIELDS.map(([key, label]) => {
-          const val = state[key];
-          if (val == null) return null;
-          return (
-            <div key={key}>
-              {label}: {Array.isArray(val) ? val.join(", ") : val}
-            </div>
-          );
-        })}
+        {!state ? (
+          "Waiting for telemetry"
+        ) : (
+          <>
+            {TELEMETRY_FIELDS.map(([key, label]) => {
+              const val = state[key];
+              if (val == null) return null;
+              return (
+                <div key={key}>
+                  {label}: {Array.isArray(val) ? val.join(", ") : val}
+                </div>
+              );
+            })}
+          </>
+        )}
       </div>
     </div>
   );
@@ -141,7 +135,6 @@ function ConnectionStatus() {
 
 // ── Submarine 3D Container ──────────────────────────────────────────
 function Submarine3DContainer() {
-  const containerRef = useRef(null);
   useEffect(() => {
     gamepadService.initSubmarine3D(
       "submarine-3d-container",
@@ -234,8 +227,10 @@ function ConsolePanel({ historyRef }) {
 
 // ── Video Stream ────────────────────────────────────────────────────
 function VideoStream() {
+  const iframeRef = useRef(null);
+
   useEffect(() => {
-    const iframe = document.getElementById("video-stream");
+    const iframe = iframeRef.current;
     if (!iframe) return;
 
     function hideControls() {
@@ -257,10 +252,10 @@ function VideoStream() {
 
   return (
     <iframe
+      ref={iframeRef}
       src="/cam"
       title="Camera Feed"
       class="video-stream"
-      id="video-stream"
     />
   );
 }
@@ -268,22 +263,10 @@ function VideoStream() {
 // ── App (Root) ──────────────────────────────────────────────────────
 function App() {
   const consoleHistoryRef = useRef(null);
-  const testingBtnRef = useRef(null);
 
   useEffect(() => {
-    // Initialize the gamepad service with the console ref
     gamepadService.init(consoleHistoryRef.current);
-
-    // Testing button handler
-    if (testingBtnRef.current) {
-      testingBtnRef.current.addEventListener("click", () => {
-        gamepadService.handleTestButton();
-      });
-    }
-
-    return () => {
-      gamepadService.destroy();
-    };
+    return () => gamepadService.destroy();
   }, []);
 
   return (
@@ -319,7 +302,10 @@ function App() {
           </div>
         </div>
 
-        <button id="testing-btn" ref={testingBtnRef}>
+        <button
+          id="testing-btn"
+          onClick={() => gamepadService.handleTestButton()}
+        >
           reset
         </button>
 
