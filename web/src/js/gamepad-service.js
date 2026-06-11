@@ -171,7 +171,7 @@ class GamepadService {
 
     // Update analog sticks
     this.updateAnalogSticks(gamepad.axes);
-    this.updateAnalogTriggers(gamepad.buttons);
+    this.updateAnalogTriggers(gamepad.buttons, gamepad.axes);
 
     // Store current button state for next frame
     this.previousButtons = gamepad.buttons.map((button) => button.pressed);
@@ -244,14 +244,30 @@ class GamepadService {
     else this.lastRightStickSent = active;
   }
 
-  updateAnalogTriggers(buttons) {
+  updateAnalogTriggers(buttons, axes) {
+    // On many controllers (Xbox in Chrome, etc.) the analog trigger values
+    // live on the axes array, not on buttons[].value.  Prefer the button
+    // value when it's non-zero, otherwise fall back to axes[4] (left) and
+    // axes[5] (right).
     if (buttons.length < 8) return;
 
-    leftTrigger.value = buttons[6].value;
-    rightTrigger.value = buttons[7].value;
+    const ltFromBtn = buttons[6].value;
+    const rtFromBtn = buttons[7].value;
 
-    this._sendTrigger("left", buttons[6].value);
-    this._sendTrigger("right", buttons[7].value);
+    // Trigger axes typically range -1 (released) to 1 (pressed).
+    // Normalize to 0->1.
+    const normalizeAxis = (v) => (v + 1) / 2;
+    const ltFromAxis = axes.length >= 6 ? normalizeAxis(axes[4]) : 0;
+    const rtFromAxis = axes.length >= 6 ? normalizeAxis(axes[5]) : 0;
+
+    const ltVal = ltFromBtn !== 0 ? ltFromBtn : ltFromAxis;
+    const rtVal = rtFromBtn !== 0 ? rtFromBtn : rtFromAxis;
+
+    leftTrigger.value = ltVal;
+    rightTrigger.value = rtVal;
+
+    this._sendTrigger("left", ltVal);
+    this._sendTrigger("right", rtVal);
   }
 
   _sendTrigger(name, value) {

@@ -232,7 +232,7 @@ class SerialClient:
                             logger.info(cmd)
                         await callback(cmd)
                     except ValidationError:
-                        traceback.print_exc()
+                        # traceback.print_exc()
                         logger.debug(f"RX: {data}")
                         await callback(ConsoleLog(line=data))
                 else:
