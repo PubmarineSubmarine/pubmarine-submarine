@@ -10,6 +10,7 @@ import gamepadService, {
   telemetry,
   connected,
   wsConnected,
+  consoleEntries,
 } from "./gamepad-service.js";
 
 // ── Stick Display ───────────────────────────────────────────────────
@@ -163,12 +164,21 @@ function ArtificialHorizonCanvas() {
 }
 
 // ── Console Panel ───────────────────────────────────────────────────
-function ConsolePanel({ historyRef }) {
+function ConsolePanel() {
   const [collapsed, setCollapsed] = useState(true);
   const inputRef = useRef(null);
+  const historyRef = useRef(null);
+
+  // Auto-scroll to bottom when new entries arrive
+  useEffect(() => {
+    const el = historyRef.current;
+    if (el && !collapsed) {
+      el.scrollTop = el.scrollHeight;
+    }
+  });
 
   const handleDownload = () => {
-    gamepadService.downloadConsole(historyRef.current);
+    gamepadService.downloadConsole();
   };
 
   const handleConsoleInput = (e) => {
@@ -180,6 +190,9 @@ function ConsolePanel({ historyRef }) {
       inputRef.current.value = "";
     }
   };
+
+  const entries = consoleEntries.value;
+  const displayEntries = entries.slice(-1500);
 
   return (
     <>
@@ -207,7 +220,19 @@ function ConsolePanel({ historyRef }) {
       >
         <div class="console-body">
           <div id="console-history" ref={historyRef} class="console-buffer">
-            <div class="history-placeholder">No messages...</div>
+            {displayEntries.length === 0 ? (
+              <div class="history-placeholder">No messages...</div>
+            ) : (
+              displayEntries.map((entry, i) => (
+                <div class="history-item" key={i}>
+                  <span class="timestamp">
+                    {new Date(entry.ts).toLocaleTimeString()}
+                  </span>
+                  <span class="button-name">[{entry.label}]</span>
+                  <span class="button-value">{entry.message}</span>
+                </div>
+              ))
+            )}
           </div>
           <div class="console-input-row">
             <input
@@ -262,10 +287,8 @@ function VideoStream() {
 
 // ── App (Root) ──────────────────────────────────────────────────────
 function App() {
-  const consoleHistoryRef = useRef(null);
-
   useEffect(() => {
-    gamepadService.init(consoleHistoryRef.current);
+    gamepadService.init();
     return () => gamepadService.destroy();
   }, []);
 
@@ -312,7 +335,7 @@ function App() {
         <ConnectionStatus />
       </div>
 
-      <ConsolePanel historyRef={consoleHistoryRef} />
+      <ConsolePanel />
     </div>
   );
 }
