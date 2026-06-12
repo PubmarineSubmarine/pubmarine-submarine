@@ -15,7 +15,6 @@ import gamepadService, {
   consoleEntries,
 } from "./gamepad-service.js";
 
-// ── Stick Display ───────────────────────────────────────────────────
 function StickDisplay({ stick }) {
   const x = stick.value.x;
   const y = stick.value.y;
@@ -46,7 +45,6 @@ function StickDisplay({ stick }) {
   );
 }
 
-// ── Trigger Display ─────────────────────────────────────────────────
 function TriggerDisplay({ label, trigger }) {
   const value = trigger.value;
   return (
@@ -56,7 +54,6 @@ function TriggerDisplay({ label, trigger }) {
   );
 }
 
-// ── Last Button Display ─────────────────────────────────────────────
 function LastButtonDisplay() {
   const btn = lastButton.value;
   return (
@@ -69,7 +66,6 @@ function LastButtonDisplay() {
   );
 }
 
-// ── Telemetry Readout ───────────────────────────────────────────────
 const TELEMETRY_FIELDS = [
   ["bat", "Battery"],
   ["depth", "Depth"],
@@ -113,7 +109,6 @@ function TelemetryReadout() {
   );
 }
 
-// ── Connection Status ───────────────────────────────────────────────
 function ConnectionStatus() {
   const isConn = connected.value;
   const isWs = wsConnected.value;
@@ -136,7 +131,6 @@ function ConnectionStatus() {
   );
 }
 
-// ── Submarine 3D Container ──────────────────────────────────────────
 function Submarine3DContainer() {
   const gyro = telemetry.value?.gyro;
   let gyroData = null;
@@ -164,7 +158,6 @@ function Submarine3DContainer() {
   );
 }
 
-// ── Artificial Horizon Canvas ───────────────────────────────────────
 function ArtificialHorizonCanvas() {
   const gyro = telemetry.value?.gyro;
   const pitch = Array.isArray(gyro) ? gyro[1] : gyro?.y || 0;
@@ -177,7 +170,6 @@ function ArtificialHorizonCanvas() {
   );
 }
 
-// ── Console Panel ───────────────────────────────────────────────────
 function ConsolePanel() {
   const [collapsed, setCollapsed] = useState(true);
   const inputRef = useRef(null);
@@ -264,7 +256,6 @@ function ConsolePanel() {
   );
 }
 
-// ── Video Stream ────────────────────────────────────────────────────
 function VideoStream() {
   const iframeRef = useRef(null);
 
@@ -299,7 +290,6 @@ function VideoStream() {
   );
 }
 
-// ── App (Root) ──────────────────────────────────────────────────────
 function App() {
   useEffect(() => {
     gamepadService.init();
@@ -347,7 +337,6 @@ function App() {
   );
 }
 
-// ── Mount ───────────────────────────────────────────────────────────
 const root = document.getElementById("app");
 if (root) {
   render(<App />, root);

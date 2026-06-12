@@ -8,7 +8,6 @@ import {
 
 export { wsConnected };
 
-// ── Reactive signals ────────────────────────────────────────────────
 export const leftStick = signal({ x: 0, y: 0 });
 export const rightStick = signal({ x: 0, y: 0 });
 export const leftTrigger = signal(0);
@@ -18,7 +17,6 @@ export const telemetry = signal(null);
 export const connected = signal(false);
 export const consoleEntries = signal([]);
 
-// ── Constants ───────────────────────────────────────────────────────
 const DEADZONE = 0.1;
 const POLL_INTERVAL_MS = 50;
 const STICK_SEND_INTERVAL_MS = 10;
@@ -44,7 +42,6 @@ const BUTTON_NAMES = {
   16: "Home / Xbox",
 };
 
-// ── Module-level state ──────────────────────────────────────────────
 let gamepadIndex = null;
 let previousButtons = [];
 let pollInterval = null;
@@ -55,11 +52,6 @@ let lastLeftStickActive = false;
 let lastRightStickActive = false;
 let lastLeftTriggerActive = false;
 let lastRightTriggerActive = false;
-
-// Heavy-weight visualizers — set once by the App component after mount
-// (Removed: submarine3D is now managed by the Preact component)
-
-// ── WebSocket message handler ───────────────────────────────────────
 
 function handleWsMessage(data) {
   if (data.name === "STAT") {
@@ -80,8 +72,6 @@ function handleWsMessage(data) {
     }
   }
 }
-
-// ── Console (signal-driven) ─────────────────────────────────────────
 
 function logConsole(label, message) {
   const timestamp = new Date().toISOString();
@@ -114,8 +104,6 @@ function downloadConsole() {
   consoleEntries.value = [];
 }
 
-// ── Gamepad discovery ───────────────────────────────────────────────
-
 function checkForGamepads() {
   const gamepads = navigator.getGamepads();
   for (let i = 0; i < gamepads.length; i++) {
@@ -128,8 +116,6 @@ function checkForGamepads() {
   connected.value = false;
   return false;
 }
-
-// ── Polling lifecycle ───────────────────────────────────────────────
 
 function start() {
   if (pollInterval || gamepadIndex === null) {
@@ -150,8 +136,6 @@ function stop() {
     pollInterval = null;
   }
 }
-
-// ── Gamepad state polling ───────────────────────────────────────────
 
 function updateGamepadState() {
   if (gamepadIndex === null) return;
@@ -286,13 +270,9 @@ function sendTrigger(name, value) {
   else lastRightTriggerActive = active;
 }
 
-// ── Telemetry / status display ──────────────────────────────────────
-
 function updateStatusDisplay(state) {
   telemetry.value = state;
 }
-
-// ── Init / destroy ──────────────────────────────────────────────────
 
 function init() {
   bindEvents();
@@ -330,7 +310,6 @@ function bindEvents() {
   });
 }
 
-// ── Singleton export (backward-compatible API) ──────────────────────
 const gamepadService = {
   init,
   destroy,
