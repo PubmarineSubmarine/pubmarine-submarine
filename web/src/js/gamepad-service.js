@@ -292,12 +292,6 @@ function updateStatusDisplay(state) {
   telemetry.value = state;
 }
 
-// ── Testing button handler ──────────────────────────────────────────
-
-function handleTestButton() {
-  onButtonPress(8, 1.0);
-}
-
 // ── Init / destroy ──────────────────────────────────────────────────
 
 function init() {
@@ -341,7 +335,6 @@ const gamepadService = {
   init,
   destroy,
   downloadConsole,
-  handleTestButton,
   sendWebSocketData: wsSend,
 };
 export default gamepadService;

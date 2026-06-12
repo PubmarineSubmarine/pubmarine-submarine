@@ -339,13 +339,6 @@ function App() {
           </div>
         </div>
 
-        <button
-          id="testing-btn"
-          onClick={() => gamepadService.handleTestButton()}
-        >
-          reset
-        </button>
-
         <ConnectionStatus />
       </div>
 
