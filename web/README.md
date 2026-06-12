@@ -21,7 +21,12 @@ sudo systemctl enable --now missioncontrol
 ### To run for local debugging
 ```
 # backend
-SERIAL_PORT="DEBUG" uv run app/main.py
+SERIAL_PORT="DEBUG" uv run app/main.py \
+    --host 0.0.0.0 \
+    --port 8000 \
+    --reload \
+    --ssl-keyfile certs/key.pem \
+    --ssl-certfile certs/cert.pem
 # frontend
 npm run watch
 ```
