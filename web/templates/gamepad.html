@@ -1,33 +1,7 @@
 {% extends "base.html" %} {% block content %}
 <div id="app"></div>
 
-<!-- Import map to resolve 'three' bare specifier -->
-<script type="importmap">
-    {
-        "imports": {
-            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-        }
-    }
-</script>
-
-<script type="module">
-    // Import Three.js and loaders as ES6 modules
-    import * as THREE from "three";
-    import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
-    import { MTLLoader } from "three/addons/loaders/MTLLoader.js";
-
-    // Make THREE and loaders available globally
-    window.THREE = THREE;
-    window.OBJLoader = OBJLoader;
-    window.MTLLoader = MTLLoader;
-
-    // Signal that libraries are ready
-    window.dispatchEvent(new Event("objloader-ready"));
-</script>
-<script src="{{ url_for('static', path='/js/submarine-3d.js') }}"></script>
-<script src="{{ url_for('static', path='/js/artificial-horizon.js') }}"></script>
-<!-- Single Preact bundle — replaces gamepad.js -->
+<!-- Single Preact bundle (includes Three.js and Submarine3D) -->
 <script
     type="module"
     src="{{ url_for('static', path='/js/gamepad.bundle.js') }}"

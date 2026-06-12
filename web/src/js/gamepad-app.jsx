@@ -1,5 +1,7 @@
 import { render, Fragment } from "preact";
 import { useState, useEffect, useRef } from "preact/hooks";
+import ArtificialHorizon from "./artificial-horizon.jsx";
+import Submarine3D from "./submarine-3d.jsx";
 
 import gamepadService, {
   leftStick,
@@ -136,29 +138,41 @@ function ConnectionStatus() {
 
 // ── Submarine 3D Container ──────────────────────────────────────────
 function Submarine3DContainer() {
-  useEffect(() => {
-    gamepadService.initSubmarine3D(
-      "submarine-3d-container",
-      "/static/subsanwich.obj",
-    );
-  }, []);
+  const gyro = telemetry.value?.gyro;
+  let gyroData = null;
+  if (gyro) {
+    if (typeof gyro === "string") {
+      const matches = gyro.match(/\(([-\d.]+),([-\d.]+),([-\d.]+)\)/);
+      if (matches) {
+        gyroData = {
+          x: parseFloat(matches[1]),
+          y: parseFloat(matches[2]),
+          z: parseFloat(matches[3]),
+        };
+      }
+    } else if (Array.isArray(gyro)) {
+      gyroData = { x: gyro[0], y: gyro[1], z: gyro[2] };
+    } else if (typeof gyro === "object") {
+      gyroData = gyro;
+    }
+  }
 
   return (
     <div class="overlay-submarine-3d">
-      <div id="submarine-3d-container" class="submarine-3d-container" />
+      <Submarine3D modelPath="/static/subsanwich.obj" gyro={gyroData} />
     </div>
   );
 }
 
 // ── Artificial Horizon Canvas ───────────────────────────────────────
 function ArtificialHorizonCanvas() {
-  useEffect(() => {
-    gamepadService.initArtificialHorizon("artificial-horizon");
-  }, []);
+  const gyro = telemetry.value?.gyro;
+  const pitch = Array.isArray(gyro) ? gyro[1] : gyro?.y || 0;
+  const roll = Array.isArray(gyro) ? gyro[0] : gyro?.x || 0;
 
   return (
     <div class="overlay-artificial-horizon">
-      <canvas id="artificial-horizon" width="200" height="200" />
+      <ArtificialHorizon pitch={pitch} roll={roll} />
     </div>
   );
 }

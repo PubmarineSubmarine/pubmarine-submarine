@@ -8,11 +8,9 @@ const buildOptions = {
   outfile: "static/js/gamepad.bundle.js",
   format: "esm",
   target: "es2020",
-  // Classic JSX transform — compiles <div/> to h("div")
   jsx: "transform",
   jsxFactory: "h",
   jsxFragment: "Fragment",
-  // Inject Preact's h and Fragment as global shims so the factory calls resolve
   inject: ["./src/js/preact-shim.js"],
   minify: !isWatch,
   sourcemap: isWatch ? "inline" : false,

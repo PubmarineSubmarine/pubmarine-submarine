@@ -57,8 +57,7 @@ let lastLeftTriggerActive = false;
 let lastRightTriggerActive = false;
 
 // Heavy-weight visualizers — set once by the App component after mount
-let submarine3D = null;
-let artificialHorizon = null;
+// (Removed: submarine3D is now managed by the Preact component)
 
 // ── WebSocket message handler ───────────────────────────────────────
 
@@ -291,61 +290,6 @@ function sendTrigger(name, value) {
 
 function updateStatusDisplay(state) {
   telemetry.value = state;
-
-  if (submarine3D && state.gyro) {
-    let gyroData;
-    if (typeof state.gyro === "string") {
-      const matches = state.gyro.match(/\(([-\d.]+),([-\d.]+),([-\d.]+)\)/);
-      if (matches) {
-        gyroData = {
-          x: parseFloat(matches[1]),
-          y: parseFloat(matches[2]),
-          z: parseFloat(matches[3]),
-        };
-      }
-    } else if (Array.isArray(state.gyro)) {
-      gyroData = { x: state.gyro[0], y: state.gyro[1], z: state.gyro[2] };
-    } else if (typeof state.gyro === "object") {
-      gyroData = state.gyro;
-    }
-
-    if (gyroData) {
-      submarine3D.updateOrientation(gyroData);
-      artificialHorizon?.updateOrientation(gyroData);
-    }
-  }
-}
-
-// ── 3D / horizon init helpers (called by App component) ─────────────
-
-function initSubmarine3D(containerId, modelPath) {
-  const initSub = () => {
-    if (
-      typeof THREE !== "undefined" &&
-      typeof OBJLoader !== "undefined" &&
-      typeof Submarine3D !== "undefined"
-    ) {
-      submarine3D = new Submarine3D(containerId, modelPath);
-      console.log("3D submarine visualization initialized");
-    } else {
-      console.warn("THREE, Submarine3D class or OBJLoader not found");
-    }
-  };
-
-  if (typeof THREE !== "undefined" && typeof OBJLoader !== "undefined") {
-    initSub();
-  } else {
-    window.addEventListener("objloader-ready", initSub, { once: true });
-  }
-}
-
-function initArtificialHorizon(canvasId) {
-  if (typeof ArtificialHorizon !== "undefined") {
-    artificialHorizon = new ArtificialHorizon(canvasId);
-    console.log("Artificial horizon initialized");
-  } else {
-    console.warn("ArtificialHorizon class not found");
-  }
 }
 
 // ── Testing button handler ──────────────────────────────────────────
@@ -397,8 +341,6 @@ const gamepadService = {
   init,
   destroy,
   downloadConsole,
-  initSubmarine3D,
-  initArtificialHorizon,
   handleTestButton,
   sendWebSocketData: wsSend,
 };
