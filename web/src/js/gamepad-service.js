@@ -14,6 +14,7 @@ export const leftTrigger = signal(0);
 export const rightTrigger = signal(0);
 export const lastButton = signal("None");
 export const telemetry = signal(null);
+export const orientation = signal(null);
 export const connected = signal(false);
 export const consoleEntries = signal([]);
 
@@ -56,7 +57,10 @@ let lastRightTriggerActive = false;
 function handleWsMessage(data) {
   if (data.name === "STAT") {
     updateStatusDisplay(data);
-    if (data.raw) logConsole("DEBUG", data.raw);
+    //if (data.raw) logConsole("DEBUG", data.raw);
+  } else if (data.name === "ORI") {
+    updateOrientationDisplay(data);
+   // logConsole("ORI", `r=${data.roll?.toFixed(1)} p=${data.pitch?.toFixed(1)} y=${data.yaw?.toFixed(1)}`);
   } else if (data.name === "CONSOLE") {
     console.info(data.line);
     logConsole(data.level, data.line);
@@ -272,6 +276,10 @@ function sendTrigger(name, value) {
 
 function updateStatusDisplay(state) {
   telemetry.value = state;
+}
+
+function updateOrientationDisplay(ori) {
+  orientation.value = ori;
 }
 
 function init() {

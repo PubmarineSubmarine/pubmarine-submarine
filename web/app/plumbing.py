@@ -1,5 +1,7 @@
 import logging
+from asyncio import create_task, sleep
 from os import environ
+from typing import Optional
 
 from fastapi import WebSocket
 from gpio import reset_pico
@@ -13,6 +15,7 @@ from protocol import (
     StopCmd,
 )
 from serial_client import DebugSerialClient, SerialClient
+from orientation import OrientationEstimator
 
 logger = logging.getLogger(__name__)
 
@@ -30,14 +33,25 @@ class Plumbing:
         self.throttle = 0.0
         self.steer = 0.0
         self.lights = False
+        # Madgwick-based absolute orientation estimator. Runs over every STAT
+        # message and emits synthetic ORI messages at 10 Hz, even when the
+        # serial stream is slow.
+        self.orientation = OrientationEstimator()
+        self._ori_task = None
+        self._last_ori_emit_ts: float = 0.0
 
     async def init(self):
         print("connecting serial")
         await self.serial.connect()
+        if self._ori_task is None:
+            self._ori_task = create_task(self._orientation_loop())
 
     async def shutdown(self):
         await self.serial.write_cmd(StopCmd())
         self.serial.disconnect()
+        if self._ori_task is not None:
+            self._ori_task.cancel()
+            self._ori_task = None
 
     def ws_connect(self, ws: WebSocket):
         self.connections.append(ws)
@@ -60,11 +74,118 @@ class Plumbing:
                     self.lights = False
             except:
                 pass
+            # Feed the orientation filter with the latest accel/gyro. The
+            # estimator is rate-limited internally; we just integrate every
+            # sample and let the loop below decide when to emit.
+            self.orientation.on_state(msg.acc, msg.gyro)
         j = msg.model_dump_json()
         for ws in self.connections:
             await ws.send_text(j)
 
+    async def handle_console_cmd(self, text: str) -> Optional[Command]:
+        """Handle a console command. Recognized special commands:
+            ``ORI_DUMP`` -> print a debug summary of the orientation estimator
+            ``CAL``     -> zero the home offset at the current pose
+        """
+        stripped = text.strip().upper()
+        if stripped == "ORI_DUMP":
+            await self._dump_orientation()
+            return None
+        if stripped == "CAL":
+            if self.orientation.calibrate():
+                await self.handle_circuitpy_msg(
+                    ConsoleLog(
+                        level="ORI",
+                        line="calibrated: current pose is now home (ORI = 0,0,0)",
+                    )
+                )
+            else:
+                await self.handle_circuitpy_msg(
+                    ConsoleLog(
+                        level="ORI",
+                        line="calibration failed: filter not ready yet",
+                    )
+                )
+            return None
+        return None
+
+    async def _dump_orientation(self) -> None:
+        info = self.orientation.get_debug_info()
+        lines = [
+            "=== orientation dump ===",
+            f"  filter ready   : {info['filter_ready']}",
+            f"  raw accel (m/s2)   : {tuple(round(x, 3) for x in info['raw_accel'])}",
+            f"  raw gyro (rad/s)   : {tuple(round(x, 4) for x in info['raw_gyro'])}",
+        ]
+        if "accel_tilt_deg" in info:
+            tr, tp = info["accel_tilt_deg"]
+            lines.append(
+                f"  accel-only tilt  : roll={tr:+.2f} pitch={tp:+.2f}  (no filter, ground truth)"
+            )
+        if "accel_predicted" in info:
+            px, py, pz = info["accel_predicted"]
+            rx, ry, rz = info["accel_residual"]
+            res_norm = (rx * rx + ry * ry + rz * rz) ** 0.5
+            lines.append(
+                f"  filter-predicted gravity: ({px:+.3f}, {py:+.3f}, {pz:+.3f})"
+            )
+            lines.append(
+                f"  residual            : ({rx:+.3f}, {ry:+.3f}, {rz:+.3f})  |r|={res_norm:.3f}"
+            )
+        if "chassis_euler" in info:
+            r, p, y = info["chassis_euler"]
+            lines.append(f"  chassis Euler (deg) : r={r:+.2f} p={p:+.2f} y={y:+.2f}")
+            qw, qx, qy, qz = info["chassis_quat"]
+            lines.append(
+                f"  chassis quat (wxyz) : {qw:+.4f} {qx:+.4f} {qy:+.4f} {qz:+.4f}"
+            )
+        hr, hp, hy = info["home_euler"]
+        lines.append(f"  home Euler (deg)    : r={hr:+.2f} p={hp:+.2f} y={hy:+.2f}")
+        qw, qx, qy, qz = info["home_quat"]
+        lines.append(f"  home quat (wxyz)    : {qw:+.4f} {qx:+.4f} {qy:+.4f} {qz:+.4f}")
+        if "chassis_euler" in info and "accel_tilt_deg" in info:
+            tr, tp = info["accel_tilt_deg"]
+            cr, cp, _ = info["chassis_euler"]
+            lines.append(
+                f"  -- diagnostics:"
+            )
+            lines.append(
+                f"     accel says roll={tr:+.2f}/pitch={tp:+.2f}; filter says roll={cr:+.2f}/pitch={cp:+.2f}"
+            )
+            lines.append(
+                "     large residual = filter is fighting or has lost accel reference"
+            )
+        for line in lines:
+            await self.handle_circuitpy_msg(ConsoleLog(level="ORI", line=line))
+
+    async def _orientation_loop(self):
+        """Background task that drives the orientation estimator.
+
+        Ticks faster than 10 Hz so the filter keeps integrating on its wall
+        clock, and the estimator itself rate-limits the outgoing ``OriCmd``
+        to 10 Hz.
+        """
+        try:
+            while True:
+                ori = self.orientation.maybe_emit()
+                if ori is not None:
+                    j = ori.model_dump_json()
+                    for ws in list(self.connections):
+                        try:
+                            await ws.send_text(j)
+                        except Exception:
+                            pass
+                await sleep(0.02)  # 50 Hz tick -> 10 Hz emit via estimator
+        except Exception:
+            logger.exception("orientation loop crashed")
+
     async def console_cmd(self, text: str):
+        # Try to interpret the command locally first (e.g. CAL, ORI_DUMP).
+        if (await self.handle_console_cmd(text)) is None and text.strip().upper() in {
+            "CAL",
+            "ORI_DUMP",
+        }:
+            return
         await self.handle_circuitpy_msg(ConsoleLog(level="ECHO", line=text))
         await self.serial.write_text(f"{text}\r\n")
 

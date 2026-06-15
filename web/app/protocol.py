@@ -155,10 +155,29 @@ class SetConfigCmd(Command):
 
     def serialize(self) -> str:
         return f"SET_CONFIG {json.dumps(self.config)}"
- 
+
+
+class OriCmd(Command):
+    """Absolute orientation of the submarine, computed by fusing gyro + accel
+    with a Madgwick AHRS filter on the backend.
+
+    The Euler angles follow the ZYX (yaw-pitch-roll) intrinsic convention, in
+    degrees. The quaternion is in (w, x, y, z) form. The ``ready`` flag is 0
+    until the filter has consumed at least one STAT sample.
+    """
+    name: Literal["ORI"] = "ORI"
+    roll: float | None = None
+    pitch: float | None = None
+    yaw: float | None = None
+    qw: float | None = None
+    qx: float | None = None
+    qy: float | None = None
+    qz: float | None = None
+    ready: int = 0
+
 
 class CommandModel(BaseModel):
-    command: ResetCmd | StopCmd | MotionCmd | StateCmd | PingCmd | PongCmd | ConfigCmd | GetConfigCmd | SetConfigCmd = Field(discriminator="name")
+    command: ResetCmd | StopCmd | MotionCmd | StateCmd | PingCmd | PongCmd | ConfigCmd | GetConfigCmd | SetConfigCmd | OriCmd = Field(discriminator="name")
 
 
 def test1():
@@ -170,6 +189,7 @@ def test1():
         BOOT
         STOP
         CAL
+        ORI ROLL=1.2 PITCH=-3.4 YAW=90.0 QW=0.99 QX=0.01 QY=-0.03 QZ=0.00 READY=1
     """.strip()
     for txt_cmd in test.split("\n"):
         txt_cmd = txt_cmd.strip()
@@ -203,6 +223,7 @@ def test():
             depth=0.5,
             bat=3.5,
         ),
+        OriCmd(roll=1.2, pitch=-3.4, yaw=90.0, qw=0.99, qx=0.01, qy=-0.03, qz=0.0, ready=1),
     ]
     print([cmd.serialize() for cmd in commands])
 

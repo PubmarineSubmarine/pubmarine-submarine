@@ -10,6 +10,7 @@ import gamepadService, {
   rightTrigger,
   lastButton,
   telemetry,
+  orientation,
   connected,
   wsConnected,
   consoleEntries,
@@ -71,6 +72,7 @@ const TELEMETRY_FIELDS = [
   ["depth", "Depth"],
   ["acc", "Accel"],
   ["gyro", "Gyro"],
+  ["ori", "Ori"],
   ["temp", "Temp"],
   ["hum", "Humidity"],
   ["mcu", "MCU Temp"],
@@ -85,6 +87,16 @@ const TELEMETRY_FIELDS = [
 
 function TelemetryReadout() {
   const state = telemetry.value;
+  const ori = orientation.value;
+
+  const formatVal = (key, val) => {
+    if (val == null) return null;
+    if (key === "ori") {
+      return `r=${ori.roll?.toFixed(1)} p=${ori.pitch?.toFixed(1)} y=${ori.yaw?.toFixed(1)}`;
+    }
+    if (Array.isArray(val)) return val.join(", ");
+    return val;
+  };
 
   return (
     <div class="overlay-status-left">
@@ -94,11 +106,12 @@ function TelemetryReadout() {
         ) : (
           <>
             {TELEMETRY_FIELDS.map(([key, label]) => {
-              const val = state[key];
-              if (val == null) return null;
+              const val = key === "ori" ? ori : state[key];
+              const formatted = formatVal(key, val);
+              if (formatted == null) return null;
               return (
                 <div key={key}>
-                  {label}: {Array.isArray(val) ? val.join(", ") : val}
+                  {label}: {formatted}
                 </div>
               );
             })}
@@ -133,6 +146,7 @@ function ConnectionStatus() {
 
 function Submarine3DContainer() {
   const gyro = telemetry.value?.gyro;
+  const ori = orientation.value;
   let gyroData = null;
   if (gyro) {
     if (typeof gyro === "string") {
@@ -153,15 +167,22 @@ function Submarine3DContainer() {
 
   return (
     <div class="overlay-submarine-3d">
-      <Submarine3D modelPath="/static/subsanwich.obj" gyro={gyroData} />
+      <Submarine3D
+        modelPath="/static/subsanwich.obj"
+        gyro={gyroData}
+        orientation={ori}
+      />
     </div>
   );
 }
 
 function ArtificialHorizonCanvas() {
-  const gyro = telemetry.value?.gyro;
-  const pitch = Array.isArray(gyro) ? gyro[1] : gyro?.y || 0;
-  const roll = Array.isArray(gyro) ? gyro[0] : gyro?.x || 0;
+  const ori = orientation.value;
+  // Prefer the absolute orientation from the Madgwick filter. Fall back to
+  // raw gyro (which is angular velocity, not angle) if no ORI has arrived
+  // yet so the canvas doesn't appear frozen.
+  const pitch = ori?.pitch ?? 0;
+  const roll = ori?.roll ?? 0;
 
   return (
     <div class="overlay-artificial-horizon">
