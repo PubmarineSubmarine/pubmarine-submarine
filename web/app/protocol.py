@@ -158,13 +158,7 @@ class SetConfigCmd(Command):
 
 
 class OriCmd(Command):
-    """Absolute orientation of the submarine, computed by fusing gyro + accel
-    with a Madgwick AHRS filter on the backend.
-
-    The Euler angles follow the ZYX (yaw-pitch-roll) intrinsic convention, in
-    degrees. The quaternion is in (w, x, y, z) form. The ``ready`` flag is 0
-    until the filter has consumed at least one STAT sample.
-    """
+    """Absolute chassis orientation (ZYX Euler deg + wxyz quaternion)."""
     name: Literal["ORI"] = "ORI"
     roll: float | None = None
     pitch: float | None = None

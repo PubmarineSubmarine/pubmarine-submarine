@@ -33,7 +33,6 @@ HOME_OFFSET_EULER_DEG = (0.0, 0.0, 0.0)
 MADGWICK_BETA: float = 0.1
 
 INVALID_SENTINEL: float = -1.0
-GRAVITY_MAGNITUDE: float = 9.80665
 
 
 def _euler_to_quat(roll_deg: float, pitch_deg: float, yaw_deg: float) -> np.ndarray:
@@ -256,10 +255,6 @@ class OrientationEstimator:
         # debug logging.
         self._last_accel: Tuple[float, float, float] = (0.0, 0.0, 0.0)
         self._last_gyro: Tuple[float, float, float] = (0.0, 0.0, 0.0)
-
-    @staticmethod
-    def _quats_to_euler_deg(q: np.ndarray) -> Tuple[float, float, float]:
-        return _quat_to_euler(q)
 
     def _rotate_sensor_to_chassis(
         self,

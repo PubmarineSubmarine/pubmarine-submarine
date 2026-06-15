@@ -89,15 +89,6 @@ function TelemetryReadout() {
   const state = telemetry.value;
   const ori = orientation.value;
 
-  const formatVal = (key, val) => {
-    if (val == null) return null;
-    if (key === "ori") {
-      return `r=${ori.roll?.toFixed(1)} p=${ori.pitch?.toFixed(1)} y=${ori.yaw?.toFixed(1)}`;
-    }
-    if (Array.isArray(val)) return val.join(", ");
-    return val;
-  };
-
   return (
     <div class="overlay-status-left">
       <div class="stick-values-overlay status-values">
@@ -106,12 +97,20 @@ function TelemetryReadout() {
         ) : (
           <>
             {TELEMETRY_FIELDS.map(([key, label]) => {
-              const val = key === "ori" ? ori : state[key];
-              const formatted = formatVal(key, val);
-              if (formatted == null) return null;
+              if (key === "ori") {
+                if (!ori) return null;
+                return (
+                  <div key={key}>
+                    {label}: r={ori.roll?.toFixed(1)} p={ori.pitch?.toFixed(1)} y={ori.yaw?.toFixed(1)}
+                  </div>
+                );
+              }
+              const val = state[key];
+              if (val == null) return null;
+              const text = Array.isArray(val) ? val.join(", ") : val;
               return (
                 <div key={key}>
-                  {label}: {formatted}
+                  {label}: {text}
                 </div>
               );
             })}
@@ -145,31 +144,12 @@ function ConnectionStatus() {
 }
 
 function Submarine3DContainer() {
-  const gyro = telemetry.value?.gyro;
   const ori = orientation.value;
-  let gyroData = null;
-  if (gyro) {
-    if (typeof gyro === "string") {
-      const matches = gyro.match(/\(([-\d.]+),([-\d.]+),([-\d.]+)\)/);
-      if (matches) {
-        gyroData = {
-          x: parseFloat(matches[1]),
-          y: parseFloat(matches[2]),
-          z: parseFloat(matches[3]),
-        };
-      }
-    } else if (Array.isArray(gyro)) {
-      gyroData = { x: gyro[0], y: gyro[1], z: gyro[2] };
-    } else if (typeof gyro === "object") {
-      gyroData = gyro;
-    }
-  }
 
   return (
     <div class="overlay-submarine-3d">
       <Submarine3D
         modelPath="/static/subsanwich.obj"
-        gyro={gyroData}
         orientation={ori}
       />
     </div>
@@ -178,9 +158,6 @@ function Submarine3DContainer() {
 
 function ArtificialHorizonCanvas() {
   const ori = orientation.value;
-  // Prefer the absolute orientation from the Madgwick filter. Fall back to
-  // raw gyro (which is angular velocity, not angle) if no ORI has arrived
-  // yet so the canvas doesn't appear frozen.
   const pitch = ori?.pitch ?? 0;
   const roll = ori?.roll ?? 0;
 
