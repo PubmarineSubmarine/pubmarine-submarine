@@ -9,6 +9,7 @@ import gamepadService, {
   leftTrigger,
   rightTrigger,
   lastButton,
+  startPressed,
   telemetry,
   orientation,
   connected,
@@ -169,8 +170,7 @@ function ArtificialHorizonCanvas() {
   );
 }
 
-function ConsolePanel() {
-  const [collapsed, setCollapsed] = useState(true);
+function ConsolePanel({ collapsed, onToggle }) {
   const inputRef = useRef(null);
   const historyRef = useRef(null);
 
@@ -227,7 +227,7 @@ function ConsolePanel() {
           for="console-collapsed"
           id="collapse-console"
           title="Toggle console"
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={onToggle}
         >
           ☰ {collapsed ? "Show Console" : "Hide Console"}
         </label>
@@ -304,9 +304,19 @@ function VideoStream() {
 }
 
 function App() {
+  const [consoleCollapsed, setConsoleCollapsed] = useState(true);
+  const toggleConsole = () => setConsoleCollapsed((c) => !c);
+
   useEffect(() => {
     gamepadService.init();
     return () => gamepadService.destroy();
+  }, []);
+
+  // Toggle the console when the gamepad's Start button is pressed.
+  useEffect(() => {
+    return startPressed.subscribe(() => {
+      setConsoleCollapsed((c) => !c);
+    });
   }, []);
 
   return (
@@ -345,7 +355,7 @@ function App() {
         <ConnectionStatus />
       </div>
 
-      <ConsolePanel />
+      <ConsolePanel collapsed={consoleCollapsed} onToggle={toggleConsole} />
     </div>
   );
 }

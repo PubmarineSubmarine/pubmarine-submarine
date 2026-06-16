@@ -13,6 +13,10 @@ export const rightStick = signal({ x: 0, y: 0 });
 export const leftTrigger = signal(0);
 export const rightTrigger = signal(0);
 export const lastButton = signal("None");
+// Monotonically increasing counter incremented on every Start-button
+// rising edge. Unlike `lastButton` (which holds the button name and uses
+// Object.is equality), this fires subscribers on *every* press.
+export const startPressed = signal(0);
 export const telemetry = signal(null);
 export const orientation = signal(null);
 export const connected = signal(false);
@@ -179,6 +183,9 @@ function onButtonPress(buttonIndex, value) {
     timestamp: Date.now(),
   });
   lastButton.value = buttonName;
+  if (buttonIndex === 9) {
+    startPressed.value = startPressed.value + 1;
+  }
   logConsole("BTN", buttonName);
 }
 
