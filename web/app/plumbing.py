@@ -152,7 +152,7 @@ class Plumbing:
     async def button_pressed(self, index, value):
         match index:
             case 0:  # A
-                await self.serial.write_cmd(MotionCmd(rd=1, rl=1, rr=1))
+                await self.serial.write_cmd(MotionCmd(fu=1, fd=1, fl=1, fr=1, ru=1, rd=1, rl=1, rr=1))
             case 1:  # B
                 # await self.serial.write_cmd(ResetCmd())
                 self.lights = not self.lights
@@ -187,7 +187,7 @@ class Plumbing:
     async def button_released(self, index, value):
         match index:
             case 0:  # A
-                await self.serial.write_cmd(MotionCmd(rd=0, rl=0, rr=0))
+                await self.serial.write_cmd(MotionCmd(fu=0, fd=0, fl=0, fr=0, ru=0, rd=0, rl=0, rr=0))
             case 4:  # Left Bumper
                 await self.serial.write_cmd(MotionCmd(fu=0, fd=0, fl=0, fr=0, ru=0, rd=0, rl=0, rr=0))
             case 5:  # Right Bumper
