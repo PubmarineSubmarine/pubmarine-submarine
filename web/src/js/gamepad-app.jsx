@@ -107,7 +107,8 @@ function TelemetryReadout() {
               }
               const val = state[key];
               if (val == null) return null;
-              const text = Array.isArray(val) ? val.join(", ") : val;
+              const fmt = (n) => (typeof n === "number" ? n.toFixed(1) : n);
+              const text = Array.isArray(val) ? val.map(fmt).join(", ") : val;
               return (
                 <div key={key}>
                   {label}: {text}
@@ -185,6 +186,13 @@ function ConsolePanel() {
     gamepadService.downloadConsole();
   };
 
+  const handleCalibrate = () => {
+    gamepadService.sendWebSocketData({
+      type: "console_command",
+      text: "CAL",
+    });
+  };
+
   const handleConsoleInput = (e) => {
     if (e.key === "Enter" && inputRef.current?.value.trim()) {
       gamepadService.sendWebSocketData({
@@ -201,6 +209,13 @@ function ConsolePanel() {
   return (
     <>
       <div class="console-controls">
+        <button
+          id="calibrate-orientation"
+          onClick={handleCalibrate}
+          title="Capture current orientation as the new home pose"
+        >
+          ⚓ Calibrate
+        </button>
         <button
           id="download-console"
           onClick={handleDownload}

@@ -9,7 +9,6 @@ from protocol import (
     ConsoleLog,
     MotionCmd,
     PingCmd,
-    ResetCmd,
     StateCmd,
     StopCmd,
 )
@@ -81,61 +80,8 @@ class Plumbing:
         for ws in self.connections:
             await ws.send_text(j)
 
-    async def _dump_orientation(self) -> None:
-        info = self.orientation.get_debug_info()
-        lines = [
-            "=== orientation dump ===",
-            f"  filter ready       : {info['filter_ready']}",
-            f"  raw accel (m/s2)   : {tuple(round(x, 3) for x in info['raw_accel'])}",
-            f"  raw gyro (rad/s)   : {tuple(round(x, 4) for x in info['raw_gyro'])}",
-        ]
-        if "accel_tilt_deg" in info:
-            tr, tp = info["accel_tilt_deg"]
-            lines.append(
-                f"  accel-only tilt    : roll={tr:+.2f} pitch={tp:+.2f}  (no filter, ground truth)"
-            )
-        if "accel_predicted" in info:
-            px, py, pz = info["accel_predicted"]
-            rx, ry, rz = info["accel_residual"]
-            res_norm = (rx * rx + ry * ry + rz * rz) ** 0.5
-            lines.append(
-                f"  filter-predicted g : ({px:+.3f}, {py:+.3f}, {pz:+.3f})"
-            )
-            lines.append(
-                f"  residual           : ({rx:+.3f}, {ry:+.3f}, {rz:+.3f})  |r|={res_norm:.3f}"
-            )
-        if "chassis_euler" in info:
-            r, p, y = info["chassis_euler"]
-            lines.append(f"  chassis Euler (deg): r={r:+.2f} p={p:+.2f} y={y:+.2f}")
-            qw, qx, qy, qz = info["chassis_quat"]
-            lines.append(
-                f"  chassis quat (wxyz): {qw:+.4f} {qx:+.4f} {qy:+.4f} {qz:+.4f}"
-            )
-            tr, tp = info["accel_tilt_deg"]
-            cr, cp, _ = info["chassis_euler"]
-            lines.append("  -- diagnostics:")
-            lines.append(
-                f"     accel says roll={tr:+.2f}/pitch={tp:+.2f}; filter says roll={cr:+.2f}/pitch={cp:+.2f}"
-            )
-            lines.append(
-                "     large residual = filter is fighting or has lost accel reference"
-            )
-        hr, hp, hy = info["home_euler"]
-        qw, qx, qy, qz = info["home_quat"]
-        lines += [
-            f"  home Euler (deg)   : r={hr:+.2f} p={hp:+.2f} y={hy:+.2f}",
-            f"  home quat (wxyz)   : {qw:+.4f} {qx:+.4f} {qy:+.4f} {qz:+.4f}",
-        ]
-        for line in lines:
-            await self.handle_circuitpy_msg(ConsoleLog(level="ORI", line=line))
-
     async def _orientation_loop(self):
-        """Background task that drives the orientation estimator.
-
-        Ticks faster than 10 Hz so the filter keeps integrating on its wall
-        clock, and the estimator itself rate-limits the outgoing ``OriCmd``
-        to 10 Hz.
-        """
+        """Background task that drives the orientation estimator."""
         try:
             while True:
                 ori = self.orientation.maybe_emit()
@@ -146,15 +92,12 @@ class Plumbing:
                             await ws.send_text(j)
                         except Exception:
                             pass
-                await sleep(0.02)  # 50 Hz tick -> 10 Hz emit via estimator
+                await sleep(0.02)  # 50 Hz tick
         except Exception:
             logger.exception("orientation loop crashed")
 
     async def console_cmd(self, text: str):
         stripped = text.strip().upper()
-        if stripped == "ORI_DUMP":
-            await self._dump_orientation()
-            return
         if stripped == "CAL":
             if self.orientation.calibrate():
                 line = "calibrated: current pose is now home (ORI = 0,0,0)"

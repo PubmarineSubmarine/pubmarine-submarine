@@ -10,27 +10,19 @@ import numpy as np
 
 from protocol import OriCmd
 
-# --- Mounting offset -----------------------------------------------------------
-#
-# The MPU-6050 is not mounted flat in the chassis. Apply a constant rotation
-# to bring sensor-frame readings into the chassis frame. Tune these three
-# angles (roll, pitch, yaw in degrees) to match the physical install.
-MOUNT_OFFSET_EULER_DEG = (0.0, 0.0, 0.0)
-# --- Home / "level" offset ----------------------------------------------------
-#
-# The chassis rarely sits in a "level + heading-zero" pose on the bench. After
-# the sensor-to-chassis mount offset is applied, this offset is applied to the
-# filter's chassis-in-world quaternion to define the *user* frame. The ORI
-# message is reported in the user frame, so setting this to the inverse of
-# the current chassis orientation is equivalent to a zero calibration.
-#
-# You can either set this constant or send ``CAL`` from the console at runtime
-# to capture the current pose as the new home. Runtime calibration overrides
-# whatever is hardcoded here.
-HOME_OFFSET_EULER_DEG = (0.0, 0.0, 0.0)
+# Tune these three angles (roll, pitch, yaw in degrees) to match the physical install of the MPU-6050
+MOUNT_OFFSET_EULER_DEG = (0.0, -90.0, 0.0)
 
 # Higher = faster convergence to gravity but more noise during motion.
 MADGWICK_BETA: float = 0.1
+
+# Exponential moving average applied to the *emitted* orientation quaternion
+# (slerp from the previous emit toward the new target). Range (0, 1]:
+#   1.0 -> no smoothing, no added latency (current behavior)
+#   0.8 -> time constant ~ 0.45 s at the default 10 Hz emit rate
+#   0.5 -> time constant ~ 0.14 s
+# Applied to quaternions (not Euler) so it's well-defined near gimbal-lock.
+ORI_LPF_ALPHA: float = 0.8
 
 INVALID_SENTINEL: float = -1.0
 
@@ -98,16 +90,32 @@ def _normalize(v: np.ndarray) -> np.ndarray:
     return v / n
 
 
+def _slerp(a: np.ndarray, b: np.ndarray, t: float) -> np.ndarray:
+    """Spherical linear interpolation between unit quaternions a and b.
+
+    ``t`` is the interpolation parameter (0 -> a, 1 -> b). Shortest-path
+    is used (flips the sign of b if the dot product is negative).
+    """
+    dot = float(np.dot(a, b))
+    if dot < 0.0:
+        b = -b
+        dot = -dot
+    # If the inputs are nearly parallel, fall back to normalized lerp to
+    # avoid a divide-by-near-zero in the slerp formula.
+    if dot > 0.9995:
+        out = a + t * (b - a)
+    else:
+        theta_0 = math.acos(max(-1.0, min(1.0, dot)))
+        sin_theta_0 = math.sin(theta_0)
+        theta = theta_0 * t
+        s0 = math.cos(theta) - dot * math.sin(theta) / sin_theta_0
+        s1 = math.sin(theta) / sin_theta_0
+        out = s0 * a + s1 * b
+    return _normalize(out)
+
+
 @dataclass
 class MadgwickFilter:
-    """Stateful Madgwick AHRS filter.
-
-    The ``update`` method should be called with every (accel, gyro) sample. The
-    filter integrates the gyroscope and corrects toward the gravity vector
-    estimated by the accelerometer. ``dt`` is the time delta since the previous
-    sample in seconds.
-    """
-
     beta: float = MADGWICK_BETA
     q: np.ndarray = None  # type: ignore[assignment]
     ready: bool = False
@@ -220,28 +228,27 @@ class OrientationEstimator:
       * applies a static mount offset to the raw MPU-6050 readings,
       * runs a Madgwick filter to get an absolute orientation in world frame,
       * emits a fresh ``OriCmd`` at most every 100 ms (10 Hz).
-
-    Call ``on_state`` from the serial callback whenever a ``StateCmd`` arrives
-    with ``acc``/``gyro`` populated, then call ``tick`` periodically (the
-    plumbing class does this on a 100 ms timer).
     """
 
     def __init__(
         self,
         mount_offset_euler_deg: Tuple[float, float, float] = MOUNT_OFFSET_EULER_DEG,
-        home_offset_euler_deg: Tuple[float, float, float] = HOME_OFFSET_EULER_DEG,
         beta: float = MADGWICK_BETA,
         emit_interval_s: float = 0.1,
+        ori_lpf_alpha: float = ORI_LPF_ALPHA,
     ) -> None:
         self._offset_q = _euler_to_quat(*mount_offset_euler_deg)
         # Pre-compute its inverse (conjugate of a unit quaternion).
         self._offset_q_inv = self._offset_q.copy()
         self._offset_q_inv[1:] = -self._offset_q_inv[1:]
-        # The "home" pose: chassis-in-world quaternion that the user wants
-        # to call zero. The ORI message is reported relative to this.
-        self._home_offset_q = _euler_to_quat(*home_offset_euler_deg)
+        self._home_offset_q = _euler_to_quat(0, 0, 0)
         self._home_offset_q_inv = self._home_offset_q.copy()
         self._home_offset_q_inv[1:] = -self._home_offset_q_inv[1:]
+        # Last emitted orientation, used as the prior for the smoothing
+        # EMA. Starts at identity so the first emit is a normal slerp
+        # toward the first target.
+        self._emit_q = np.array([1.0, 0.0, 0.0, 0.0], dtype=np.float64)
+        self._ori_lpf_alpha = float(ori_lpf_alpha)
         self._filter = MadgwickFilter(beta=beta)
         self._last_sample_ts: Optional[float] = None
         self._last_emit_ts: float = 0.0
@@ -261,13 +268,6 @@ class OrientationEstimator:
         accel: Tuple[float, float, float],
         gyro: Tuple[float, float, float],
     ) -> Tuple[Tuple[float, float, float], Tuple[float, float, float]]:
-        """Apply the static mount offset to accel and gyro vectors.
-
-        The MPU-6050's body frame is rotated relative to the chassis by
-        ``self._offset_q``. We rotate the measured vectors by the *inverse*
-        offset to express them in the chassis frame before feeding them to the
-        filter.
-        """
         a = np.array(accel, dtype=np.float64)
         g = np.array(gyro, dtype=np.float64)
         # Rotate by the offset quaternion using the standard v' = q v q^-1.
@@ -291,6 +291,7 @@ class OrientationEstimator:
         self._home_offset_q = _euler_to_quat(0.0, 0.0, 0.0)
         self._home_offset_q_inv = self._home_offset_q.copy()
         self._home_offset_q_inv[1:] = -self._home_offset_q_inv[1:]
+        self._emit_q = np.array([1.0, 0.0, 0.0, 0.0], dtype=np.float64)
 
     def on_state(self, accel, gyro) -> None:
         """Called whenever a fresh accel/gyro sample is available."""
@@ -330,10 +331,7 @@ class OrientationEstimator:
 
     def calibrate(self) -> bool:
         """Capture the current chassis-in-world orientation as the new home.
-
-        After this call, the ORI message will read (0, 0, 0) until the chassis
-        moves relative to the pose it was in at calibration time. Returns
-        ``False`` if the filter has not yet produced a valid estimate.
+        Returns `False` if the filter has not yet produced a valid estimate.
         """
         if not self._filter.ready:
             return False
@@ -341,61 +339,6 @@ class OrientationEstimator:
         self._home_offset_q_inv = self._home_offset_q.copy()
         self._home_offset_q_inv[1:] = -self._home_offset_q_inv[1:]
         return True
-
-    def get_debug_info(self) -> dict:
-        """Return a snapshot of the estimator state for logging/diagnostics."""
-        info: dict = {
-            "raw_accel": self._last_accel,
-            "raw_gyro": self._last_gyro,
-            "filter_ready": self._filter.ready,
-        }
-        if self._filter.ready:
-            r, p, y = _quat_to_euler(self._filter.q)
-            info["chassis_euler"] = (r, p, y)
-            info["chassis_quat"] = tuple(float(x) for x in self._filter.q)
-            # Compute the gravity vector the filter *predicts* in the body
-            # frame, given its current orientation. If the filter is well
-            # aligned with the accelerometer, ``accel_residual`` is small.
-            q = self._filter.q
-            w, x, yi, z = q
-            # R[:, 2] extracts the third column of the rotation matrix,
-            # which is the world +Z axis expressed in the body frame. Since
-            # the accel measures -gravity (i.e., +Z in world), the
-            # predicted normalized accel is R[:, 2].
-            pred_x = 2.0 * (x * z + w * yi)
-            pred_y = 2.0 * (yi * z - w * x)
-            pred_z = 1.0 - 2.0 * (x * x + yi * yi)
-            an = sqrt(
-                self._last_accel[0] ** 2
-                + self._last_accel[1] ** 2
-                + self._last_accel[2] ** 2
-            )
-            if an > 1e-8:
-                mx, my, mz = (
-                    self._last_accel[0] / an,
-                    self._last_accel[1] / an,
-                    self._last_accel[2] / an,
-                )
-            else:
-                mx = my = mz = 0.0
-            info["accel_predicted"] = (pred_x, pred_y, pred_z)
-            info["accel_residual"] = (
-                pred_x - mx,
-                pred_y - my,
-                pred_z - mz,
-            )
-            # Direct tilt from the raw accelerometer (no filter): atan2 of
-            # the horizontal component over the vertical. Independent of
-            # any filter state, so the user can compare it against
-            # ``chassis_euler`` to see if the filter is tracking gravity.
-            info["accel_tilt_deg"] = (
-                math.degrees(math.atan2(mx, mz)),
-                math.degrees(math.atan2(my, mz)),
-            )
-        hr, hp, hy = _quat_to_euler(self._home_offset_q)
-        info["home_euler"] = (hr, hp, hy)
-        info["home_quat"] = tuple(float(x) for x in self._home_offset_q)
-        return info
 
     def maybe_emit(self) -> OriCmd | None:
         self.tick()
@@ -409,6 +352,11 @@ class OrientationEstimator:
         # q_user = q_home^-1 * q_chassis_in_world
         q = _quat_mul(self._home_offset_q_inv, self._filter.q)
         q = _normalize(q)
+        # Slerp from the previous emit toward this target to attenuate
+        # residual high-frequency jitter. alpha == 1 reproduces the
+        # original (unsmoothed) behavior exactly.
+        q = _slerp(self._emit_q, q, self._ori_lpf_alpha)
+        self._emit_q = q
         roll, pitch, yaw = _quat_to_euler(q)
         return OriCmd(
             roll=round(roll, 3),
