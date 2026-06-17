@@ -29,10 +29,8 @@ export default function ArtificialHorizon({ pitch, roll }) {
       currentPitch.current +=
         (targetPitch.current - currentPitch.current) * 0.15;
       currentRoll.current += (targetRoll.current - currentRoll.current) * 0.15;
-      // Invert pitch: with the chase-cam convention, positive pitch
-      // (nose up) means the horizon sits lower in the sub's view, so
-      // the ladder needs to render in the opposite direction.
-      const p = -currentPitch.current;
+      // Invert pitch here if desired
+      const p = currentPitch.current;
       const r = currentRoll.current;
       const ps = 3,
         po = p * ps;
