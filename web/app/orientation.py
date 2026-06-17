@@ -8,10 +8,11 @@ from typing import Optional, Tuple
 
 import numpy as np
 
-from protocol import OriCmd
+from app.protocol import OriCmd
 
 # Tune these three angles (roll, pitch, yaw in degrees) to match the physical install of the MPU-6050
-MOUNT_OFFSET_EULER_DEG = (0.0, -90.0, 0.0)
+#MOUNT_OFFSET_EULER_DEG = (0.0, -90.0, 0.0)
+MOUNT_OFFSET_EULER_DEG = (0.0, 0.0, 0.0)
 
 # Higher = faster convergence to gravity but more noise during motion.
 MADGWICK_BETA: float = 0.1
@@ -262,6 +263,11 @@ class OrientationEstimator:
         # debug logging.
         self._last_accel: Tuple[float, float, float] = (0.0, 0.0, 0.0)
         self._last_gyro: Tuple[float, float, float] = (0.0, 0.0, 0.0)
+        # Gyro bias, in chassis frame (post-mount-offset). Subtracted from
+        # every gyro reading before it reaches the filter. Captured at
+        # ``calibrate()`` time -- the user holds the sub still, runs CAL,
+        # and whatever the gyro reads at that moment is treated as zero.
+        self._gyro_bias: Tuple[float, float, float] = (0.0, 0.0, 0.0)
 
     def _rotate_sensor_to_chassis(
         self,
@@ -292,6 +298,7 @@ class OrientationEstimator:
         self._home_offset_q_inv = self._home_offset_q.copy()
         self._home_offset_q_inv[1:] = -self._home_offset_q_inv[1:]
         self._emit_q = np.array([1.0, 0.0, 0.0, 0.0], dtype=np.float64)
+        self._gyro_bias = (0.0, 0.0, 0.0)
 
     def on_state(self, accel, gyro) -> None:
         """Called whenever a fresh accel/gyro sample is available."""
@@ -325,20 +332,70 @@ class OrientationEstimator:
             dt = 0.5
         self._last_accel = self._pending_accel
         self._last_gyro = self._pending_gyro
-        self._filter.update(self._pending_accel, self._pending_gyro, dt)
+        # Apply the captured gyro bias. The bias is in chassis frame, which
+        # is what ``_pending_gyro`` already is (it was rotated by the mount
+        # offset in ``on_state``).
+        bx, by, bz = self._gyro_bias
+        gx, gy, gz = self._pending_gyro
+        gyro_corrected = (gx - bx, gy - by, gz - bz)
+        self._filter.update(self._pending_accel, gyro_corrected, dt)
         self._last_sample_ts = now
         self._has_pending = False
 
     def calibrate(self) -> bool:
-        """Capture the current chassis-in-world orientation as the new home.
-        Returns `False` if the filter has not yet produced a valid estimate.
+        """Capture the current chassis-in-world orientation as the new home,
+        and the current gyro reading as the new bias.
+
+        After this call, the ORI message will read (0, 0, 0) until the
+        chassis moves, and subsequent gyro readings will have the captured
+        bias subtracted so the filter no longer drifts from a non-zero
+        resting rate. The user should hold the sub perfectly still while
+        sending ``CAL`` -- any actual rotation at calibration time will be
+        captured as part of the "bias" and show up as a counter-rotation
+        on the next real motion.
+
+        Returns ``False`` if the filter has not yet produced a valid
+        estimate.
         """
         if not self._filter.ready:
             return False
         self._home_offset_q = self._filter.q.copy()
         self._home_offset_q_inv = self._home_offset_q.copy()
         self._home_offset_q_inv[1:] = -self._home_offset_q_inv[1:]
+        # Capture the gyro bias from the most recent chassis-frame reading.
+        # Prefer the pending one (newer); fall back to the last integrated
+        # sample if no pending is available.
+        if self._has_pending:
+            self._gyro_bias = self._pending_gyro
+        else:
+            self._gyro_bias = self._last_gyro
         return True
+
+    def get_debug_info(self) -> dict:
+        """Return a snapshot of the estimator state for logging/diagnostics."""
+        info: dict = {
+            "raw_accel": self._last_accel,
+            "raw_gyro": self._last_gyro,
+            "filter_ready": self._filter.ready,
+            "gyro_bias": self._gyro_bias,
+        }
+        if self._filter.ready:
+            r, p, y = _quat_to_euler(self._filter.q)
+            info["chassis_euler"] = (r, p, y)
+            # Direct tilt from the raw accelerometer (no filter). Compare
+            # against ``chassis_euler`` to see if the filter is tracking
+            # gravity correctly.
+            ax, ay, az = self._last_accel
+            an = sqrt(ax * ax + ay * ay + az * az)
+            if an > 1e-8:
+                axn = ax / an
+                ayn = ay / an
+                azn = az / an
+                info["accel_tilt_deg"] = (
+                    math.degrees(math.atan2(axn, azn)),
+                    math.degrees(math.atan2(ayn, azn)),
+                )
+        return info
 
     def maybe_emit(self) -> OriCmd | None:
         self.tick()

@@ -100,13 +100,48 @@ class Plumbing:
         stripped = text.strip().upper()
         if stripped == "CAL":
             if self.orientation.calibrate():
-                line = "calibrated: current pose is now home (ORI = 0,0,0)"
+                info = self.orientation.get_debug_info()
+                bx, by, bz = info["gyro_bias"]
+                line = (
+                    "calibrated: home=0,0,0; gyro bias captured "
+                    f"({bx:+.4f}, {by:+.4f}, {bz:+.4f}) rad/s"
+                )
             else:
                 line = "calibration failed: filter not ready yet"
             await self.handle_circuitpy_msg(ConsoleLog(level="ORI", line=line))
             return
+        if stripped == "ORI_DUMP":
+            await self._dump_orientation()
+            return
         await self.handle_circuitpy_msg(ConsoleLog(level="ECHO", line=text))
         await self.serial.write_text(f"{text}\r\n")
+
+    async def _dump_orientation(self) -> None:
+        info = self.orientation.get_debug_info()
+        lines = [
+            "=== orientation dump ===",
+            f"  filter ready   : {info['filter_ready']}",
+            f"  raw accel (m/s2)   : {tuple(round(x, 3) for x in info['raw_accel'])}",
+            f"  raw gyro (rad/s)   : {tuple(round(x, 4) for x in info['raw_gyro'])}",
+            f"  gyro bias (rad/s)  : {tuple(round(x, 4) for x in info['gyro_bias'])}",
+        ]
+        if "accel_tilt_deg" in info:
+            tr, tp = info["accel_tilt_deg"]
+            lines.append(
+                f"  accel-only tilt  : roll={tr:+.2f} pitch={tp:+.2f}  (ground truth)"
+            )
+        if "chassis_euler" in info:
+            r, p, y = info["chassis_euler"]
+            lines.append(f"  chassis Euler (deg) : r={r:+.2f} p={p:+.2f} y={y:+.2f}")
+        if "accel_tilt_deg" in info and "chassis_euler" in info:
+            tr, tp = info["accel_tilt_deg"]
+            cr, cp, _ = info["chassis_euler"]
+            lines.append(
+                f"  accel says roll={tr:+.2f}/pitch={tp:+.2f}; "
+                f"filter says roll={cr:+.2f}/pitch={cp:+.2f}"
+            )
+        for line in lines:
+            await self.handle_circuitpy_msg(ConsoleLog(level="ORI", line=line))
 
     async def stick_moved(self, stick: str, x: float, y: float):
         if stick == "right":
