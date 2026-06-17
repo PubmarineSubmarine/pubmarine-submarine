@@ -12,15 +12,13 @@ export const leftStick = signal({ x: 0, y: 0 });
 export const rightStick = signal({ x: 0, y: 0 });
 export const leftTrigger = signal(0);
 export const rightTrigger = signal(0);
-export const lastButton = signal("None");
-// Monotonically increasing counter incremented on every Start-button
-// rising edge. Unlike `lastButton` (which holds the button name and uses
-// Object.is equality), this fires subscribers on *every* press.
+// Monotonically increasing counter incremented on every Start-button press
 export const startPressed = signal(0);
 export const telemetry = signal(null);
 export const orientation = signal(null);
 export const connected = signal(false);
 export const consoleEntries = signal([]);
+export const config = signal(null);
 
 const DEADZONE = 0.1;
 const POLL_INTERVAL_MS = 50;
@@ -68,6 +66,7 @@ function handleWsMessage(data) {
     logConsole(data.level, data.line);
   } else if (data.name === "CONFIG") {
     console.info(data.config);
+    config.value = data.config;
     logConsole(data.name, JSON.stringify(data.config));
   } else if (data.name === "PONG") {
     // silent heartbeat
@@ -182,7 +181,6 @@ function onButtonPress(buttonIndex, value) {
     value,
     timestamp: Date.now(),
   });
-  lastButton.value = buttonName;
   if (buttonIndex === 9) {
     startPressed.value = startPressed.value + 1;
   }
@@ -319,10 +317,15 @@ function bindEvents() {
   });
 }
 
+function sendConsoleCommand(text) {
+  wsSend({ type: "console_command", text });
+}
+
 const gamepadService = {
   init,
   destroy,
   downloadConsole,
   sendWebSocketData: wsSend,
+  sendConsoleCommand,
 };
 export default gamepadService;

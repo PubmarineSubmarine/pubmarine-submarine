@@ -1,4 +1,4 @@
-import { render, Fragment } from "preact";
+import { render } from "preact";
 import { useState, useEffect, useRef } from "preact/hooks";
 import ArtificialHorizon from "./artificial-horizon.jsx";
 import Submarine3D from "./submarine-3d.jsx";
@@ -8,14 +8,14 @@ import gamepadService, {
   rightStick,
   leftTrigger,
   rightTrigger,
-  lastButton,
   startPressed,
-  telemetry,
   orientation,
   connected,
   wsConnected,
-  consoleEntries,
 } from "./gamepad-service.js";
+
+import { TelemetryReadout } from "./components/telemetry.jsx";
+import { ConsolePanel } from "./components/console-panel.jsx";
 
 function StickDisplay({ stick }) {
   const x = stick.value.x;
@@ -57,71 +57,9 @@ function TriggerDisplay({ label, trigger }) {
 }
 
 function LastButtonDisplay() {
-  const btn = lastButton.value;
-  return (
-    <div class="overlay-button-display">
-      <div class="overlay-label">Last Button</div>
-      <div class="button-display-overlay">
-        <span class="button-name">{btn}</span>
-      </div>
-    </div>
-  );
+  return null;
 }
 
-const TELEMETRY_FIELDS = [
-  ["bat", "Battery"],
-  ["depth", "Depth"],
-  ["acc", "Accel"],
-  ["gyro", "Gyro"],
-  ["ori", "Ori"],
-  ["temp", "Temp"],
-  ["hum", "Humidity"],
-  ["mcu", "MCU Temp"],
-  ["pi", "Pi Temp"],
-  ["ia", "IA"],
-  ["ib", "IB"],
-  ["fm", "FM"],
-  ["fj", "FJ"],
-  ["td", "TD"],
-  ["br", "BR"],
-];
-
-function TelemetryReadout() {
-  const state = telemetry.value;
-  const ori = orientation.value;
-
-  return (
-    <div class="overlay-status-left">
-      <div class="stick-values-overlay status-values">
-        {!state ? (
-          "Waiting for telemetry"
-        ) : (
-          <>
-            {TELEMETRY_FIELDS.map(([key, label]) => {
-              if (key === "ori") {
-                if (!ori) return null;
-                return (
-                  <div key={key}>
-                    {label}: r={ori.roll?.toFixed(1)} p={ori.pitch?.toFixed(1)} y={ori.yaw?.toFixed(1)}
-                  </div>
-                );
-              }
-              const val = state[key];
-              if (val == null) return null;
-              const fmt = (n) => (typeof n === "number" ? n.toFixed(1) : n);
-              const text = Array.isArray(val) ? val.map(fmt).join(", ") : val;
-              return (
-                <div key={key}>
-                  {label}: {text}
-                </div>
-              );
-            })}
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
 
 function ConnectionStatus() {
   const isConn = connected.value;
@@ -167,105 +105,6 @@ function ArtificialHorizonCanvas() {
     <div class="overlay-artificial-horizon">
       <ArtificialHorizon pitch={pitch} roll={roll} />
     </div>
-  );
-}
-
-function ConsolePanel({ collapsed, onToggle }) {
-  const inputRef = useRef(null);
-  const historyRef = useRef(null);
-
-  // Auto-scroll to bottom when new entries arrive
-  useEffect(() => {
-    const el = historyRef.current;
-    if (el && !collapsed) {
-      el.scrollTop = el.scrollHeight;
-    }
-  });
-
-  const handleDownload = () => {
-    gamepadService.downloadConsole();
-  };
-
-  const handleCalibrate = () => {
-    gamepadService.sendWebSocketData({
-      type: "console_command",
-      text: "CAL",
-    });
-  };
-
-  const handleConsoleInput = (e) => {
-    if (e.key === "Enter" && inputRef.current?.value.trim()) {
-      gamepadService.sendWebSocketData({
-        type: "console_command",
-        text: inputRef.current.value.trim(),
-      });
-      inputRef.current.value = "";
-    }
-  };
-
-  const entries = consoleEntries.value;
-  const displayEntries = entries.slice(-1500);
-
-  return (
-    <>
-      <div class="console-controls">
-        <button
-          id="calibrate-orientation"
-          onClick={handleCalibrate}
-          title="Capture current orientation as the new home pose"
-        >
-          ⚓ Calibrate
-        </button>
-        <button
-          id="download-console"
-          onClick={handleDownload}
-          title="Download &amp; clear"
-        >
-          ⬇ Download Console
-        </button>
-        <label
-          for="console-collapsed"
-          id="collapse-console"
-          title="Toggle console"
-          onClick={onToggle}
-        >
-          ☰ {collapsed ? "Show Console" : "Hide Console"}
-        </label>
-      </div>
-
-      <div
-        class="console-section"
-        style={{ display: collapsed ? "none" : "flex" }}
-      >
-        <div class="console-body">
-          <div id="console-history" ref={historyRef} class="console-buffer">
-            {displayEntries.length === 0 ? (
-              <div class="history-placeholder">No messages...</div>
-            ) : (
-              displayEntries.map((entry, i) => (
-                <div class="history-item" key={i}>
-                  <span class="timestamp">
-                    {new Date(entry.ts).toLocaleTimeString()}
-                  </span>
-                  <span class="button-name">[{entry.label}]</span>
-                  <span class="button-value">{entry.message}</span>
-                </div>
-              ))
-            )}
-          </div>
-          <div class="console-input-row">
-            <input
-              type="text"
-              ref={inputRef}
-              class="console-input"
-              placeholder="Send command..."
-              autocomplete="off"
-              onKeyDown={handleConsoleInput}
-            />
-          </div>
-        </div>
-      </div>
-    </>
   );
 }
 
@@ -328,7 +167,6 @@ function App() {
 
             {/* Gamepad Overlay */}
             <div class="gamepad-overlay">
-              <LastButtonDisplay />
               <TelemetryReadout />
               <Submarine3DContainer />
               <ArtificialHorizonCanvas />
