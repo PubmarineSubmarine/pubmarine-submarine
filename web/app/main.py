@@ -1,6 +1,5 @@
 import json
 import logging
-from asyncio import TaskGroup
 from contextlib import asynccontextmanager
 
 import httpx
@@ -62,13 +61,12 @@ async def websocket_endpoint(websocket: WebSocket):
     plumbing.ws_connect(websocket)
 
     try:
-        async with TaskGroup() as tg:
-            while True:
-                # Receive gamepad data from client
-                data = await websocket.receive_text()
-                gamepad_data = json.loads(data)
+        while True:
+            # Receive gamepad data from client
+            data = await websocket.receive_text()
+            gamepad_data = json.loads(data)
 
-                tg.create_task(handle_gamepad_data(gamepad_data))
+            await handle_gamepad_data(gamepad_data)
 
     except WebSocketDisconnect:
         await plumbing.ws_disconnect(websocket)
