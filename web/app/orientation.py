@@ -8,7 +8,7 @@ from typing import Optional, Tuple
 
 import numpy as np
 
-from app.protocol import OriCmd
+from protocol import OriCmd
 
 # Tune these three angles (roll, pitch, yaw in degrees) to match the physical install of the MPU-6050
 #MOUNT_OFFSET_EULER_DEG = (0.0, -90.0, 0.0)
