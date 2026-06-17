@@ -77,8 +77,13 @@ class Plumbing:
             # sample and let the loop below decide when to emit.
             self.orientation.on_state(msg.acc, msg.gyro)
         j = msg.model_dump_json()
-        for ws in self.connections:
-            await ws.send_text(j)
+        for ws in list(self.connections):
+            try:
+                await ws.send_text(j)
+            except Exception:
+                if ws in self.connections:
+                    self.connections.remove(ws)
+                    logger.info(f"Dropped dead WebSocket. Total: {len(self.connections)}")
 
     async def _orientation_loop(self):
         """Background task that drives the orientation estimator."""

@@ -235,5 +235,10 @@ class SerialClient:
                         # traceback.print_exc()
                         logger.debug(f"RX: {data}")
                         await callback(ConsoleLog(line=data))
+                    except Exception:
+                        # Never let a callback exception (e.g. a WebSocket
+                        # send on a half-closed socket) kill the read loop
+                        # and silently freeze the serial client.
+                        logger.exception("Error in serial callback, continuing")
                 else:
                     logger.debug(f"RX: {data}")
