@@ -51,8 +51,7 @@ function ConfigEditor() {
     }
     try {
       gamepadService.sendConsoleCommand(`SET_CONFIG ${JSON.stringify(parsed)}`);
-      setDirty(false);
-      setStatus("Sent SET_CONFIG");
+      setStatus("Sent SET_CONFIG — updating when drone responds…");
     } catch (e) {
       setStatus(`Send failed: ${e.message}`);
     }

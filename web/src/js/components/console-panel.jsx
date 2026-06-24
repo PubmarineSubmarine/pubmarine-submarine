@@ -2,6 +2,7 @@ import { useEffect, useRef } from "preact/hooks";
 import gamepadService, {
   startPressed,
   consoleEntries,
+  heartbeatEnabled,
 } from "../gamepad-service.js";
 
 export function ConsolePanel({ collapsed, onToggle }) {
@@ -18,6 +19,10 @@ export function ConsolePanel({ collapsed, onToggle }) {
 
   const handleDownload = () => {
     gamepadService.downloadConsole();
+  };
+
+  const handleToggleHeartbeat = () => {
+    gamepadService.setHeartbeatEnabled(!heartbeatEnabled.value);
   };
 
   const handleCalibrate = () => {
@@ -43,6 +48,13 @@ export function ConsolePanel({ collapsed, onToggle }) {
   return (
     <>
       <div class="console-controls">
+        <button
+          id="toggle-heartbeat"
+          onClick={handleToggleHeartbeat}
+          title="Toggle motor-failsafe heartbeat"
+        >
+          {heartbeatEnabled.value ? "❤ Heartbeat: On" : "♡ Heartbeat: Off"}
+        </button>
         <button
           id="calibrate-orientation"
           onClick={handleCalibrate}

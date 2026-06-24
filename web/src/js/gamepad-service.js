@@ -19,11 +19,13 @@ export const orientation = signal(null);
 export const connected = signal(false);
 export const consoleEntries = signal([]);
 export const config = signal(null);
+export const heartbeatEnabled = signal(true);
 
 const DEADZONE = 0.1;
 const POLL_INTERVAL_MS = 50;
 const STICK_SEND_INTERVAL_MS = 10;
 const CONSOLE_BUFFER_LIMIT = 100_000;
+const HEARTBEAT_INTERVAL_MS = 1000;
 
 const BUTTON_NAMES = {
   0: "A",
@@ -49,6 +51,7 @@ let gamepadIndex = null;
 let previousButtons = [];
 let pollInterval = null;
 let lastGamepadJSON = "";
+let heartbeatInterval = null;
 
 let lastStickSent = null;
 let lastLeftStickActive = false;
@@ -122,6 +125,31 @@ function checkForGamepads() {
   return false;
 }
 
+function startHeartbeat() {
+  if (heartbeatInterval) return;
+  if (!heartbeatEnabled.value) return;
+  wsSend({ type: "heartbeat" });
+  heartbeatInterval = setInterval(() => {
+    wsSend({ type: "heartbeat" });
+  }, HEARTBEAT_INTERVAL_MS);
+}
+
+function stopHeartbeat() {
+  if (heartbeatInterval) {
+    clearInterval(heartbeatInterval);
+    heartbeatInterval = null;
+  }
+}
+
+function setHeartbeatEnabled(enabled) {
+  heartbeatEnabled.value = enabled;
+  if (enabled) {
+    startHeartbeat();
+  } else {
+    stopHeartbeat();
+  }
+}
+
 function start() {
   if (pollInterval || gamepadIndex === null) {
     if (gamepadIndex === null && checkForGamepads()) {
@@ -130,12 +158,14 @@ function start() {
     return;
   }
   pollInterval = setInterval(updateGamepadState, POLL_INTERVAL_MS);
+  startHeartbeat();
 }
 
 function stop() {
   if (wsConnected.value) {
     wsSend({ type: "stop" });
   }
+  stopHeartbeat();
   if (pollInterval) {
     clearInterval(pollInterval);
     pollInterval = null;
@@ -287,6 +317,16 @@ function init() {
   if (socket) {
     socket.onmessage = (event) => handleWsMessage(JSON.parse(event.data));
   }
+  // Drive the heartbeat off wsConnected so it (re)starts on every
+  // reconnect — ws-client.js creates a fresh WebSocket each time, so
+  // a one-shot open listener would be lost after the first drop.
+  wsConnected.subscribe((isConnected) => {
+    if (isConnected) {
+      startHeartbeat();
+    } else {
+      stopHeartbeat();
+    }
+  });
   checkForGamepads();
 }
 
@@ -327,5 +367,6 @@ const gamepadService = {
   downloadConsole,
   sendWebSocketData: wsSend,
   sendConsoleCommand,
+  setHeartbeatEnabled,
 };
 export default gamepadService;
