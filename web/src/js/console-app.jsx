@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import gamepadService, {
   consoleEntries,
   config,
+  heartbeatEnabled,
   wsConnected,
 } from "./gamepad-service.js";
 
@@ -115,6 +116,10 @@ function FullscreenConsole() {
     gamepadService.sendConsoleCommand("CAL");
   };
 
+  const handleToggleHeartbeat = () => {
+    gamepadService.setHeartbeatEnabled(!heartbeatEnabled.value);
+  };
+
   const entries = consoleEntries.value;
   const displayEntries = entries.slice(-1500);
 
@@ -138,6 +143,13 @@ function FullscreenConsole() {
             title="Download &amp; clear"
           >
             ⬇ Download Console
+          </button>
+          <button
+            id="toggle-heartbeat"
+            onClick={handleToggleHeartbeat}
+            title="Toggle motor-failsafe heartbeat"
+          >
+            {heartbeatEnabled.value ? "❤ Heartbeat: On" : "♡ Heartbeat: Off"}
           </button>
         </div>
       </div>
