@@ -15,6 +15,7 @@ DEFAULT_CONFIG = {
     "autoreload": True,
     "reload_on_success": False,
     "reload_on_error": True,
+    "jet_mapping": "ABCDEFGH",
 }
 
 

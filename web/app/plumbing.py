@@ -153,10 +153,12 @@ class Plumbing:
             # sv1 = int(90 + 45*y)
             # sv2 = int(90 - 45*y)
             # await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
-            self.throttle = -y
-            await self.update_motors()
+            sv1 = int(90 + 30 * y)
+            sv2 = int(90 - 30 * y)
+            await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
         elif stick == "left":
             self.steer = x
+            self.throttle = -y
             await self.update_motors()
 
     async def trigger_moved(self, trigger: str, value: float):
@@ -167,12 +169,12 @@ class Plumbing:
         #     self.throttle = value
         #     await self.update_motors()
         if trigger == "left":
-            sv1 = int(90 + 45 * value)
-            sv2 = int(90 - 45 * value)
+            sv1 = int(90 + 30 * value)
+            sv2 = int(90 - 30 * value)
             await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
         elif trigger == "right":
-            sv1 = int(90 - 45 * value)
-            sv2 = int(90 + 45 * value)
+            sv1 = int(90 - 30 * value)
+            sv2 = int(90 + 30 * value)
             await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
 
     async def update_motors(self):
@@ -204,22 +206,22 @@ class Plumbing:
                 pass
             case 4:  # Left Bumper
                 # roll CCW
-                await self.serial.write_cmd(MotionCmd(fu=1, fr=0, fd=1, fl=0, ru=1, rr=0, rd=1, rl=0))
+                await self.serial.write_cmd(MotionCmd(fu=1, fd=0, fl=1, fr=0, ru=1, rd=0, rl=1, rr=0))
             case 5:  # Right Bumper
                 # roll CW
-                await self.serial.write_cmd(MotionCmd(fu=0, fr=1, fd=0, fl=1, ru=0, rr=1, rd=0, rl=1))
+                await self.serial.write_cmd(MotionCmd(fu=0, fd=1, fl=0, fr=1, ru=0, rd=1, rl=0, rr=1))
             case 12:  # D-Pad Up
-                # pitch up
-                await self.serial.write_cmd(MotionCmd(fu=1, fr=1, fd=0, fl=0, ru=0, rr=0, rd=1, rl=1))
+                # translate up
+                await self.serial.write_cmd(MotionCmd(fu=0, fd=0, fl=1, fr=1, ru=0, rd=0, rl=1, rr=1))
             case 13:  # D-Pad Down
-                # pitch down
-                await self.serial.write_cmd(MotionCmd(fu=0, fr=0, fd=1, fl=1, ru=1, rr=1, rd=0, rl=0))
+                # translate down
+                await self.serial.write_cmd(MotionCmd(fu=1, fd=1, fl=0, fr=0, ru=1, rd=1, rl=0, rr=0))
             case 14:  # D-Pad Left
-                # yaw left
-                await self.serial.write_cmd(MotionCmd(fu=1, fr=0, fd=0, fl=1, ru=0, rr=1, rd=1, rl=0))
+                # translate left
+                await self.serial.write_cmd(MotionCmd(fu=0, fd=1, fl=1, fr=0, ru=0, rd=1, rl=1, rr=0))
             case 15:  # D-Pad Right
-                # yaw right
-                await self.serial.write_cmd(MotionCmd(fu=0, fr=1, fd=1, fl=0, ru=1, rr=0, rd=0, rl=1))
+                # translate right
+                await self.serial.write_cmd(MotionCmd(fu=1, fd=0, fl=0, fr=1, ru=1, rd=0, rl=0, rr=1))
             case 8:  # back / select
                 await reset_pico()
                 # await self.serial.write_cmd(ResetCmd(flags=["SOFT"]))
