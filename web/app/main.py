@@ -55,6 +55,12 @@ async def gamepad_page(request: Request):
     return RedirectResponse(url="/")
 
 
+@app.get("/console", response_class=HTMLResponse)
+async def console_page(request: Request):
+    """Serve the console-only page (telemetry, 3D model, console)."""
+    return templates.TemplateResponse("console.html", {"request": request})
+
+
 @app.websocket("/ws/gamepad")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()

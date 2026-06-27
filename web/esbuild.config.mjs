@@ -2,10 +2,8 @@ import * as esbuild from "esbuild";
 
 const isWatch = process.argv.includes("--watch");
 
-const buildOptions = {
-  entryPoints: ["src/js/gamepad-app.jsx"],
+const commonOptions = {
   bundle: true,
-  outfile: "static/js/gamepad.bundle.js",
   format: "esm",
   target: "es2020",
   jsx: "transform",
@@ -17,11 +15,29 @@ const buildOptions = {
   treeShaking: true,
 };
 
+const entryPoints = [
+  {
+    in: "src/js/gamepad-app.jsx",
+    out: "gamepad",
+  },
+  {
+    in: "src/js/console-app.jsx",
+    out: "console",
+  },
+];
+
+const buildOptions = {
+  ...commonOptions,
+  entryPoints: entryPoints,
+  outdir: "static/js",
+  entryNames: "[name].bundle",
+};
+
 if (isWatch) {
   const ctx = await esbuild.context(buildOptions);
   await ctx.watch();
   console.log("Watching for changes...");
 } else {
   await esbuild.build(buildOptions);
-  console.log("Build complete → static/js/gamepad.bundle.js");
+  console.log("Build complete → static/js/{gamepad,console}.bundle.js");
 }

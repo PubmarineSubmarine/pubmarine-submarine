@@ -12,20 +12,20 @@ export const leftStick = signal({ x: 0, y: 0 });
 export const rightStick = signal({ x: 0, y: 0 });
 export const leftTrigger = signal(0);
 export const rightTrigger = signal(0);
-export const lastButton = signal("None");
-// Monotonically increasing counter incremented on every Start-button
-// rising edge. Unlike `lastButton` (which holds the button name and uses
-// Object.is equality), this fires subscribers on *every* press.
+// Monotonically increasing counter incremented on every Start-button press
 export const startPressed = signal(0);
 export const telemetry = signal(null);
 export const orientation = signal(null);
 export const connected = signal(false);
 export const consoleEntries = signal([]);
+export const config = signal(null);
+export const heartbeatEnabled = signal(true);
 
 const DEADZONE = 0.1;
 const POLL_INTERVAL_MS = 50;
 const STICK_SEND_INTERVAL_MS = 10;
 const CONSOLE_BUFFER_LIMIT = 100_000;
+const HEARTBEAT_INTERVAL_MS = 1000;
 
 const BUTTON_NAMES = {
   0: "A",
@@ -51,6 +51,7 @@ let gamepadIndex = null;
 let previousButtons = [];
 let pollInterval = null;
 let lastGamepadJSON = "";
+let heartbeatInterval = null;
 
 let lastStickSent = null;
 let lastLeftStickActive = false;
@@ -68,6 +69,7 @@ function handleWsMessage(data) {
     logConsole(data.level, data.line);
   } else if (data.name === "CONFIG") {
     console.info(data.config);
+    config.value = data.config;
     logConsole(data.name, JSON.stringify(data.config));
   } else if (data.name === "PONG") {
     // silent heartbeat
@@ -123,6 +125,31 @@ function checkForGamepads() {
   return false;
 }
 
+function startHeartbeat() {
+  if (heartbeatInterval) return;
+  if (!heartbeatEnabled.value) return;
+  wsSend({ type: "heartbeat" });
+  heartbeatInterval = setInterval(() => {
+    wsSend({ type: "heartbeat" });
+  }, HEARTBEAT_INTERVAL_MS);
+}
+
+function stopHeartbeat() {
+  if (heartbeatInterval) {
+    clearInterval(heartbeatInterval);
+    heartbeatInterval = null;
+  }
+}
+
+function setHeartbeatEnabled(enabled) {
+  heartbeatEnabled.value = enabled;
+  if (enabled) {
+    startHeartbeat();
+  } else {
+    stopHeartbeat();
+  }
+}
+
 function start() {
   if (pollInterval || gamepadIndex === null) {
     if (gamepadIndex === null && checkForGamepads()) {
@@ -131,12 +158,14 @@ function start() {
     return;
   }
   pollInterval = setInterval(updateGamepadState, POLL_INTERVAL_MS);
+  startHeartbeat();
 }
 
 function stop() {
   if (wsConnected.value) {
     wsSend({ type: "stop" });
   }
+  stopHeartbeat();
   if (pollInterval) {
     clearInterval(pollInterval);
     pollInterval = null;
@@ -182,7 +211,6 @@ function onButtonPress(buttonIndex, value) {
     value,
     timestamp: Date.now(),
   });
-  lastButton.value = buttonName;
   if (buttonIndex === 9) {
     startPressed.value = startPressed.value + 1;
   }
@@ -289,6 +317,16 @@ function init() {
   if (socket) {
     socket.onmessage = (event) => handleWsMessage(JSON.parse(event.data));
   }
+  // Drive the heartbeat off wsConnected so it (re)starts on every
+  // reconnect — ws-client.js creates a fresh WebSocket each time, so
+  // a one-shot open listener would be lost after the first drop.
+  wsConnected.subscribe((isConnected) => {
+    if (isConnected) {
+      startHeartbeat();
+    } else {
+      stopHeartbeat();
+    }
+  });
   checkForGamepads();
 }
 
@@ -319,10 +357,16 @@ function bindEvents() {
   });
 }
 
+function sendConsoleCommand(text) {
+  wsSend({ type: "console_command", text });
+}
+
 const gamepadService = {
   init,
   destroy,
   downloadConsole,
   sendWebSocketData: wsSend,
+  sendConsoleCommand,
+  setHeartbeatEnabled,
 };
 export default gamepadService;
