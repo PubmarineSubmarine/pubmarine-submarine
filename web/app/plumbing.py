@@ -33,7 +33,7 @@ class Plumbing:
         self.lights = False
         self.orient_mode = False
         # Power limit applied to the main thrusters in update_motors().
-        self.main_thruster_power_limit = 0.6
+        self.main_thruster_power_limit = 0.7
         self._main_thruster_boost_active = False
         # Madgwick-based absolute orientation estimator. Runs over every STAT
         # message and emits synthetic ORI messages at 10 Hz, even when the
