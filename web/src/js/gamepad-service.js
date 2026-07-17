@@ -53,6 +53,9 @@ let pollInterval = null;
 let lastGamepadJSON = "";
 let heartbeatInterval = null;
 
+const previousSnapshotByIndex = new Map();
+const lastInputTimeByIndex = new Map();
+
 let lastStickSent = null;
 let unsubConfigFetch = null;
 let lastLeftStickActive = false;
@@ -174,11 +177,46 @@ function stop() {
 }
 
 function updateGamepadState() {
-  if (gamepadIndex === null) return;
-
   const gamepads = navigator.getGamepads();
-  const gamepad = gamepads[gamepadIndex];
+  const activeGamepads = [];
+  for (let i = 0; i < gamepads.length; i++) {
+    if (gamepads[i]) activeGamepads.push(gamepads[i]);
+  }
+  if (activeGamepads.length === 0) {
+    stop();
+    return;
+  }
 
+  // Find the gamepad with the most recent input across all connected pads.
+  let mostRecentIndex = gamepadIndex;
+  let mostRecentTime = -1;
+  for (const gp of activeGamepads) {
+    const snapshot = JSON.stringify({
+      b: gp.buttons.map((btn) => btn.value),
+      a: gp.axes,
+    });
+    if (snapshot !== previousSnapshotByIndex.get(gp.index)) {
+      previousSnapshotByIndex.set(gp.index, snapshot);
+      lastInputTimeByIndex.set(gp.index, Date.now());
+    }
+    const t = lastInputTimeByIndex.get(gp.index) ?? 0;
+    if (t > mostRecentTime) {
+      mostRecentTime = t;
+      mostRecentIndex = gp.index;
+    }
+  }
+  if (mostRecentIndex === null) {
+    mostRecentIndex = activeGamepads[0].index;
+  }
+
+  // Switch active gamepad to the one with most recent input
+  if (mostRecentIndex !== gamepadIndex) {
+    gamepadIndex = mostRecentIndex;
+    previousButtons = gamepads[gamepadIndex].buttons.map((b) => b.pressed);
+    lastGamepadJSON = "";
+  }
+
+  const gamepad = gamepads[gamepadIndex];
   if (!gamepad) {
     stop();
     return;
@@ -349,22 +387,40 @@ function destroy() {
 function bindEvents() {
   window.addEventListener("gamepadconnected", (e) => {
     console.log("Gamepad connected:", e.gamepad.id);
-    gamepadIndex = e.gamepad.index;
     connected.value = true;
     wsSend({
       type: "gamepad_connected",
       gamepad_id: e.gamepad.id,
       index: e.gamepad.index,
     });
+    if (gamepadIndex === null) {
+      gamepadIndex = e.gamepad.index;
+    }
     start();
   });
 
   window.addEventListener("gamepaddisconnected", (e) => {
     console.log("Gamepad disconnected:", e.gamepad.id);
-    connected.value = false;
     wsSend({ type: "gamepad_disconnected", gamepad_id: e.gamepad.id });
-    stop();
-    gamepadIndex = null;
+    previousSnapshotByIndex.delete(e.gamepad.index);
+    lastInputTimeByIndex.delete(e.gamepad.index);
+    if (e.gamepad.index === gamepadIndex) {
+      gamepadIndex = null;
+      previousButtons = [];
+      lastGamepadJSON = "";
+      // Fall back to another connected gamepad if one is available.
+      const gamepads = navigator.getGamepads();
+      for (let i = 0; i < gamepads.length; i++) {
+        if (gamepads[i]) {
+          gamepadIndex = i;
+          break;
+        }
+      }
+      if (gamepadIndex === null) {
+        connected.value = false;
+        stop();
+      }
+    }
   });
 }
 

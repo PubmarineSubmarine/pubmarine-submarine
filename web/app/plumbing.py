@@ -4,6 +4,7 @@ from os import environ
 
 from fastapi import WebSocket
 from gpio import reset_pico
+from orientation import OrientationEstimator
 from protocol import (
     Command,
     ConsoleLog,
@@ -13,7 +14,6 @@ from protocol import (
     StopCmd,
 )
 from serial_client import DebugSerialClient, SerialClient
-from orientation import OrientationEstimator
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +32,9 @@ class Plumbing:
         self.steer = 0.0
         self.lights = False
         self.orient_mode = False
+        # Power limit applied to the main thrusters in update_motors().
+        self.main_thruster_power_limit = 0.6
+        self._main_thruster_boost_active = False
         # Madgwick-based absolute orientation estimator. Runs over every STAT
         # message and emits synthetic ORI messages at 10 Hz, even when the
         # serial stream is slow.
@@ -108,10 +111,7 @@ class Plumbing:
             if self.orientation.calibrate():
                 info = self.orientation.get_debug_info()
                 bx, by, bz = info["gyro_bias"]
-                line = (
-                    "calibrated: home=0,0,0; gyro bias captured "
-                    f"({bx:+.4f}, {by:+.4f}, {bz:+.4f}) rad/s"
-                )
+                line = f"calibrated: home=0,0,0; gyro bias captured ({bx:+.4f}, {by:+.4f}, {bz:+.4f}) rad/s"
             else:
                 line = "calibration failed: filter not ready yet"
             await self.handle_circuitpy_msg(ConsoleLog(level="ORI", line=line))
@@ -133,19 +133,14 @@ class Plumbing:
         ]
         if "accel_tilt_deg" in info:
             tr, tp = info["accel_tilt_deg"]
-            lines.append(
-                f"  accel-only tilt  : roll={tr:+.2f} pitch={tp:+.2f}  (ground truth)"
-            )
+            lines.append(f"  accel-only tilt  : roll={tr:+.2f} pitch={tp:+.2f}  (ground truth)")
         if "chassis_euler" in info:
             r, p, y = info["chassis_euler"]
             lines.append(f"  chassis Euler (deg) : r={r:+.2f} p={p:+.2f} y={y:+.2f}")
         if "accel_tilt_deg" in info and "chassis_euler" in info:
             tr, tp = info["accel_tilt_deg"]
             cr, cp, _ = info["chassis_euler"]
-            lines.append(
-                f"  accel says roll={tr:+.2f}/pitch={tp:+.2f}; "
-                f"filter says roll={cr:+.2f}/pitch={cp:+.2f}"
-            )
+            lines.append(f"  accel says roll={tr:+.2f}/pitch={tp:+.2f}; filter says roll={cr:+.2f}/pitch={cp:+.2f}")
         for line in lines:
             await self.handle_circuitpy_msg(ConsoleLog(level="ORI", line=line))
 
@@ -154,8 +149,8 @@ class Plumbing:
             # sv1 = int(90 + 45*y)
             # sv2 = int(90 - 45*y)
             # await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
-            sv1 = int(90 + 15 * y)
-            sv2 = int(90 - 15 * y)
+            sv1 = int(90 + 20 * y)
+            sv2 = int(90 - 20 * y)
             await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
         elif stick == "left":
             self.steer = x
@@ -189,6 +184,9 @@ class Plumbing:
             rel_throttle = 1
         a = a_steer * rel_steer + self.throttle * rel_throttle
         b = b_steer * rel_steer + self.throttle * rel_throttle
+        limit = 1.0 if self._main_thruster_boost_active else self.main_thruster_power_limit
+        a *= limit
+        b *= limit
         print(f"{self.steer=} {self.throttle=} {rel_steer=} {rel_throttle=} {a=} {b=}")
         await self.serial.write_cmd(MotionCmd(a=a, b=b))
 
@@ -209,8 +207,9 @@ class Plumbing:
                 # roll CCW
                 await self.serial.write_cmd(MotionCmd(fu=1, fd=0, fl=1, fr=0, ru=1, rd=0, rl=1, rr=0))
             case 5:  # Right Bumper
-                # roll CW
-                await self.serial.write_cmd(MotionCmd(fu=0, fd=1, fl=0, fr=1, ru=0, rd=1, rl=0, rr=1))
+                # Boost A/B thrusters to 100% while held.
+                self._main_thruster_boost_active = True
+                await self.update_motors()
             case 12:  # D-Pad Up
                 if self.orient_mode:
                     # pitch up
@@ -252,7 +251,8 @@ class Plumbing:
             case 4:  # Left Bumper
                 await self.serial.write_cmd(MotionCmd(fu=0, fd=0, fl=0, fr=0, ru=0, rd=0, rl=0, rr=0))
             case 5:  # Right Bumper
-                await self.serial.write_cmd(MotionCmd(fu=0, fd=0, fl=0, fr=0, ru=0, rd=0, rl=0, rr=0))
+                self._main_thruster_boost_active = False
+                await self.update_motors()
             case 12:  # D-Pad Up
                 await self.serial.write_cmd(MotionCmd(fu=0, fd=0, fl=0, fr=0, ru=0, rd=0, rl=0, rr=0))
             case 13:  # D-Pad Down
