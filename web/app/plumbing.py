@@ -31,6 +31,7 @@ class Plumbing:
         self.throttle = 0.0
         self.steer = 0.0
         self.lights = False
+        self.orient_mode = False
         # Madgwick-based absolute orientation estimator. Runs over every STAT
         # message and emits synthetic ORI messages at 10 Hz, even when the
         # serial stream is slow.
@@ -153,8 +154,8 @@ class Plumbing:
             # sv1 = int(90 + 45*y)
             # sv2 = int(90 - 45*y)
             # await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
-            sv1 = int(90 + 30 * y)
-            sv2 = int(90 - 30 * y)
+            sv1 = int(90 + 15 * y)
+            sv2 = int(90 - 15 * y)
             await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
         elif stick == "left":
             self.steer = x
@@ -169,12 +170,12 @@ class Plumbing:
         #     self.throttle = value
         #     await self.update_motors()
         if trigger == "left":
-            sv1 = int(90 + 30 * value)
-            sv2 = int(90 - 30 * value)
+            sv1 = int(90 + 15 * value)
+            sv2 = int(90 - 15 * value)
             await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
         elif trigger == "right":
-            sv1 = int(90 - 30 * value)
-            sv2 = int(90 + 30 * value)
+            sv1 = int(90 - 15 * value)
+            sv2 = int(90 + 15 * value)
             await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
 
     async def update_motors(self):
@@ -211,20 +212,38 @@ class Plumbing:
                 # roll CW
                 await self.serial.write_cmd(MotionCmd(fu=0, fd=1, fl=0, fr=1, ru=0, rd=1, rl=0, rr=1))
             case 12:  # D-Pad Up
-                # translate up
-                await self.serial.write_cmd(MotionCmd(fu=0, fd=0, fl=1, fr=1, ru=0, rd=0, rl=1, rr=1))
+                if self.orient_mode:
+                    # pitch up
+                    await self.serial.write_cmd(MotionCmd(fu=0, fd=0, fl=1, fr=1, ru=1, rd=1, rl=0, rr=0))
+                else:
+                    # translate up
+                    await self.serial.write_cmd(MotionCmd(fu=0, fd=0, fl=1, fr=1, ru=0, rd=0, rl=1, rr=1))
             case 13:  # D-Pad Down
-                # translate down
-                await self.serial.write_cmd(MotionCmd(fu=1, fd=1, fl=0, fr=0, ru=1, rd=1, rl=0, rr=0))
+                if self.orient_mode:
+                    # pitch down
+                    await self.serial.write_cmd(MotionCmd(fu=1, fd=1, fl=0, fr=0, ru=0, rd=0, rl=1, rr=1))
+                else:
+                    # translate down
+                    await self.serial.write_cmd(MotionCmd(fu=1, fd=1, fl=0, fr=0, ru=1, rd=1, rl=0, rr=0))
             case 14:  # D-Pad Left
-                # translate left
-                await self.serial.write_cmd(MotionCmd(fu=0, fd=1, fl=1, fr=0, ru=0, rd=1, rl=1, rr=0))
+                if self.orient_mode:
+                    # yaw left
+                    await self.serial.write_cmd(MotionCmd(fu=1, fd=0, fl=0, fr=1, ru=0, rd=1, rl=1, rr=0))
+                else:
+                    # translate left
+                    await self.serial.write_cmd(MotionCmd(fu=0, fd=1, fl=1, fr=0, ru=0, rd=1, rl=1, rr=0))
             case 15:  # D-Pad Right
-                # translate right
-                await self.serial.write_cmd(MotionCmd(fu=1, fd=0, fl=0, fr=1, ru=1, rd=0, rl=0, rr=1))
+                if self.orient_mode:
+                    # yaw right
+                    await self.serial.write_cmd(MotionCmd(fu=0, fd=1, fl=1, fr=0, ru=1, rd=0, rl=0, rr=1))
+                else:
+                    # translate right
+                    await self.serial.write_cmd(MotionCmd(fu=1, fd=0, fl=0, fr=1, ru=1, rd=0, rl=0, rr=1))
             case 8:  # back / select
                 await reset_pico()
                 # await self.serial.write_cmd(ResetCmd(flags=["SOFT"]))
+            case 11:  # Right Stick
+                self.orient_mode = True
 
     async def button_released(self, index, value):
         match index:
@@ -242,6 +261,8 @@ class Plumbing:
                 await self.serial.write_cmd(MotionCmd(fu=0, fd=0, fl=0, fr=0, ru=0, rd=0, rl=0, rr=0))
             case 15:  # D-Pad Right
                 await self.serial.write_cmd(MotionCmd(fu=0, fd=0, fl=0, fr=0, ru=0, rd=0, rl=0, rr=0))
+            case 11:  # Right Stick
+                self.orient_mode = False
 
     async def heartbeat(self):
         await self.serial.write_cmd(PingCmd())

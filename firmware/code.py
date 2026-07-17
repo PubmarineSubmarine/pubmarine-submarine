@@ -29,12 +29,17 @@ MOTOR_MIN_START = config.get("motor_min_start", 0.3)
 MOTOR_MAX_START = config.get("motor_max_start", 0.5)
 MOTOR_MAX_CHANGE_TICK = config.get("motor_max_change_tick", 0.2)
 SERVO_MAX_CHANGE_TICK = config.get("servo_max_change_tick", 90)
+SV1_MAX_CHANGE_TICK = config.get("sv1_max_change_tick", 90)
+SV2_MAX_CHANGE_TICK = config.get("sv2_max_change_tick", 90)
 SV1_ADJUST = config.get("sv1_adjust", 0)
 SV2_ADJUST = config.get("sv2_adjust", 0)
 SV3_ADJUST = config.get("sv3_adjust", 0)
 SV4_ADJUST = config.get("sv4_adjust", 0)
 MOTOR_A_SCALE = config.get("motor_a_scale", 1.0)
 MOTOR_B_SCALE = config.get("motor_b_scale", -1.0)
+BATTERY_WARN_VOLTAGE = config.get("battery_warn_voltage", 10.5)
+BATTERY_CRITICAL_VOLTAGE = config.get("battery_critical_voltage", 9.9)
+CURRENT_SMOOTHING = config.get("current_smoothing", 0.5)
 
 class Requests:
     a: float = 0.0
@@ -78,18 +83,18 @@ def soft_servo_control(servo, requested):
         requested = clamp(10, 170, requested)
         requested = clamp(0, 180, requested + SV1_ADJUST)
         delta = requested - controls.sv1.angle
-        if abs(delta) > SERVO_MAX_CHANGE_TICK:
+        if abs(delta) > SV1_MAX_CHANGE_TICK:
             sign = delta / abs(delta)
-            controls.sv1.angle += sign * SERVO_MAX_CHANGE_TICK
+            controls.sv1.angle += sign * SV1_MAX_CHANGE_TICK
         else:
             controls.sv1.angle = requested
     elif servo == controls.sv2:
         requested = clamp(10, 170, requested)
         requested = clamp(0, 180, requested + SV2_ADJUST)
         delta = requested - controls.sv2.angle
-        if abs(delta) > SERVO_MAX_CHANGE_TICK:
+        if abs(delta) > SV2_MAX_CHANGE_TICK:
             sign = delta / abs(delta)
-            controls.sv2.angle += sign * SERVO_MAX_CHANGE_TICK
+            controls.sv2.angle += sign * SV2_MAX_CHANGE_TICK
         else:
             controls.sv2.angle = requested
 
@@ -281,6 +286,15 @@ def cmd_clear_config(params):
     config = get_config()
     print(json.dumps(config))
 
+def cmd_clear_fault(params):
+    print("# clearing fault")
+    controls.sleep_m.value = False
+    controls.sleep_j.value = False
+    time.sleep(0.1)
+    controls.sleep_m.value = True
+    controls.sleep_j.value = True
+    print("# cleared fault")
+
 def do_error(params):
     print(f"ERR {params}")
 
@@ -305,6 +319,8 @@ hum = 0.0
 mcu = 0.0
 ia = 0.0
 ib = 0.0
+battery_warn = False
+battery_critical = False
 
 try:
     controls.sleep_m.value = True
@@ -358,6 +374,8 @@ try:
                 cmd_set_config(tail)
             elif cmd == "CLEAR_CONFIG":
                 cmd_clear_config(tail)
+            elif cmd == "CLEAR_FAULT":
+                cmd_clear_fault(tail)
             elif cmd == "PING":
                 print("PONG")
             elif cmd == "REPL":
@@ -369,14 +387,25 @@ try:
             else:
                 do_error("Unknown command")
 
-        # print(f"# req a = {requests.a}, current a = {controls.motor_a.throttle}")
-        # print(f"# req b = {requests.b}, current b = {controls.motor_b.throttle}")
-        soft_motor_control(controls.motor_a, requests.a)
-        soft_motor_control(controls.motor_b, requests.b)
-        # print(f"# req sv1 = {requests.sv1}, current sv1 = {controls.sv1.angle}")
-        # print(f"# req sv2 = {requests.sv2}, current sv2 = {controls.sv2.angle}")
-        soft_servo_control(controls.sv1, requests.sv1)
-        soft_servo_control(controls.sv2, requests.sv2)
+        bat = controls.sensor_battery.voltage * 4
+        if config.get("battery_protection", True) and bat < BATTERY_CRITICAL_VOLTAGE:
+            if not battery_critical:
+                print("# Low battery")
+                cmd_stop("")
+                battery_critical = True
+        else:
+            # print(f"# req a = {requests.a}, current a = {controls.motor_a.throttle}")
+            # print(f"# req b = {requests.b}, current b = {controls.motor_b.throttle}")
+            soft_motor_control(controls.motor_a, requests.a)
+            soft_motor_control(controls.motor_b, requests.b)
+            # print(f"# req sv1 = {requests.sv1}, current sv1 = {controls.sv1.angle}")
+            # print(f"# req sv2 = {requests.sv2}, current sv2 = {controls.sv2.angle}")
+            soft_servo_control(controls.sv1, requests.sv1)
+            soft_servo_control(controls.sv2, requests.sv2)
+        if config.get("battery_protection", True) and bat < BATTERY_WARN_VOLTAGE:
+            if not battery_warn:
+                print("# Battery warning")
+                battery_warn = True
 
         controls.led.value = not controls.led.value
         for i in range(len(controls.pixels)):
@@ -396,10 +425,11 @@ try:
             traceback.print_exception(e)
             acc = (-1.0, -1.0, -1.0)
             gyro = (-1.0, -1.0, -1.0)
-        bat = controls.sensor_battery.voltage * 4
         depth = controls.sensor_depth.value / 65535.0
-        ia = controls.sensor_ipropi_a.voltage / 330.0 * 1100
-        ib = controls.sensor_ipropi_b.voltage / 330.0 * 1100
+        ia_inst = controls.sensor_ipropi_a.voltage / 330.0 * 1100
+        ib_inst = controls.sensor_ipropi_b.voltage / 330.0 * 1100
+        ia = (1 - CURRENT_SMOOTHING) * ia + CURRENT_SMOOTHING * ia_inst
+        ib = (1 - CURRENT_SMOOTHING) * ib + CURRENT_SMOOTHING * ib_inst
         mcu = microcontroller.cpu.temperature
         if config.get("sens_interval", 0) > 0 and tick_number % config.get("sens_interval", 0) == 0:
             temp = controls.aht.temperature

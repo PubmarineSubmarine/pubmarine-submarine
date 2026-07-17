@@ -19,10 +19,10 @@ from config import get_config
 
 
 # Main motors
-_a1 = pwmio.PWMOut(pins.A1, frequency=440)
-_a2 = pwmio.PWMOut(pins.A2, frequency=440)
-_b1 = pwmio.PWMOut(pins.B1, frequency=440)
-_b2 = pwmio.PWMOut(pins.B2, frequency=440)
+_a1 = pwmio.PWMOut(pins.A1, frequency=10000)
+_a2 = pwmio.PWMOut(pins.A2, frequency=10000)
+_b1 = pwmio.PWMOut(pins.B1, frequency=10000)
+_b2 = pwmio.PWMOut(pins.B2, frequency=10000)
 motor_a = motor.DCMotor(_a1, _a2)
 motor_b = motor.DCMotor(_b1, _b2)
 motor_a.decay_mode = motor.FAST_DECAY
