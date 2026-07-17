@@ -16,6 +16,10 @@ DEFAULT_CONFIG = {
     "reload_on_success": False,
     "reload_on_error": True,
     "jet_mapping": "ABCDEFGH",
+    "battery_protection": True,
+    "battery_warn_voltage": 10.5,
+    "battery_critical_voltage": 9.9,
+    "current_smoothing": 0.5,
 }
 
 

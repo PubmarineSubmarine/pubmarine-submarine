@@ -122,7 +122,7 @@ class StateCmd(Command):
             acc=(0, 2.1, 0),
             gyro=(-4.5, 0.1, 3.2),
             depth=0.5,
-            bat=3.5,
+            bat=10.2,
         )
 
 

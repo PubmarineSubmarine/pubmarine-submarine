@@ -1,0 +1,7 @@
+[Unit]
+Wants=network.target
+[Service]
+WorkingDirectory=/home/michael/pubmarine-submarine/web
+ExecStart=/home/michael/.local/bin/uv run app/main.py
+[Install]
+WantedBy=multi-user.target

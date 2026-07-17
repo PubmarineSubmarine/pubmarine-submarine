@@ -18,8 +18,8 @@ const COLOR_MAP = {
 // model axes below; yaw goes to the grid (it would just spin the sub
 // about its own axis otherwise). Tune MODEL_ROLL_AXIS / MODEL_PITCH_AXIS
 // if the OBJ is authored differently.
-const MODEL_ROLL_AXIS = new THREE.Vector3(0, 0, 1);
-const MODEL_PITCH_AXIS = new THREE.Vector3(1, 0, 0);
+const MODEL_ROLL_AXIS = new THREE.Vector3(0, 0, -1);
+const MODEL_PITCH_AXIS = new THREE.Vector3(-1, 0, 0);
 
 function chassisOriToModel(qw, qx, qy, qz) {
   const q = new THREE.Quaternion(qx, qy, qz, qw);

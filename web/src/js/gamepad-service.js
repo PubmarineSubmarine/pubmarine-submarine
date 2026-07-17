@@ -54,6 +54,7 @@ let lastGamepadJSON = "";
 let heartbeatInterval = null;
 
 let lastStickSent = null;
+let unsubConfigFetch = null;
 let lastLeftStickActive = false;
 let lastRightStickActive = false;
 let lastLeftTriggerActive = false;
@@ -328,11 +329,21 @@ function init() {
     }
   });
   checkForGamepads();
+
+  unsubConfigFetch = wsConnected.subscribe((connected) => {
+    if (connected) {
+      wsSend({ type: "console_command", text: "GET_CONFIG" });
+    }
+  });
 }
 
 function destroy() {
   stop();
   wsDisconnect();
+  if (unsubConfigFetch) {
+    unsubConfigFetch();
+    unsubConfigFetch = null;
+  }
 }
 
 function bindEvents() {
@@ -360,6 +371,8 @@ function bindEvents() {
 function sendConsoleCommand(text) {
   wsSend({ type: "console_command", text });
 }
+
+export { sendConsoleCommand };
 
 const gamepadService = {
   init,
