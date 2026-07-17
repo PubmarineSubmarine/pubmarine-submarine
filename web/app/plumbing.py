@@ -204,22 +204,22 @@ class Plumbing:
                 pass
             case 4:  # Left Bumper
                 # roll CCW
-                await self.serial.write_cmd(MotionCmd(fu=1, fr=0, fd=1, fl=0, ru=1, rr=0, rd=1, rl=0))
+                await self.serial.write_cmd(MotionCmd(fu=1, fd=0, fl=1, fr=0, ru=1, rd=0, rl=1, rr=0))
             case 5:  # Right Bumper
                 # roll CW
-                await self.serial.write_cmd(MotionCmd(fu=0, fr=1, fd=0, fl=1, ru=0, rr=1, rd=0, rl=1))
+                await self.serial.write_cmd(MotionCmd(fu=0, fd=1, fl=0, fr=1, ru=0, rd=1, rl=0, rr=1))
             case 12:  # D-Pad Up
                 # pitch up
-                await self.serial.write_cmd(MotionCmd(fu=1, fr=1, fd=0, fl=0, ru=0, rr=0, rd=1, rl=1))
+                await self.serial.write_cmd(MotionCmd(fu=0, fd=1, fl=0, fr=1, ru=0, rd=1, rl=0, rr=1))
             case 13:  # D-Pad Down
                 # pitch down
-                await self.serial.write_cmd(MotionCmd(fu=0, fr=0, fd=1, fl=1, ru=1, rr=1, rd=0, rl=0))
+                await self.serial.write_cmd(MotionCmd(fu=0, fd=1, fl=0, fr=1, ru=0, rd=1, rl=0, rr=1))
             case 14:  # D-Pad Left
                 # yaw left
-                await self.serial.write_cmd(MotionCmd(fu=1, fr=0, fd=0, fl=1, ru=0, rr=1, rd=1, rl=0))
+                await self.serial.write_cmd(MotionCmd(fu=0, fd=1, fl=0, fr=1, ru=0, rd=1, rl=0, rr=1))
             case 15:  # D-Pad Right
                 # yaw right
-                await self.serial.write_cmd(MotionCmd(fu=0, fr=1, fd=1, fl=0, ru=1, rr=0, rd=0, rl=1))
+                await self.serial.write_cmd(MotionCmd(fu=0, fd=1, fl=0, fr=1, ru=0, rd=1, rl=0, rr=1))
             case 8:  # back / select
                 await reset_pico()
                 # await self.serial.write_cmd(ResetCmd(flags=["SOFT"]))

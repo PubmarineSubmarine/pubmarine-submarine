@@ -15,13 +15,14 @@ import i2cdisplaybus
 import adafruit_displayio_ssd1306
 
 from adafruit_motor import motor, servo
+from config import get_config
 
 
 # Main motors
-_a1 = pwmio.PWMOut(pins.A1, frequency=440)
-_a2 = pwmio.PWMOut(pins.A2, frequency=440)
-_b1 = pwmio.PWMOut(pins.B1, frequency=440)
-_b2 = pwmio.PWMOut(pins.B2, frequency=440)
+_a1 = pwmio.PWMOut(pins.A1, frequency=10000)
+_a2 = pwmio.PWMOut(pins.A2, frequency=10000)
+_b1 = pwmio.PWMOut(pins.B1, frequency=10000)
+_b2 = pwmio.PWMOut(pins.B2, frequency=10000)
 motor_a = motor.DCMotor(_a1, _a2)
 motor_b = motor.DCMotor(_b1, _b2)
 motor_a.decay_mode = motor.FAST_DECAY
@@ -32,21 +33,24 @@ fault_m = digitalio.DigitalInOut(pins.FAULT_M)
 fault_m.switch_to_input()
 
 # Jets
-jet_fu = digitalio.DigitalInOut(pins.FU)
+_jet_mapping = get_config().get("jet_mapping", "ABCDEFGH")
+_pin_mapping = {"A": pins.FU, "B": pins.FD, "C": pins.FL, "D": pins.FR,
+                "E": pins.RU, "F": pins.RD, "G": pins.RL, "H": pins.RR}
+jet_fu = digitalio.DigitalInOut(_pin_mapping[_jet_mapping[0]])
 jet_fu.switch_to_output()
-jet_fd = digitalio.DigitalInOut(pins.FD)
+jet_fd = digitalio.DigitalInOut(_pin_mapping[_jet_mapping[1]])
 jet_fd.switch_to_output()
-jet_fl = digitalio.DigitalInOut(pins.FL)
+jet_fl = digitalio.DigitalInOut(_pin_mapping[_jet_mapping[2]])
 jet_fl.switch_to_output()
-jet_fr = digitalio.DigitalInOut(pins.FR)
+jet_fr = digitalio.DigitalInOut(_pin_mapping[_jet_mapping[3]])
 jet_fr.switch_to_output()
-jet_ru = digitalio.DigitalInOut(pins.RU)
+jet_ru = digitalio.DigitalInOut(_pin_mapping[_jet_mapping[4]])
 jet_ru.switch_to_output()
-jet_rd = digitalio.DigitalInOut(pins.RD)
+jet_rd = digitalio.DigitalInOut(_pin_mapping[_jet_mapping[5]])
 jet_rd.switch_to_output()
-jet_rl = digitalio.DigitalInOut(pins.RL)
+jet_rl = digitalio.DigitalInOut(_pin_mapping[_jet_mapping[6]])
 jet_rl.switch_to_output()
-jet_rr = digitalio.DigitalInOut(pins.RR)
+jet_rr = digitalio.DigitalInOut(_pin_mapping[_jet_mapping[7]])
 jet_rr.switch_to_output()
 sleep_j = digitalio.DigitalInOut(pins.SLEEP_J)
 sleep_j.switch_to_output()

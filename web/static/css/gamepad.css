@@ -786,6 +786,79 @@
     color: #495057;
 }
 
+/* Alert Banner - Top Center */
+.alert-banner-container {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    pointer-events: none;
+}
+
+.alert-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: center;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    animation: alertSlideIn 0.3s ease-out;
+    white-space: nowrap;
+}
+
+.alert-banner-message {
+    flex: 1;
+}
+
+.alert-banner-btn {
+    pointer-events: auto;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+
+.alert-banner-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.alert-banner--warn {
+    background: rgba(255, 165, 0, 0.85);
+    color: #fff;
+    border: 1px solid rgba(255, 140, 0, 0.5);
+}
+
+.alert-banner--critical {
+    background: rgba(220, 53, 69, 0.85);
+    color: #fff;
+    border: 1px solid rgba(200, 35, 51, 0.5);
+}
+
+@keyframes alertSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .gamepad-status {

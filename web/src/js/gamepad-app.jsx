@@ -15,6 +15,7 @@ import gamepadService, {
 } from "./gamepad-service.js";
 
 import { TelemetryReadout } from "./components/telemetry.jsx";
+import { AlertBanner } from "./components/alert-banner.jsx";
 import { ConsolePanel } from "./components/console-panel.jsx";
 
 function StickDisplay({ stick }) {
@@ -167,6 +168,7 @@ function App() {
 
             {/* Gamepad Overlay */}
             <div class="gamepad-overlay">
+              <AlertBanner />
               <TelemetryReadout />
               <Submarine3DContainer />
               <ArtificialHorizonCanvas />
