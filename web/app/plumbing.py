@@ -30,6 +30,9 @@ class Plumbing:
         self.serial.callback = self.handle_circuitpy_msg
         self.throttle = 0.0
         self.steer = 0.0
+        self.pitch = 0.0
+        self.roll = 0.0
+        self.roll_compensation = 0
         self.lights = False
         self.orient_mode = False
         # Power limit applied to the main thrusters in update_motors().
@@ -146,16 +149,18 @@ class Plumbing:
 
     async def stick_moved(self, stick: str, x: float, y: float):
         if stick == "right":
+            self.pitch = y
+            self.roll = x
             # sv1 = int(90 + 45*y)
             # sv2 = int(90 - 45*y)
             # await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
-            sv1 = int(90 + 20 * y)
-            sv2 = int(90 - 20 * y)
-            await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
+            # sv1 = int(90 + 25 * y)
+            # sv2 = int(90 - 25 * y)
+            # await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
         elif stick == "left":
             self.steer = x
             self.throttle = -y
-            await self.update_motors()
+        await self.update_motors()
 
     async def trigger_moved(self, trigger: str, value: float):
         # if trigger == "left":
@@ -165,17 +170,20 @@ class Plumbing:
         #     self.throttle = value
         #     await self.update_motors()
         if trigger == "left":
-            sv1 = int(90 + 15 * value)
-            sv2 = int(90 - 15 * value)
-            await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
+            self.pitch = value
+            # sv1 = int(90 + 25 * value)
+            # sv2 = int(90 - 25 * value)
         elif trigger == "right":
-            sv1 = int(90 - 15 * value)
-            sv2 = int(90 + 15 * value)
-            await self.serial.write_cmd(MotionCmd(sv1=sv1, sv2=sv2))
+            self.pitch = -value
+            # sv1 = int(90 - 25 * value)
+            # sv2 = int(90 + 25 * value)
+        await self.update_motors()
 
     async def update_motors(self):
         a_steer = self.steer
         b_steer = -self.steer
+        sv1_pitch = self.pitch + self.roll
+        sv2_pitch = -self.pitch + self.roll
         if abs(self.steer) + abs(self.throttle) > 0:
             rel_steer = abs(self.steer) / (abs(self.steer) + abs(self.throttle))
             rel_throttle = abs(self.throttle) / (abs(self.steer) + abs(self.throttle))
@@ -188,7 +196,7 @@ class Plumbing:
         a *= limit
         b *= limit
         print(f"{self.steer=} {self.throttle=} {rel_steer=} {rel_throttle=} {a=} {b=}")
-        await self.serial.write_cmd(MotionCmd(a=a, b=b))
+        await self.serial.write_cmd(MotionCmd(a=a, b=b, sv1=int(90 + 25 * sv1_pitch + self.roll_compensation * self.steer), sv2=int(90 + 25 * sv2_pitch + self.roll_compensation * self.steer)))
 
     async def button_pressed(self, index, value):
         match index:
