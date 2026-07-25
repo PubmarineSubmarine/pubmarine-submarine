@@ -16,6 +16,8 @@ export const TELEMETRY_FIELDS = [
   ["fj", "FJ"],
   ["td", "TD"],
   ["br", "BR"],
+  ["a", "A"],
+  ["b", "B"],
 ];
 
 export function TelemetryReadout() {

@@ -19,10 +19,12 @@ logger = logging.getLogger(__name__)
 
 
 class Plumbing:
-    def __init__(self):
+    def __init__(self, *, serial=None):
         self.connections: list[WebSocket] = []
         port = environ.get("SERIAL_PORT")
-        if port == "DEBUG":
+        if serial:
+            self.serial = serial
+        elif port == "DEBUG":
             self.serial = DebugSerialClient()
         else:
             self.serial = SerialClient(port=port)
