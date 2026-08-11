@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "watch": "node esbuild.config.mjs --watch"
+  },
+  "dependencies": {
+    "@preact/signals": "^1.2.0",
+    "@types/three": "^0.184.1",
+    "preact": "^10.29.0",
+    "three": "^0.184.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

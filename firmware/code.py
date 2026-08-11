@@ -28,16 +28,24 @@ MOTOR_MIN = config.get("motor_min", 0.2)
 MOTOR_MIN_START = config.get("motor_min_start", 0.3)
 MOTOR_MAX_START = config.get("motor_max_start", 0.5)
 MOTOR_MAX_CHANGE_TICK = config.get("motor_max_change_tick", 0.2)
+SERVO_MAX_CHANGE_TICK = config.get("servo_max_change_tick", 90)
+SV1_MAX_CHANGE_TICK = config.get("sv1_max_change_tick", 90)
+SV2_MAX_CHANGE_TICK = config.get("sv2_max_change_tick", 90)
 SV1_ADJUST = config.get("sv1_adjust", 0)
 SV2_ADJUST = config.get("sv2_adjust", 0)
 SV3_ADJUST = config.get("sv3_adjust", 0)
 SV4_ADJUST = config.get("sv4_adjust", 0)
 MOTOR_A_SCALE = config.get("motor_a_scale", 1.0)
 MOTOR_B_SCALE = config.get("motor_b_scale", -1.0)
+BATTERY_WARN_VOLTAGE = config.get("battery_warn_voltage", 10.5)
+BATTERY_CRITICAL_VOLTAGE = config.get("battery_critical_voltage", 9.9)
+CURRENT_SMOOTHING = config.get("current_smoothing", 0.5)
 
 class Requests:
     a: float = 0.0
     b: float = 0.0
+    sv1: float = 90.0
+    sv2: float = 90.0
 
 requests = Requests()
 
@@ -71,11 +79,24 @@ def soft_motor_control(motor, requested):
                 motor.throttle = requested
 
 def soft_servo_control(servo, requested):
-    requested = clamp(10, 170, requested)
     if servo == controls.sv1:
-        controls.sv1.angle = clamp(0, 180, requested + SV1_ADJUST)
+        requested = clamp(10, 170, requested)
+        requested = clamp(0, 180, requested + SV1_ADJUST)
+        delta = requested - controls.sv1.angle
+        if abs(delta) > SV1_MAX_CHANGE_TICK:
+            sign = delta / abs(delta)
+            controls.sv1.angle += sign * SV1_MAX_CHANGE_TICK
+        else:
+            controls.sv1.angle = requested
     elif servo == controls.sv2:
-        controls.sv2.angle = clamp(0, 180, requested + SV2_ADJUST)
+        requested = clamp(10, 170, requested)
+        requested = clamp(0, 180, requested + SV2_ADJUST)
+        delta = requested - controls.sv2.angle
+        if abs(delta) > SV2_MAX_CHANGE_TICK:
+            sign = delta / abs(delta)
+            controls.sv2.angle += sign * SV2_MAX_CHANGE_TICK
+        else:
+            controls.sv2.angle = requested
 
 def cmd_mot(params):
     commands = params.split(" ")
@@ -109,6 +130,10 @@ def cmd_mot(params):
             if value < 0 or value > 180:
                 do_error("Range")
                 continue
+            if channel == "SV1":
+                requests.sv1 = value
+            elif channel == "SV2":
+                requests.sv2 = value
         if channel == "A":
             # controls.motor_a.throttle = value
             requests.a = value
@@ -132,9 +157,11 @@ def cmd_mot(params):
         elif channel == "RR":
             controls.jet_rr.value = bool(value)
         elif channel == "SV1":
-            soft_servo_control(controls.sv1, value)
+            # soft_servo_control(controls.sv1, value)
+            pass
         elif channel == "SV2":
-            soft_servo_control(controls.sv2, value)
+            # soft_servo_control(controls.sv2, value)
+            pass
         elif channel == "SV3":
             controls.sv3.angle = value
         elif channel == "SV4":
@@ -161,6 +188,8 @@ def cmd_stop(params):
     controls.motor_b.throttle = 0
     requests.a = 0
     requests.b = 0
+    requests.sv1 = 90
+    requests.sv2 = 90
     controls.jet_fu.value = False
     controls.jet_fd.value = False
     controls.jet_fl.value = False
@@ -175,48 +204,67 @@ def cmd_stop(params):
 
 
 def cmd_test(params):
-    INTERVAL = 1.0
+    INTERVAL = 1.5
     cmd_stop("")
-    controls.motor_a.throttle = 1
-    controls.sv1.angle = 45
-    controls.lights.value = True
+    display.label.text = "TEST FU"
+    print("# TEST FU")
+    controls.display.refresh()
+    controls.jet_fu.value = True
     time.sleep(INTERVAL)
-    controls.motor_a.throttle = 0
-    controls.sv1.angle = 90
-    controls.motor_b.throttle = 1
-    controls.sv2.angle = 45
-    controls.lights.value = False
+    microcontroller.watchdog.feed()
+    display.label.text = "TEST FD"
+    print("# TEST FD")
+    controls.display.refresh()
+    controls.jet_fu.value = False
+    controls.jet_fd.value = True
     time.sleep(INTERVAL)
-    controls.sv2.angle = 90
-    controls.motor_b.throttle = 0
-    controls.motor_a.throttle = -1
+    microcontroller.watchdog.feed()
+    display.label.text = "TEST FL"
+    print("# TEST FL")
+    controls.display.refresh()
+    controls.jet_fd.value = False
+    controls.jet_fl.value = True
     time.sleep(INTERVAL)
-    controls.motor_a.throttle = 0
-    controls.motor_b.throttle = -1
+    microcontroller.watchdog.feed()
+    display.label.text = "TEST FR"
+    print("# TEST FR")
+    controls.display.refresh()
+    controls.jet_fl.value = False
+    controls.jet_fr.value = True
     time.sleep(INTERVAL)
-    # controls.jet_fu.value = True
-    # time.sleep(INTERVAL)
-    # controls.jet_fu.value = False
-    # controls.jet_fd.value = True
-    # time.sleep(INTERVAL)
-    # controls.jet_fd.value = False
-    # controls.jet_fl.value = True
-    # time.sleep(INTERVAL)
-    # controls.jet_fl.value = False
-    # controls.jet_fr.value = True
-    # time.sleep(INTERVAL)
-    # controls.jet_fr.value = False
-    # controls.jet_ru.value = True
-    # time.sleep(INTERVAL)
-    # controls.jet_ru.value = False
-    # controls.jet_rd.value = True
-    # time.sleep(INTERVAL)
-    # controls.jet_rd.value = False
-    # controls.jet_rl.value = True
-    # time.sleep(INTERVAL)
-    # controls.jet_rl.value = False
-    # controls.jet_rr.value = True
-    # time.sleep(INTERVAL)
+    microcontroller.watchdog.feed()
+    display.label.text = "TEST RU"
+    print("# TEST RU")
+    controls.display.refresh()
+    controls.jet_fr.value = False
+    controls.jet_ru.value = True
+    time.sleep(INTERVAL)
+    microcontroller.watchdog.feed()
+    display.label.text = "TEST RD"
+    print("# TEST RD")
+    controls.display.refresh()
+    controls.jet_ru.value = False
+    controls.jet_rd.value = True
+    time.sleep(INTERVAL)
+    microcontroller.watchdog.feed()
+    display.label.text = "TEST RL"
+    print("# TEST RL")
+    controls.display.refresh()
+    controls.jet_rd.value = False
+    controls.jet_rl.value = True
+    time.sleep(INTERVAL)
+    microcontroller.watchdog.feed()
+    display.label.text = "TEST RR"
+    print("# TEST RR")
+    controls.display.refresh()
+    controls.jet_rl.value = False
+    controls.jet_rr.value = True
+    time.sleep(INTERVAL)
+    microcontroller.watchdog.feed()
+    controls.jet_rr.value = False
+    display.label.text = "test done"
+    print("# TEST DONE")
+    controls.display.refresh()
     cmd_stop("")
 
 
@@ -237,6 +285,15 @@ def cmd_clear_config(params):
     clear_config()
     config = get_config()
     print(json.dumps(config))
+
+def cmd_clear_fault(params):
+    print("# clearing fault")
+    controls.sleep_m.value = False
+    controls.sleep_j.value = False
+    time.sleep(0.1)
+    controls.sleep_m.value = True
+    controls.sleep_j.value = True
+    print("# cleared fault")
 
 def do_error(params):
     print(f"ERR {params}")
@@ -262,6 +319,8 @@ hum = 0.0
 mcu = 0.0
 ia = 0.0
 ib = 0.0
+battery_warn = False
+battery_critical = False
 
 try:
     controls.sleep_m.value = True
@@ -315,6 +374,8 @@ try:
                 cmd_set_config(tail)
             elif cmd == "CLEAR_CONFIG":
                 cmd_clear_config(tail)
+            elif cmd == "CLEAR_FAULT":
+                cmd_clear_fault(tail)
             elif cmd == "PING":
                 print("PONG")
             elif cmd == "REPL":
@@ -326,10 +387,25 @@ try:
             else:
                 do_error("Unknown command")
 
-        # print(f"# req a = {requests.a}, current a = {controls.motor_a.throttle}")
-        # print(f"# req b = {requests.b}, current b = {controls.motor_b.throttle}")
-        soft_motor_control(controls.motor_a, requests.a)
-        soft_motor_control(controls.motor_b, requests.b)
+        bat = controls.sensor_battery.voltage * 4
+        if config.get("battery_protection", True) and bat < BATTERY_CRITICAL_VOLTAGE:
+            if not battery_critical:
+                print("# Low battery")
+                cmd_stop("")
+                battery_critical = True
+        else:
+            # print(f"# req a = {requests.a}, current a = {controls.motor_a.throttle}")
+            # print(f"# req b = {requests.b}, current b = {controls.motor_b.throttle}")
+            soft_motor_control(controls.motor_a, requests.a)
+            soft_motor_control(controls.motor_b, requests.b)
+            # print(f"# req sv1 = {requests.sv1}, current sv1 = {controls.sv1.angle}")
+            # print(f"# req sv2 = {requests.sv2}, current sv2 = {controls.sv2.angle}")
+            soft_servo_control(controls.sv1, requests.sv1)
+            soft_servo_control(controls.sv2, requests.sv2)
+        if config.get("battery_protection", True) and bat < BATTERY_WARN_VOLTAGE:
+            if not battery_warn:
+                print("# Battery warning")
+                battery_warn = True
 
         controls.led.value = not controls.led.value
         for i in range(len(controls.pixels)):
@@ -349,10 +425,11 @@ try:
             traceback.print_exception(e)
             acc = (-1.0, -1.0, -1.0)
             gyro = (-1.0, -1.0, -1.0)
-        bat = controls.sensor_battery.voltage * 4
         depth = controls.sensor_depth.value / 65535.0
-        ia = controls.sensor_ipropi_a.voltage / 330.0 * 1100
-        ib = controls.sensor_ipropi_b.voltage / 330.0 * 1100
+        ia_inst = controls.sensor_ipropi_a.voltage / 330.0 * 1100
+        ib_inst = controls.sensor_ipropi_b.voltage / 330.0 * 1100
+        ia = (1 - CURRENT_SMOOTHING) * ia + CURRENT_SMOOTHING * ia_inst
+        ib = (1 - CURRENT_SMOOTHING) * ib + CURRENT_SMOOTHING * ib_inst
         mcu = microcontroller.cpu.temperature
         if config.get("sens_interval", 0) > 0 and tick_number % config.get("sens_interval", 0) == 0:
             temp = controls.aht.temperature

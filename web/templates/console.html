@@ -1,0 +1,9 @@
+{% extends "base.html" %} {% block title %}Console{% endblock %} {% block content %}
+<div id="app"></div>
+
+<!-- Console Preact bundle -->
+<script
+    type="module"
+    src="{{ url_for('static', path='/js/console.bundle.js') }}"
+></script>
+{% endblock %}

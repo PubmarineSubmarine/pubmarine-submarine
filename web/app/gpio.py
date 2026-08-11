@@ -1,11 +1,12 @@
-from asyncio import sleep
 import logging
+from asyncio import sleep
+
 logger = logging.getLogger(__name__)
 
 
 try:
     import RPi.GPIO as GPIO
-except RuntimeError:
+except (RuntimeError, ModuleNotFoundError):
     GPIO = None
     logger.warning("GPIO unavailable")
 
